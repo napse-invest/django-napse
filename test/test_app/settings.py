@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # django-napse
     "django_napse",
-    "django_napse.napse_core",
-    "django_napse.napse_simulations",
+    "django_napse.core",
+    "django_napse.simulations",
 ]
 
 MIDDLEWARE = [
