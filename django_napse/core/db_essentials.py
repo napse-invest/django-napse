@@ -9,7 +9,7 @@ from django.dispatch import receiver
 
 @receiver(post_migrate)
 def create_exchanges(sender, **kwargs):
-    Exchange = apps.get_model("napse_core", "Exchange")
+    Exchange = apps.get_model("django_napse_core", "Exchange")
     exchange_configs = settings.NAPSE_EXCHANGE_CONFIGS
     created_exchanges = []
     for exchange_name, exchange_config in exchange_configs.items():
@@ -22,10 +22,10 @@ def create_exchanges(sender, **kwargs):
 
 @receiver(post_migrate)
 def create_accounts(sender, **kwargs):
-    from django_napse.napse_core.models.account.exchange import EXCHANGE_ACCOUNT_DICT
+    from django_napse.core.models.account.exchange import EXCHANGE_ACCOUNT_DICT
 
-    Exchange = apps.get_model("napse_core", "Exchange")
-    NapseAccount = apps.get_model("napse_core", "NapseAccount")
+    Exchange = apps.get_model("django_napse_core", "Exchange")
+    NapseAccount = apps.get_model("django_napse_core", "NapseAccount")
     with open(settings.NAPSE_SECRETS_FILE_PATH, "r") as json_file:
         secrets = json.load(json_file)
     created_accounts = []
