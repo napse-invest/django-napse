@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    #  django-napse
+    # django-napse
     "django_napse",
     "django_napse.core",
     "django_napse.simulations",
