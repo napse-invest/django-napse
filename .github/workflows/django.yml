@@ -22,12 +22,8 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        echo "core requirements"
-        pip install -r requirements/core.txt
-        echo "developpement requirements"
-        pip install -r requirements/developpement.txt
-        echo "simulation requirements"
-        pip install -r requirements/simulation.txt
+        pip-compile ./requirements/developpement.txt --output-file ./full-requirements.txt --resolver=backtracking
+        pip install -r ./full-requirements.txt
     - name: Run Tests
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
