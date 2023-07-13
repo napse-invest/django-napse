@@ -36,3 +36,8 @@ jobs:
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
         python ./test/test_app/manage.py test --parallel
+    
+    - uses: LouisBrunner/checks-action@v1.6.1
+      if: always()
+      with:
+        name: Django Build
