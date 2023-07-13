@@ -1,0 +1,5 @@
+-r core.txt
+-r simulations.txt
+
+tblib==2.0.0 # https://pypi.org/project/tblib/
+coverage==7.2.7  # https://github.com/nedbat/coveragepy
