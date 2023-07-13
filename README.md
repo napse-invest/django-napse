@@ -14,3 +14,7 @@ Not implemented yet.
 ```python test/test_app/manage.py makemigrations``` \
 ```python test/test_app/manage.py migrate``` \
 ```python test/test_app/manage.py runserver```
+
+#### Run coverage tests
+
+```coverage run test/test_app/manage.py test -v2 --keepdb && coverage html && open ~/<path_to_project>/django-napse/htmlcov/index.html```
