@@ -25,4 +25,5 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
+        export PYTHONPATH="$PYTHONPATH:./django-napse/"
         python ./test/test_app/manage.py test
