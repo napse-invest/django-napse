@@ -178,7 +178,7 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
         wallet = self.simple_create()
         self.assertEqual(wallet.space, self.owner)
 
-    @skipIf(napse_settings.IS_IN_PIPELINE)
+    @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_value_market_BTC(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
@@ -186,7 +186,7 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
             Currency.objects.create(wallet=wallet, ticker="BTC", amount=1, mbp=20000)
             self.assertTrue(wallet.value_market() > 0)
 
-    @skipIf(napse_settings.IS_IN_PIPELINE)
+    @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_value_market_USDT(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
@@ -194,7 +194,7 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
             Currency.objects.create(wallet=wallet, ticker="USDT", amount=1, mbp=1)
             self.assertEqual(wallet.value_market(), 1)
 
-    @skipIf(napse_settings.IS_IN_PIPELINE)
+    @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_value_zero(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
