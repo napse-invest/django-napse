@@ -11,10 +11,12 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 
 from pathlib import Path
 
+import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent
-
-
+env = environ.Env()
+env.read_env(str(BASE_DIR / ".env"))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
@@ -22,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent
 SECRET_KEY = "django-insecure-secret"  # noqa: S105
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["localhost"]
 
 
 # Application definition
@@ -36,8 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # django-napse
-    "django_napse",
+    # Napse
     "django_napse.core",
     "django_napse.simulations",
 ]
@@ -127,14 +128,11 @@ STATIC_URL = "/static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Custom settings
+# Napse settings
 
 NAPSE_EXCHANGE_CONFIGS = {
     "BINANCE": {
         "description": "Binance exchange. More info: https://www.binance.com/en",
-    },
-    "dYdX": {
-        "description": "dYdX exchange. More info: https://dydx.exchange",
     },
 }
 

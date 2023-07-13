@@ -1,0 +1,2 @@
+class OrderProcessor:
+    pass
