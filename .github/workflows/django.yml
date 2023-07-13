@@ -1,7 +1,7 @@
 name: Django CI
 
 on:
-  push:
+  pull_request:
     branches: [ "main", "dev" ]
 
 jobs:
@@ -25,4 +25,5 @@ jobs:
         pip install -r requirements.txt
     - name: Run Tests
       run: |
-        python manage.py test
+        export PYTHONPATH="$PYTHONPATH:./django-napse/"
+        python ./test/test_app/manage.py test
