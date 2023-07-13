@@ -12,7 +12,7 @@ printf "\n===============================================\nVirtual python enviro
 source .venv/bin/activate
 printf "Virtual python environment has been acivated.\n"
 
-pip-compile ./requirements/developpement.txt --output-file ./full-requirements.txt --resolver=backtracking
+pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
 pip install -r ./full-requirements.txt
 deactivate
 pip uninstall pip-tools -y
