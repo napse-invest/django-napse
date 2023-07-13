@@ -1,2 +1,0 @@
-print("mdr")
-print("lol")
