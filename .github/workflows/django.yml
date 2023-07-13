@@ -23,7 +23,9 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install pip-tools
+        pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
+        pip install -r ./full-requirements.txt
 
     - name: Lint with ruff
       run: |
@@ -32,9 +34,6 @@ jobs:
         ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
       continue-on-error: true
 
-        pip install pip-tools
-        pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
-        pip install -r ./full-requirements.txt
     - name: Run Tests
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
