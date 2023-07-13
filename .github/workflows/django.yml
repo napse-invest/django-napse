@@ -40,4 +40,5 @@ jobs:
     - uses: LouisBrunner/checks-action@v1.6.1
       if: always()
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         name: Django Build
