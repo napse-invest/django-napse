@@ -13,14 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python
+    - name: Set up python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
         # x64 or x86
         architecture: 'x64'
 
-    - name: Install Dependencies
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pip-tools
@@ -34,8 +34,9 @@ jobs:
         ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
       continue-on-error: true
 
-    - name: Run Tests
+    - name: Tests and coverage
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
         export IS_IN_PIPELINE=True
-        python ./test/test_app/manage.py test -v2 --parallel
+        pip install coverage-badge
+        coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
