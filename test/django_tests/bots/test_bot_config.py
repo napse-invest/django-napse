@@ -1,4 +1,5 @@
 from django_napse.core.models import BotConfig, Exchange, ExchangeAccount, NapseSpace
+from django_napse.core.settings import napse_settings
 from django_napse.utils.errors import BotConfigError
 from django_napse.utils.model_test_case import ModelTestCase
 

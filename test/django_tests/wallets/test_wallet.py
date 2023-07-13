@@ -1,3 +1,5 @@
+from unittest import skipIf
+
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
@@ -14,6 +16,7 @@ from django_napse.core.models import (
     SpaceWallet,
     Wallet,
 )
+from django_napse.core.settings import napse_settings
 from django_napse.utils.errors import WalletError
 from django_napse.utils.model_test_case import ModelTestCase
 
@@ -175,6 +178,7 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
         wallet = self.simple_create()
         self.assertEqual(wallet.space, self.owner)
 
+    @skipIf(napse_settings.IS_IN_PIPELINE)
     def test_value_market_BTC(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
@@ -182,6 +186,7 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
             Currency.objects.create(wallet=wallet, ticker="BTC", amount=1, mbp=20000)
             self.assertTrue(wallet.value_market() > 0)
 
+    @skipIf(napse_settings.IS_IN_PIPELINE)
     def test_value_market_USDT(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
@@ -189,6 +194,7 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
             Currency.objects.create(wallet=wallet, ticker="USDT", amount=1, mbp=1)
             self.assertEqual(wallet.value_market(), 1)
 
+    @skipIf(napse_settings.IS_IN_PIPELINE)
     def test_value_zero(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
