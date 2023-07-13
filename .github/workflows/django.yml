@@ -40,3 +40,4 @@ jobs:
         export IS_IN_PIPELINE=True
         pip install coverage-badge
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
+        coverage-badge
