@@ -42,3 +42,4 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         name: Django Build
+        conclusion: ${{ job.status }}
