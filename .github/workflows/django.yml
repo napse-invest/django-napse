@@ -28,4 +28,5 @@ jobs:
     - name: Run Tests
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
-        python ./test/test_app/manage.py test
+        export IS_IN_PIPELINE=True
+        python ./test/test_app/manage.py test -v2 --parallel
