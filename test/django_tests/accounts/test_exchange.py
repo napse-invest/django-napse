@@ -1,8 +1,10 @@
 import json
+from unittest import skipIf
 
 from django.conf import settings
 
 from django_napse.core.models import BinanceAccount, Exchange, ExchangeAccount
+from django_napse.core.settings import napse_settings
 from django_napse.utils.errors import ExchangeAccountError
 from django_napse.utils.model_test_case import ModelTestCase
 
@@ -60,9 +62,11 @@ class ExchangeUtilsTestCase:
         for exchange_account in self.model.objects.all():
             exchange_account.ping()
 
+    @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_enough_accounts(self):
         self.assertTrue(self.model.objects.count() >= 1)
 
+    @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_error_in_ping(self):
         with self.assertRaises(ExchangeAccountError.APIPermissionError):
             self.simple_create().ping()
