@@ -7,7 +7,7 @@ Unless otherwise specified, all commands are to be run at the root folder of the
 ```source setup-unix.sh```
 
 - Windows \
-Not implemented yet.
+```.\setup-windows.ps1```
 
 #### Run a test version of the project
 
