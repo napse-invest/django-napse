@@ -40,6 +40,11 @@ class Wallet(models.Model):
         error_msg = "space() not implemented by default. Please implement in a subclass of Wallet."
         raise NotImplementedError(error_msg)
 
+    @property
+    def exchange_account(self):  # pragma: no cover
+        error_msg = "exchange_account() not implemented by default. Please implement in a subclass of Wallet."
+        raise NotImplementedError(error_msg)
+
     def spend(self, amount: float, ticker: str, recv: int = 3, **kwargs) -> None:
         if not kwargs.get("force", False):
             error_msg = "DANGEROUS: You should not use this method outside of select circumstances. Use Transactions instead."
@@ -162,13 +167,17 @@ class SpaceWallet(Wallet):
     def space(self):
         return self.owner
 
+    @property
+    def exchange_account(self):
+        return self.owner.exchange_account
+
 
 class OrderWallet(Wallet):
     owner = models.OneToOneField("Order", on_delete=models.CASCADE, related_name="wallet")
 
     @property
-    def space(self):
-        return self.owner.space
+    def exchange_account(self):
+        return self.owner.exchange_account
 
 
 class ConnectionWallet(Wallet):
