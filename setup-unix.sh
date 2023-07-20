@@ -1,5 +1,5 @@
 #! /usr/bin/env bash
-sudo add-apt-repository ppa:deadsnakes/ppa
+deactivate
 sudo apt install git-flow
 sudo apt install python3
 sudo apt install python3.11
