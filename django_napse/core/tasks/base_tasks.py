@@ -4,8 +4,7 @@ from django.db import IntegrityError
 from django.db.utils import ProgrammingError
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
-from django_napse.core.celery import celery_app
-from django_napse.core.celery.celery_app import strategy_log_free
+from django_napse.core.celery_app import celery_app, strategy_log_free
 
 
 class BaseTask(celery.Task):

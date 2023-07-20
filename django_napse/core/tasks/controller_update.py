@@ -10,7 +10,9 @@ class ControllerUpdateTask(BaseTask):
 
     def run(self):
         """Run a task to update all controllers."""
+        print("ControllerUpdateTask")
         if not self.avoid_overlap(verbose=True):
+            print("skipped")
             return
         for controller in Controller.objects.all():
             controller._update_variables()
@@ -19,3 +21,5 @@ class ControllerUpdateTask(BaseTask):
 
 ControllerUpdateTask().delete_task()
 ControllerUpdateTask().register_task()
+
+print("ControllerUpdateTask registered")

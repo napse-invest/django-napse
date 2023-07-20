@@ -12,7 +12,9 @@ class OrderProcessExecutorTask(BaseTask):
 
         Process orders from bots to make buy/sell on binance.
         """
+        print("OrderProcessExecutorTask")
         if not self.avoid_overlap(verbose=True):
+            print("skipped")
             return
         processor = OrderProcessor()
         for order in Order.objects.filter(status="pending", completed=True):
