@@ -45,15 +45,5 @@ jobs:
     - name: Github reference
       run: echo "github reference - ${{ github.ref }}"
     
-    - name: Generate JaCoCo Badge
-      # if: ${{ github.ref == 'refs/heads/master' }}
-      uses: cicirello/jacoco-badge-generator@v2
-      with:
-        jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
-        # Uncomment following line if we want badge only on the main branch
-        badges-directory: build/reports/jacoco/test/html/badges
-    - name: Publish coverage report to GitHub Pages
-      # if: ${{ github.ref == 'refs/heads/master' }}
-      uses: JamesIves/github-pages-deploy-action@v4
-      with:
-        folder: build/reports/jacoco/test/html
+    - name: Update Coverage Badge
+      uses: we-cli/coverage-badge-action@main
