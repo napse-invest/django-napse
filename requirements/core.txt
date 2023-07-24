@@ -9,3 +9,4 @@ redis==4.6.0
 python-binance==1.0.17 # https://github.com/sammchardy/python-binance
 shortuuid==1.0.0 # https://github.com/skorokithakis/shortuuid
 
+anybadge==1.14.0 # https://github.com/jongracecox/anybadge
