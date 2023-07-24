@@ -40,11 +40,12 @@ jobs:
         export IS_IN_PIPELINE=True
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
 
-    - name: Github reference
-      run: echo "github reference - ${{ github.ref }}"
-    
-    - name: Create coverage badge
-      run: |
-        cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
-        mkdir -p ./badges && [ -e ./badges/coverage.svg ] && rm ./badges/coverage.svg
-        anybadge --value=$cvg_result --file=./badges/coverage.svg coverage
+    - name: Coverage value
+      run: cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
+
+    - name: Anybadge Action
+      uses: knightdave/anybadge-action@v1.1.0
+      with:
+        input: ./badges/coverage.svg
+        value: ${{ cvg_result }}
+        template: coverage
