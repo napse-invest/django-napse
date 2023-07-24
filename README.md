@@ -1,4 +1,4 @@
-![coverage](https://github.com/napse-invest/django-napse/blob/dev/test/test_app/badges/coverage.svg)
+![coverage](https://github.com/napse-invest/django-napse/blob/dev/badges/coverage.svg)
 
 # django-napse
 
