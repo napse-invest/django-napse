@@ -42,8 +42,10 @@ jobs:
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
         coverage-badge
 
-    - name: Generate JaCoCo Badge
+    - name: Github reference
       run: echo "github reference - ${{ github.ref }}"
+    
+    - name: Generate JaCoCo Badge
       # if: ${{ github.ref == 'refs/heads/master' }}
       uses: cicirello/jacoco-badge-generator@v2
       with:
