@@ -1,6 +1,6 @@
 from django.db.utils import IntegrityError
 
-from django_napse.core.models import Currency, Exchange, ExchangeAccount, NapseSpace, SpaceWallet
+from django_napse.core.models import Currency, Exchange, ExchangeAccount, NapseSpace
 from django_napse.utils.model_test_case import ModelTestCase
 
 
@@ -19,7 +19,7 @@ class CurrencyTestCase(ModelTestCase):
             description="random description",
         )
         self.space = NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
-        self.wallet = SpaceWallet.objects.create(title="Test Wallet", owner=self.space)
+        self.wallet = self.space.wallet
 
     def simple_create(self):
         return Currency.objects.create(wallet=self.wallet, ticker="BTC", amount=1, mbp=20000)

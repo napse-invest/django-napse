@@ -5,7 +5,7 @@ from django_napse.utils.errors import TransactionError
 
 
 class TransactionManager(models.Manager):
-    def create(self, from_wallet, to_wallet, amount, ticker, transaction_type="TRANSFER"):
+    def create(self, from_wallet, to_wallet, amount, ticker, transaction_type):
         """Create a Transaction object and update the wallets accordingly."""
         if amount == 0:
             return None
@@ -16,14 +16,14 @@ class TransactionManager(models.Manager):
             ticker=ticker,
             transaction_type=transaction_type,
         )
-        if from_wallet.space != to_wallet.space:
+        if from_wallet.exchange_account != to_wallet.exchange_account:
             error_msg = "Wallets must be on the same space."
-            raise TransactionError.DifferentSpaceError(error_msg)
+            raise TransactionError.DifferentAccountError(error_msg)
         if transaction_type not in TRANSACTION_TYPES:
             error_msg = f"Transaction type {transaction_type} not in {TRANSACTION_TYPES}."
             raise TransactionError.InvalidTransactionError(error_msg)
 
-        from_wallet.spend(amount, ticker)
-        to_wallet.top_up(amount, ticker, mbp=from_wallet.currencies.get(ticker=ticker).mbp)
+        from_wallet.spend(amount, ticker, force=True)
+        to_wallet.top_up(amount, ticker, mbp=from_wallet.currencies.get(ticker=ticker).mbp, force=True)
         transaction.save()
         return transaction

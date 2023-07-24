@@ -1,3 +1,4 @@
+import os
 from unittest import mock
 
 import celery
@@ -6,6 +7,7 @@ from celery.signals import setup_logging
 from django.conf import settings
 
 # set the default Django settings module for the 'celery' program.
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "test.test_app.settings")
 celery_app = celery.Celery("django_napse")
 
 

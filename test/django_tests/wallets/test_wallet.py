@@ -118,9 +118,9 @@ class BaseWalletTestCase:
             wallet.top_up(ticker="BTC", amount=-2, mbp=1, force=True)
 
     # Other
-    def test_space(self):  # pragma: no cover
-        error_msg = "Please implement this test in the child class."
-        raise NotImplementedError(error_msg)
+    def test_exchange_account(self):
+        wallet = self.simple_create()
+        self.assertEqual(wallet.exchange_account, self.owner.exchange_account)
 
     def test_has_funds(self):
         wallet = self.simple_create()
@@ -167,12 +167,12 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
             exchange_account=self.exchange_account,
             description="This is a test space",
         )
+        self.owner.wallet.delete()
 
     def test_with_real_exchange(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
-            wallet = self.model.objects.create(title="Test Wallet", owner=space)
-            wallet.top_up(ticker="BTC", amount=0.5, force=True)
+            space.wallet.top_up(ticker="BTC", amount=0.5, force=True)
 
     def test_space(self):
         wallet = self.simple_create()
@@ -182,26 +182,23 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
     def test_value_market_BTC(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
-            wallet = self.model.objects.create(title="Test Wallet", owner=space)
-            Currency.objects.create(wallet=wallet, ticker="BTC", amount=1, mbp=20000)
-            self.assertTrue(wallet.value_market() > 0)
+            Currency.objects.create(wallet=space.wallet, ticker="BTC", amount=1, mbp=20000)
+            self.assertTrue(space.wallet.value_market() > 0)
 
     @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_value_market_USDT(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
-            wallet = self.model.objects.create(title="Test Wallet", owner=space)
-            Currency.objects.create(wallet=wallet, ticker="USDT", amount=1, mbp=1)
-            self.assertEqual(wallet.value_market(), 1)
+            Currency.objects.create(wallet=space.wallet, ticker="USDT", amount=1, mbp=1)
+            self.assertEqual(space.wallet.value_market(), 1)
 
     @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_value_zero(self):
         for account in BinanceAccount.objects.all():
             space = account.spaces.first()
-            wallet = self.model.objects.create(title="Test Wallet", owner=space)
-            Currency.objects.create(wallet=wallet, ticker="BTC", amount=0, mbp=1)
-            Currency.objects.create(wallet=wallet, ticker="USDT", amount=0, mbp=1)
-            self.assertEqual(wallet.value_market(), 0)
+            Currency.objects.create(wallet=space.wallet, ticker="BTC", amount=0, mbp=1)
+            Currency.objects.create(wallet=space.wallet, ticker="USDT", amount=0, mbp=1)
+            self.assertEqual(space.wallet.value_market(), 0)
 
 
 class OrderWalletTestCase(BaseWalletTestCase, TestCase):
@@ -216,9 +213,9 @@ class OrderWalletTestCase(BaseWalletTestCase, TestCase):
         self.owner = Order.objects.create(bot=bot, buy_amount=100, sell_amount=100, price=1)
         self.owner.wallet.delete()
 
-    def test_space(self):
-        wallet = self.simple_create()
-        self.assertEqual(wallet.space, self.owner.space)
+    # def test_space(self):
+    #     wallet = self.simple_create()
+    #     self.assertEqual(wallet.space, self.owner.space)
 
 
 # class ConnectionWalletTestCase(BaseWalletTestCase, TestCase):
