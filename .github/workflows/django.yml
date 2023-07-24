@@ -49,3 +49,4 @@ jobs:
         file: ./badges/coverage.svg
         value: $cvg_result
         template: coverage
+        label: none
