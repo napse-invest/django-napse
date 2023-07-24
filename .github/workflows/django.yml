@@ -47,5 +47,5 @@ jobs:
       uses: knightdave/anybadge-action@v1.1.0
       with:
         input: ./badges/coverage.svg
-        value: ${{ cvg_result }}
+        value: $cvg_result
         template: coverage
