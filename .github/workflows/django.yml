@@ -41,3 +41,17 @@ jobs:
         pip install coverage-badge
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
         coverage-badge
+
+    - name: Generate JaCoCo Badge
+      run: echo "github reference - ${{ github.ref }}"
+      # if: ${{ github.ref == 'refs/heads/master' }}
+      uses: cicirello/jacoco-badge-generator@v2
+      with:
+        jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
+        # Uncomment following line if we want badge only on the main branch
+        badges-directory: build/reports/jacoco/test/html/badges
+    - name: Publish coverage report to GitHub Pages
+      # if: ${{ github.ref == 'refs/heads/master' }}
+      uses: JamesIves/github-pages-deploy-action@v4
+      with:
+        folder: build/reports/jacoco/test/html
