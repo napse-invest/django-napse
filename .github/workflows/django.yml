@@ -45,5 +45,7 @@ jobs:
     - name: Github reference
       run: echo "github reference - ${{ github.ref }}"
     
-    - name: Update Coverage Badge
-      uses: we-cli/coverage-badge-action@main
+    - name: Checkout gh-pages
+      run: git checkout gh-pages
+
+    
