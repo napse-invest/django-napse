@@ -46,6 +46,6 @@ jobs:
     - name: Anybadge Action
       uses: knightdave/anybadge-action@v1.1.0
       with:
-        input: ./badges/coverage.svg
+        file: ./badges/coverage.svg
         value: $cvg_result
         template: coverage
