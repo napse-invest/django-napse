@@ -46,6 +46,9 @@ jobs:
       run: echo "github reference - ${{ github.ref }}"
     
     - name: Checkout gh-pages
-      run: git checkout gh-pages
+      run: |
+        git checkout gh-pages
+        echo "done !"
+
 
     
