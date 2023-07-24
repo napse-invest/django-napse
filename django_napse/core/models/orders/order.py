@@ -62,8 +62,8 @@ class Order(models.Model):
         return self.bot.testing
 
     @property
-    def space(self):
-        return self.bot.space
+    def exchange_account(self):
+        return self.bot.exchange_account
 
     def set_status_passed(self):
         if self.status == ORDER_STATUS.PENDING:

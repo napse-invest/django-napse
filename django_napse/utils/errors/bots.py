@@ -4,6 +4,9 @@ class BotError:
     class InvalidSetting(Exception):
         """Raised when a bot is invalid."""
 
+    class NoSpace(Exception):
+        """Raised when a bot is in a fleet and therefore doesn't have a space."""
+
 
 class BotConfigError:
     """Base class for bot config errors."""

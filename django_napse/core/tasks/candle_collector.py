@@ -119,7 +119,9 @@ class CandleCollectorTask(BaseTask):
         Try to get the results of request of binance's api and send it to controller(s).
         If the request failed, the controller(s) is add to a list and controller(s) is this list try again (on all binance's backup api) at the end.
         """
+        print("CandleCollectorTask")
         if not self.avoid_overlap(verbose=True):
+            print("skipped")
             return
 
         failed_controllers = []

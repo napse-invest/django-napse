@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-secret"  # noqa: S105
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ["localhost", "0.0.0.0", "127.0.0.1", "django"]
 
 
 # Application definition
@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     # Napse
     "django_napse.core",
     "django_napse.simulations",
+    # Required
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -53,7 +55,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "urls"
+ROOT_URLCONF = "test.test_app.urls"
 
 TEMPLATES = [
     {
@@ -137,3 +139,8 @@ NAPSE_EXCHANGE_CONFIGS = {
 }
 
 NAPSE_SECRETS_FILE_PATH = BASE_DIR / "secrets.json"
+# CELERY_RESULT_BACKEND = "django-db"
+# REDIS_URL = "redis://localhost:6379/0"
+CELERY_BROKER_URL = "redis://localhost:6379"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
+DEBUG = True

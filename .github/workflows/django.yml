@@ -38,6 +38,16 @@ jobs:
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
         export IS_IN_PIPELINE=True
-        pip install coverage-badge
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
-        coverage-badge
+
+    - name: Github reference
+      run: echo "github reference - ${{ github.ref }}"
+    
+    # - name: Create coverage badge
+    #   run: |
+    #     cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
+    #     rm ./badges/coverage.svg
+    #     anybadge --value=$cvg_result --file=./badges/coverage.svg coverage
+
+
+    
