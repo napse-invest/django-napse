@@ -43,11 +43,8 @@ jobs:
     - name: Github reference
       run: echo "github reference - ${{ github.ref }}"
     
-    # - name: Create coverage badge
-    #   run: |
-    #     cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
-    #     rm ./badges/coverage.svg
-    #     anybadge --value=$cvg_result --file=./badges/coverage.svg coverage
-
-
-    
+    - name: Create coverage badge
+      run: |
+        cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
+        [ -e ./badges/coverage.svg ] && rm ./badges/coverage.svg
+        anybadge --value=$cvg_result --file=./badges/coverage.svg coverage
