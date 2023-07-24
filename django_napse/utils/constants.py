@@ -43,10 +43,9 @@ class TRANSACTION_TYPES(Enum, metaclass=CustomEnumMeta):
 
 class ORDER_STATUS(Enum, metaclass=CustomEnumMeta):
     PENDING = "PENDING"
+    READY = "READY"
     PASSED = "PASSED"
     FAILED = "FAILED"
-    ONLY_BUY_PASSED = "ONLY_BUY_PASSED"
-    ONLY_SELL_PASSED = "ONLY_SELL_PASSED"
 
 
 DEFAULT_TAX = {"BINANCE": 0.1}

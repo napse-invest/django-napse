@@ -21,7 +21,7 @@ class Fleet(models.Model):
 
     objects = FleetManager()
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return f"FLEET: {self.pk=}, name={self.name}"
 
     @property
@@ -36,7 +36,7 @@ class Fleet(models.Model):
 class DefaultFleetOperator(models.Model):
     fleet = models.OneToOneField("Fleet", on_delete=models.CASCADE, related_name="operator")
 
-    def __str__(self) -> str:  # pragma: no cover
+    def __str__(self) -> str:
         return f"DEFAULT_FLEET_OPERATOR: {self.pk=}, fleet__name={self.fleet.name}"
 
 
@@ -53,7 +53,7 @@ class SpecificShare(models.Model):
     operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_shares")
     share = models.FloatField()
 
-    def __str__(self) -> str:  # pragma: no cover
+    def __str__(self) -> str:
         return f"SPECIFIC_SHARE: {self.pk=}, operator={self.operator}, share={self.share}"
 
     class Meta:
@@ -65,7 +65,7 @@ class SpecificBreakPoint(models.Model):
     operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_breakpoints")
     scale_up_breakpoint = models.FloatField()
 
-    def __str__(self) -> str:  # pragma: no cover
+    def __str__(self) -> str:
         return f"SPECIFIC_BREAKPOINT: {self.pk=}, operator={self.operator}, scale_up_breakpoint={self.scale_up_breakpoint}"
 
     class Meta:
@@ -77,7 +77,7 @@ class SpecificAutoscale(models.Model):
     operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_autoscales")
     autoscale = models.BooleanField(default=True)
 
-    def __str__(self) -> str:  # pragma: no cover
+    def __str__(self) -> str:
         return f"SPECIFIC_AUTOSCALE: {self.pk=}, operator={self.operator}, autoscale={self.autoscale}"
 
     class Meta:

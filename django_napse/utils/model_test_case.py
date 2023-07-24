@@ -32,7 +32,7 @@ class ModelTestCase(TestCase):
         if self.skip_condition():
             return
         instance = self.simple_create()
-        instance.info(verbose=False)
+        instance.info(verbose=True)
 
     def test_str(self):
         if self.skip_condition():

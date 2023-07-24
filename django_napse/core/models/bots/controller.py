@@ -175,3 +175,17 @@ class Controller(models.Model):
         if self.last_price_update is None or self.last_price_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
             self._get_price()
         return self.price
+
+
+class Candle(models.Model):
+    controller = models.ForeignKey("Controller", on_delete=models.CASCADE, related_name="candles")
+    latest = models.BooleanField(default=False)
+    last_update = models.DateTimeField(auto_now=True)
+    open = models.FloatField()
+    high = models.FloatField()
+    low = models.FloatField()
+    close = models.FloatField()
+    volume = models.FloatField()
+
+    def __str__(self):
+        return f"CANDLE {self.pk}"

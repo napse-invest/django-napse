@@ -7,7 +7,7 @@ from django_napse.utils.errors import OrderError
 
 
 class Order(models.Model):
-    bot = models.ForeignKey("Bot", on_delete=models.CASCADE, related_name="orders")
+    connection = models.ForeignKey("Connection", on_delete=models.CASCADE, related_name="orders")
     buy_amount = models.FloatField()
     sell_amount = models.FloatField()
     price = models.FloatField()
@@ -18,13 +18,13 @@ class Order(models.Model):
     objects = OrderManager()
 
     def __str__(self):
-        return f"ORDER: {self.bot} {self.status=}"
+        return f"ORDER: {self.connection} {self.status=}"
 
     def info(self, verbose=True, beacon=""):
         string = ""
         string += f"{beacon}Transaction ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
-        string += f"{beacon}\t{self.bot=}\n"
+        string += f"{beacon}\t{self.connection=}\n"
         string += f"{beacon}\t{self.pair=}\n"
         string += f"{beacon}\t{self.buy_amount=}\n"
         string += f"{beacon}\t{self.sell_amount=}\n"
@@ -55,20 +55,28 @@ class Order(models.Model):
 
     @property
     def pair(self):
-        return self.bot.pair
+        return self.connection.bot.pair
 
     @property
     def testing(self):
-        return self.bot.testing
+        return self.connection.bot.testing
 
     @property
     def exchange_account(self):
-        return self.bot.exchange_account
+        return self.connection.bot.exchange_account
+
+    def set_status_ready(self):
+        if self.status == ORDER_STATUS.PENDING:
+            self.status = ORDER_STATUS.READY
+            self.save()
+        else:
+            error_msg: str = f"Order {self.pk} is not pending."
+            raise OrderError.StatusError(error_msg)
 
     def set_status_passed(self):
         if self.status == ORDER_STATUS.PENDING:
             self.status = ORDER_STATUS.PASSED
-            super().save()
+            self.save()
         else:
             error_msg: str = f"Order {self.pk} is not pending."
             raise OrderError.StatusError(error_msg)
@@ -76,23 +84,7 @@ class Order(models.Model):
     def set_status_failed(self):
         if self.status == ORDER_STATUS.PENDING:
             self.status = ORDER_STATUS.FAILED
-            super().save()
-        else:
-            error_msg: str = f"Order {self.pk} is not pending."
-            raise OrderError.StatusError(error_msg)
-
-    def set_status_only_sell_passed(self):
-        if self.status == ORDER_STATUS.PENDING:
-            self.status = ORDER_STATUS.ONLY_SELL_PASSED
-            super().save()
-        else:
-            error_msg: str = f"Order {self.pk} is not pending."
-            raise OrderError.StatusError(error_msg)
-
-    def set_status_only_sell(self):
-        if self.status == ORDER_STATUS.PENDING:
-            self.status = ORDER_STATUS.ONLY_SELL_PASSED
-            super().save()
+            self.save()
         else:
             error_msg: str = f"Order {self.pk} is not pending."
             raise OrderError.StatusError(error_msg)
