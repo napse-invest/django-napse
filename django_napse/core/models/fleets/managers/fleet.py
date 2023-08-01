@@ -2,7 +2,7 @@ from django.apps import apps
 from django.db import models
 
 from django_napse.core.models.fleets.cluster import Cluster
-from django_napse.utils.constants import EXCHANGES, OPERATORS
+from django_napse.utils.constants import OPERATORS
 from django_napse.utils.errors import FleetError
 
 

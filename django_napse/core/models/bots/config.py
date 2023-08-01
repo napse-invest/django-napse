@@ -1,8 +1,8 @@
 import uuid
 
-from django.apps import apps
 from django.db import models
 
+from django_napse.core.models.bots.managers.bot_config import BotConfigManager
 from django_napse.utils.findable_class import FindableClass
 
 
@@ -11,6 +11,8 @@ class BotConfig(models.Model, FindableClass):
     space = models.ForeignKey("NapseSpace", on_delete=models.CASCADE, related_name="bot_configs")
     immutable = models.BooleanField(default=False)
 
+    objects = BotConfigManager()
+
     def __str__(self) -> str:
         return f"BOT CONFIG: {self.pk}"
 
@@ -18,7 +20,6 @@ class BotConfig(models.Model, FindableClass):
         string = ""
         string += f"{beacon}BotConfig: ({self.pk=})\n"
         string += f"{beacon}Args:\n"
-        string += f"{beacon}\t{self.bot_type=}\n"
         string += f"{beacon}\t{self.space=}\n"
         string += f"{beacon}Settings:\n"
         if len(self.settings) > 0:
@@ -38,17 +39,11 @@ class BotConfig(models.Model, FindableClass):
                 settings[setting.name[8:]] = getattr(self, setting.name)
         return settings
 
-    def to_bot(self, **kwargs):
-        """Create a bot from the bot config."""
-        Bot = apps.get_model("django_napse_core", self.bot_type)
-        settings = {key: value for key, value in self.settings.items()}
-        return Bot.objects.create(**kwargs, **settings)
-
     def duplicate_immutable(self):
         return self.__class__.objects.create(
             space=self.space,
             immutable=True,
-            **{f"setting_{key}": value for key, value in self.settings.items()},
+            settings=self.settings,
         )
 
     def duplicate_other_space(self, space):
@@ -58,5 +53,5 @@ class BotConfig(models.Model, FindableClass):
         return self.__class__.objects.create(
             space=space,
             immutable=True,
-            **{f"setting_{key}": value for key, value in self.settings.items()},
+            settings=self.settings,
         )

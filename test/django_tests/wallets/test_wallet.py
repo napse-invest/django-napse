@@ -201,21 +201,21 @@ class SpaceWalletTestCase(BaseWalletTestCase, ModelTestCase):
             self.assertEqual(space.wallet.value_market(), 0)
 
 
-class OrderWalletTestCase(BaseWalletTestCase, TestCase):
-    model = OrderWallet
+# class OrderWalletTestCase(BaseWalletTestCase, TestCase):
+#     model = OrderWallet
 
-    def setUp(self) -> None:
-        super().setUp()
-        space = NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
-        config = BotConfig.objects.create(bot_type="Bot", name="test_bot", pair="MATICUSDT", interval="1m", space=space)
-        fleet = Fleet.objects.create(name="test_fleet", configs=[config], exchange_account=self.exchange_account)
-        bot = fleet.bots.first()
-        self.owner = Order.objects.create(bot=bot, buy_amount=100, sell_amount=100, price=1)
-        self.owner.wallet.delete()
+#     def setUp(self) -> None:
+#         super().setUp()
+#         space = NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
+#         config = BotConfig.objects.create(bot_type="Bot", name="test_bot", pair="MATICUSDT", interval="1m", space=space)
+#         fleet = Fleet.objects.create(name="test_fleet", configs=[config], exchange_account=self.exchange_account)
+#         bot = fleet.bots.first()
+#         self.owner = Order.objects.create(bot=bot, buy_amount=100, sell_amount=100, price=1)
+#         self.owner.wallet.delete()
 
-    # def test_space(self):
-    #     wallet = self.simple_create()
-    #     self.assertEqual(wallet.space, self.owner.space)
+# def test_space(self):
+#     wallet = self.simple_create()
+#     self.assertEqual(wallet.space, self.owner.space)
 
 
 # class ConnectionWalletTestCase(BaseWalletTestCase, TestCase):

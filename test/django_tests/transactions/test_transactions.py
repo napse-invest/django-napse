@@ -1,4 +1,4 @@
-from django_napse.core.models import BotConfig, Currency, Exchange, ExchangeAccount, Fleet, NapseSpace, Order, Transaction
+from django_napse.core.models import Currency, EmptyBotConfig, Exchange, ExchangeAccount, Fleet, NapseSpace, Order, Transaction
 from django_napse.utils.constants import TRANSACTION_TYPES
 from django_napse.utils.errors import TransactionError
 from django_napse.utils.model_test_case import ModelTestCase
@@ -31,7 +31,7 @@ class TransactionTestCase(ModelTestCase):
         self.from_wallet = self.space1.wallet
         Currency.objects.create(wallet=self.from_wallet, ticker="BTC", amount=1, mbp=20000)
 
-        config = BotConfig.objects.create(bot_type="Bot", name="test_bot", pair="MATICUSDT", interval="1m", space=self.space1)
+        config = EmptyBotConfig.objects.create(space=self.space1)
         fleet = Fleet.objects.create(name="test_fleet", configs=[config], exchange_account=self.exchange_account)
         bot = fleet.bots.first()
         order = Order.objects.create(bot=bot, buy_amount=100, sell_amount=100, price=1)

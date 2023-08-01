@@ -22,18 +22,7 @@ class BotConfigDefaultTestCase:
         self.space = NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
 
     def simple_create(self):
-        return self.model.objects.create(space=self.space, **self.settings)
-
-    def test_to_bot(self):
-        config = self.simple_create()
-        bot = config.to_bot()
-        for key, value in self.settings.items():
-            self.assertEqual(getattr(bot, key), value)
-
-    def test_hash(self):
-        config = self.simple_create()
-        self.assertEqual(config.bot_hash, config.to_bot().to_hash())
-        self.assertEqual(config.bot_hash, self.hash)
+        return self.model.objects.create(space=self.space, settings=self.settings)
 
     def test_error_duplicate(self):
         self.simple_create()
@@ -42,7 +31,7 @@ class BotConfigDefaultTestCase:
 
     def test_missing_setting(self):
         with self.assertRaises(BotConfigError.MissingSettingError):
-            self.model.objects.create(space=self.space)
+            self.model.objects.create(space=self.space, settings={})
 
     def test_duplicate_immutable(self):
         config = self.simple_create()
@@ -59,4 +48,4 @@ class BotConfigDefaultTestCase:
 
 class EmptyBotConfigTestCase(BotConfigDefaultTestCase, ModelTestCase):
     model = EmptyBotConfig
-    settings = {}
+    settings = {"empty": True}

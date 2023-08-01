@@ -7,4 +7,4 @@ class SinglePairArchitechture(Architechture):
     controller = models.ForeignKey("Controller", on_delete=models.CASCADE, related_name="single_pair_architechtures")
 
     def __str__(self) -> str:
-        return f"SinglePairArchitechture {self.pk} ({self.pair=})"
+        return f"SINGLE PAIR ARCHITECHTURE {self.pk}"

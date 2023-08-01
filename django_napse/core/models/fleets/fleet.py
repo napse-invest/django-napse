@@ -1,14 +1,9 @@
 import uuid
 
-from django.apps import apps
 from django.db import models
 
-from django_napse.core.models import Connection
 from django_napse.core.models.bots.bot import Bot
-from django_napse.core.models.fleets.cluster import Cluster
 from django_napse.core.models.fleets.managers import FleetManager
-from django_napse.utils.constants import OPERATORS
-from django_napse.utils.errors import FleetError
 
 
 class Fleet(models.Model):

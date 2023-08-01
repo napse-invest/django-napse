@@ -13,7 +13,6 @@ class Bot(models.Model):
     can_trade = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
-    architechture = models.ForeignKey("Architechture", on_delete=models.CASCADE, related_name="bots")
     strategy = models.ForeignKey("Strategy", on_delete=models.CASCADE, related_name="bots")
 
     def __str__(self):
