@@ -11,6 +11,9 @@ class ModelTestCase(TestCase):
     def skip_condition(self):
         if self.__class__.__name__ == "ModelTestCase":
             return True, "because ModelTestCase (base class) tests shouldn't be run."
+        if not self.__class__.__name__.endswith(f"{self.exchange}TestCase"):
+            error_msg = f"ModelTestCase subclass {self.__class__.__name__} name must end with <Exchange>TestCase."
+            error_msg += " Make sure you are writing tests as specified in the docs."
         if self.exchange is not None and self.exchange not in napse_settings.NAPSE_EXCHANGES_TO_TEST:
             return True, f"because {self.exchange} is not in {napse_settings.NAPSE_EXCHANGES_TO_TEST}"
         return False, ""
