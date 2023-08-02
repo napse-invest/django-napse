@@ -1,4 +1,4 @@
-from django_napse.core.models import EmptyBotConfig, Exchange, ExchangeAccount, NapseSpace
+from django_napse.core.models import EmptyBotConfig, NapseSpace
 from django_napse.utils.errors import BotConfigError
 from django_napse.utils.model_test_case import ModelTestCase
 
@@ -8,19 +8,6 @@ python test/test_app/manage.py test test.django_tests.bots.test_bot_config -v2 -
 
 
 class BotConfigDefaultTestCase:
-    def setUp(self):
-        self.exchange = Exchange.objects.create(
-            name="random exchange",
-            description="random description",
-        )
-        self.exchange_account = ExchangeAccount.objects.create(
-            exchange=self.exchange,
-            testing=True,
-            name="random exchange account 1",
-            description="random description",
-        )
-        self.space = NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
-
     def simple_create(self):
         return self.model.objects.create(space=self.space, settings=self.settings)
 
@@ -46,6 +33,10 @@ class BotConfigDefaultTestCase:
         config.duplicate_other_space(new_space)
 
 
-class EmptyBotConfigTestCase(BotConfigDefaultTestCase, ModelTestCase):
+class EmptyBotConfigTestCase(BotConfigDefaultTestCase):
     model = EmptyBotConfig
     settings = {"empty": True}
+
+
+class EmptyBotConfigBINANCETestCase(EmptyBotConfigTestCase, ModelTestCase):
+    exchange = "BINANCE"

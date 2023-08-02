@@ -1,10 +1,11 @@
 import json
 
 from django.apps import apps
-from django.conf import settings
 from django.db.models.signals import post_migrate
 from django.db.transaction import atomic
 from django.dispatch import receiver
+
+from django_napse.core.settings import napse_settings as settings
 
 
 @receiver(post_migrate)

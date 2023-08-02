@@ -18,7 +18,7 @@ class Bot(models.Model):
     def __str__(self):
         return f"BOT {self.name=} ({self.pair=})"
 
-    def info(self, verbose=True, beacon=""):  # pragma: no cover
+    def info(self, verbose=True, beacon=""):
         string = ""
         string += f"{beacon}Bot {self.pk}:\n"
         string += f"{beacon}Args:\n"

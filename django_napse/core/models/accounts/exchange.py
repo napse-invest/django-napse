@@ -57,6 +57,10 @@ class ExchangeAccount(models.Model, FindableClass):
         error_msg = f"create_client() not implemented for {self.__class__.__name__}"
         raise NotImplementedError(error_msg)
 
+    def exchange_controller(self):
+        error_msg = f"exchange_controller() not implemented for {self.__class__.__name__}"
+        raise NotImplementedError(error_msg)
+
 
 class BinanceAccount(ExchangeAccount):
     public_key = models.CharField(max_length=200)
@@ -71,7 +75,6 @@ class BinanceAccount(ExchangeAccount):
             error_msg = f"Error pinging {self.exchange.name}. Check that your API keys are correct and have the correct permissions."
             raise ExchangeAccountError.APIPermissionError(error_msg)
 
-    @property
     def exchange_controller(self):
         return BinanceController(self.public_key, self.private_key)
 

@@ -12,7 +12,7 @@ class NapseSpaceManager(models.Manager):
         while attempts < 10:
             attempts += 1
             uuid = shortuuid.ShortUUID(alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789").random(length=5)
-            if not self.filter(name=name, identifier=f"#{uuid}").exists():
+            if not self.filter(identifier=f"#{uuid}").exists():
                 break
         else:
             error_msg = f"Unable to generate a unique identifier for the space {name}"
