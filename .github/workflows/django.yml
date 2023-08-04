@@ -52,7 +52,7 @@ jobs:
         gistID: 40fac957532fe3b731c99067467de842
         filename: django-napse-version.json
         label: Version
-        message: ${{ env.COVERAGE }} %
+        message: 34
         valColorRange: 80
         minColorRange: 50 
         maxColorRange: 95
