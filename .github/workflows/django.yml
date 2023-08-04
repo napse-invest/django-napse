@@ -43,10 +43,12 @@ jobs:
     - name: Coverage value
       run: cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
 
-    - name: Anybadge Action
-      uses: knightdave/anybadge-action@v1.1.0
+    - name: Dynamic Badges
+      uses: Schneegans/dynamic-badges-action@v1.6.0
       with:
-        file: ./badges/coverage.svg
-        value: $cvg_result
-        template: coverage
-        label: none
+        auth: ${{ secrets.NAPSE_SECRET_GIST }}
+        gistID: b5b99902ec4c82d0bd11b9dea43776a5
+        filename: test.json
+        label: Hello
+        message: World
+        color: orange
