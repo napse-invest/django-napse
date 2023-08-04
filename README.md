@@ -2,6 +2,8 @@
 
 ![test](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/napse-investment/40fac957532fe3b731c99067467de842/raw/django-napse-version.json)
 
+[![push](https://github.com/nektos/act/workflows/push/badge.svg?branch=master&event=push)](https://github.com/nektos/act/actions)
+
 # django-napse
 
 ### Usefull commands
