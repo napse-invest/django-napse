@@ -52,3 +52,13 @@ jobs:
         label: Hello
         message: World
         color: orange
+    - name: Coverage badge
+      uses: Schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ secrets.NAPSE_SECRET_GIST }}
+        gistID: 40fac957532fe3b731c99067467de842
+        filename: django-napse.json
+        label: Coverage
+        message: ${{ steps.cvg_result.outputs.cvg_result }}%
+        minColorRange: 50 
+        maxColorRange: 90
