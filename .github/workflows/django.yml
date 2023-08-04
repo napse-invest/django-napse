@@ -41,24 +41,30 @@ jobs:
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
 
     - name: Coverage value
-      run: cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
+      run: |
+        cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
+        echo "COVERAGE=$cvg_result" >> $GITHUB_ENV
 
-    - name: Dynamic Badges
+    - name: Test Badges
       uses: Schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ secrets.NAPSE_SECRET_GIST }}
         gistID: 40fac957532fe3b731c99067467de842
-        filename: django-napse.json
-        label: Hello
-        message: World
-        color: orange
+        filename: django-napse-version.json
+        label: Version
+        message: 34
+        valColorRange: 34
+        minColorRange: 50 
+        maxColorRange: 95
+
     - name: Coverage badge
       uses: Schneegans/dynamic-badges-action@v1.6.0
       with:
         auth: ${{ secrets.NAPSE_SECRET_GIST }}
         gistID: 40fac957532fe3b731c99067467de842
-        filename: django-napse.json
+        filename: django-napse-coverage.json
         label: Coverage
-        message: ${{ steps.cvg_result.outputs.cvg_result }}%
+        message: ${{ env.COVERAGE }} %
+        valColorRange: 80
         minColorRange: 50 
-        maxColorRange: 90
+        maxColorRange: 95
