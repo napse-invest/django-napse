@@ -65,6 +65,6 @@ jobs:
         filename: django-napse-coverage.json
         label: Coverage
         message: ${{ env.COVERAGE }} %
-        valColorRange: 80
+        valColorRange: ${{ env.COVERAGE }}
         minColorRange: 50 
         maxColorRange: 95
