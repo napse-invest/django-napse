@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="./branding/background.svg" />
+<img src="./branding/napse_black.svg" />
 </h1><br>
 
 <p align="center">
