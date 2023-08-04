@@ -40,11 +40,15 @@ jobs:
         export IS_IN_PIPELINE=True
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
 
-    - name: Github reference
-      run: echo "github reference - ${{ github.ref }}"
-    
-    - name: Create coverage badge
-      run: |
-        cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
-        mkdir -p ./badges && [ -e ./badges/coverage.svg ] && rm ./badges/coverage.svg
-        anybadge --value=$cvg_result --file=./badges/coverage.svg coverage
+    - name: Coverage value
+      run: cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
+
+    - name: Dynamic Badges
+      uses: Schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ secrets.NAPSE_SECRET_GIST }}
+        gistID: 40fac957532fe3b731c99067467de842
+        filename: django-napse.json
+        label: Hello
+        message: World
+        color: orange
