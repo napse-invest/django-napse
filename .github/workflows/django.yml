@@ -50,7 +50,7 @@ jobs:
       with:
         auth: ${{ secrets.NAPSE_SECRET_GIST }}
         gistID: 40fac957532fe3b731c99067467de842
-        filename: django-napse.json
+        filename: django-napse-version.json
         label: Hello
         message: World
         color: orange
@@ -59,7 +59,7 @@ jobs:
       with:
         auth: ${{ secrets.NAPSE_SECRET_GIST }}
         gistID: 40fac957532fe3b731c99067467de842
-        filename: django-napse.json
+        filename: django-napse-coverage.json
         label: Coverage
         message: ${{ env.COVERAGE }} %
         valColorRange: 80
