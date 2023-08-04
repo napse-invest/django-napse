@@ -53,7 +53,7 @@ jobs:
         filename: django-napse-version.json
         label: Version
         message: 34
-        valColorRange: 80
+        valColorRange: 34
         minColorRange: 50 
         maxColorRange: 95
 
