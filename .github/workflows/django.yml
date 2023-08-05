@@ -2,7 +2,7 @@ name: Django CI
 
 on:
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
 jobs:
   build:
@@ -38,6 +38,31 @@ jobs:
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
         export IS_IN_PIPELINE=True
-        pip install coverage-badge
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
-        coverage-badge
+
+    - name: Coverage value
+      run: |
+        cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
+        echo "COVERAGE=$cvg_result" >> $GITHUB_ENV
+
+    - name: Test Badges
+      uses: Schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ secrets.NAPSE_SECRET_GIST }}
+        gistID: 40fac957532fe3b731c99067467de842
+        filename: django-napse-version.json
+        label: version
+        message: v0.0.0
+        color: green
+
+    - name: Coverage badge
+      uses: Schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ secrets.NAPSE_SECRET_GIST }}
+        gistID: 40fac957532fe3b731c99067467de842
+        filename: django-napse-coverage.json
+        label: Coverage
+        message: ${{ env.COVERAGE }} %
+        valColorRange: ${{ env.COVERAGE }}
+        minColorRange: 50 
+        maxColorRange: 95

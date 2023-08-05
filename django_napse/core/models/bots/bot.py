@@ -90,7 +90,17 @@ class Bot(models.Model, FindableClass):
         if self.is_in_simulation:
             return self.simulation.space
         if self.is_in_fleet:
-            return self.bot_in_cluster.cluster.fleet.testing
+            error_msg = "Bot is in a fleet and therefore doesn't have a space."
+            raise BotError.NoSpace(error_msg)
+        error_msg = "Bot is not in simulation or fleet."
+        raise BotError.InvalidSetting(error_msg)
+
+    @property
+    def exchange_account(self):
+        if self.is_in_simulation:
+            return self.simulation.space.exchange_account
+        if self.is_in_fleet:
+            return self.bot_in_cluster.cluster.fleet.exchange_account
         error_msg = "Bot is not in simulation or fleet."
         raise BotError.InvalidSetting(error_msg)
 

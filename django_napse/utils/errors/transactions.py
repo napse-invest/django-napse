@@ -1,7 +1,7 @@
 class TransactionError:
     """Base class for transaction errors."""
 
-    class DifferentSpaceError(Exception):
+    class DifferentAccountError(Exception):
         """Raised when the from and to wallets are on different spaces."""
 
     class InvalidTransactionError(Exception):

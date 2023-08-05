@@ -1,0 +1,19 @@
+name: Django CI
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  versionning:
+    name: Versionning
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 4
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Semantic Release
+      uses: cycjimmy/semantic-release-action@v3
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
