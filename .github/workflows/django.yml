@@ -2,7 +2,7 @@ name: Django CI
 
 on:
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
 jobs:
   build:
@@ -51,9 +51,9 @@ jobs:
         auth: ${{ secrets.NAPSE_SECRET_GIST }}
         gistID: 40fac957532fe3b731c99067467de842
         filename: django-napse-version.json
-        label: Version
-        message: 34
-        valColorRange: 34
+        label: version
+        message: ${{ env.COVERAGE }}
+        valColorRange: 12
         minColorRange: 50 
         maxColorRange: 95
 
@@ -65,6 +65,6 @@ jobs:
         filename: django-napse-coverage.json
         label: Coverage
         message: ${{ env.COVERAGE }} %
-        valColorRange: 80
+        valColorRange: ${{ env.COVERAGE }}
         minColorRange: 50 
         maxColorRange: 95
