@@ -5,6 +5,12 @@ on:
     branches: ["main"]
 
 jobs:
+  # Artifically trigger django build event
+  build:
+    name: Django build
+    runs-on: ubuntu-latest
+  
+  #
   release:
     name: Release
     runs-on: ubuntu-latest
@@ -13,18 +19,22 @@ jobs:
       uses: actions/checkout@v3
       with:
         persist-credentials: false
+
     - name: Setup Node.js
       uses: actions/setup-node@v3
       with:
         node-version: 18.x
+  
     - name: Install semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.NAPSE_GITHUB_TOKEN }}
       run: |
         npm install --save-dev semantic-release
         npx semantic-release
+
     - name: Install semantic-release extra plugins
       run: npm install --save-dev @semantic-release/git @semantic-release/changelog @semantic-release/commit-analyzer @semantic-release/release-notes-generator       
+      
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.NAPSE_GITHUB_TOKEN }}
