@@ -1,3 +1,15 @@
+# [1.1.0](https://github.com/napse-invest/django-napse/compare/v1.0.1...v1.1.0) (2023-08-05)
+
+
+### Bug Fixes
+
+* **test:** ... ([4676c9f](https://github.com/napse-invest/django-napse/commit/4676c9f4b8a49d885fb522436080319c496ee5ae))
+
+
+### Features
+
+* **readme:** update readme ([a877c0b](https://github.com/napse-invest/django-napse/commit/a877c0bac27b82d4ca4e953cd803a60325fe478e))
+
 ## [1.0.1](https://github.com/napse-invest/django-napse/compare/v1.0.0...v1.0.1) (2023-08-05)
 
 
