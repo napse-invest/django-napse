@@ -6,7 +6,7 @@
   },
   {
     "name": "feature/ci",
-    "prerelease": false
+    "prerelease": true
   }],
   "plugins": [
     "@semantic-release/commit-analyzer",
