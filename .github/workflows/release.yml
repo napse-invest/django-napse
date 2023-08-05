@@ -28,4 +28,4 @@ jobs:
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.NAPSE_GITHUB_TOKEN }}
-      run: npx semantic-release --ci
+      run: npx semantic-release
