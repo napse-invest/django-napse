@@ -15,8 +15,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 18.x
-    - name: Install dependencies
-      run: npx ci
+    - name: Install semantic-release
+      run: |
+        npm install --save-dev semantic-release
+        npx semantic-release
     - name: Install semantic-release extra plugins
       run: npm install --save-dev @semantic-release/changelog @semantic-release/git      
     - name: Lint
