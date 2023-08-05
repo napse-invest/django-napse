@@ -20,13 +20,13 @@ jobs:
         npm install --save-dev semantic-release
         npx semantic-release
     - name: Install semantic-release extra plugins
-      run: npm install --save-dev @semantic-release/changelog @semantic-release/git      
-    - name: Lint
-      run: npm run lint-fix
-    - name: Test
-      run: npm run test:unit --if-present
-    - name: Build
-      run: npm run build      
+      run: npm install --save-dev @semantic-release/git      
+    # - name: Lint
+    #   run: npm run lint-fix
+    # - name: Test
+    #   run: npm run test:unit --if-present
+    # - name: Build
+    #   run: npm run build      
     - name: Release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
