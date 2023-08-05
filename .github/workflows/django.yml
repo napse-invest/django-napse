@@ -53,7 +53,7 @@ jobs:
         filename: django-napse-version.json
         label: version
         message: v0.0.0
-        color: green
+        color: blue
 
     - name: Coverage badge
       uses: Schneegans/dynamic-badges-action@v1.6.0
