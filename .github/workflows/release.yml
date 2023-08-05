@@ -15,17 +15,13 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: 18.x
-    # - name: Install semantic-release
-    #   env:
-    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    #   run: |
-    #     npm install --save-dev semantic-release
-    #     npx semantic-release
-    # - name: Install semantic-release extra plugins
-    #   run: npm install --save-dev @semantic-release/git   
-    - name: Install dependencies
+    - name: Install semantic-release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: npx ci        
+      run: |
+        npm install --save-dev semantic-release
+        npx semantic-release
+    - name: Install semantic-release extra plugins
+      run: npm install --save-dev @semantic-release/git @semantic-release/changelog @semantic-release/commit-analyzer @semantic-release/release-notes-generator       
     - name: Release
       run: npx semantic-release --ci
