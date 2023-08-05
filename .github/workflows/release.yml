@@ -9,6 +9,14 @@ jobs:
   build:
     name: Django build
     runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        # x64 or x86
+        architecture: 'x64'
   
   #
   release:
