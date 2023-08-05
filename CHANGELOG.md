@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/napse-invest/django-napse/compare/v1.0.0...v1.0.1) (2023-08-05)
+
+
+### Bug Fixes
+
+* **release:** workflow optimization ([f131c6e](https://github.com/napse-invest/django-napse/commit/f131c6e534c87eb251d35119a23cbeb8c1f8b266))
+
 # 1.0.0 (2023-08-05)
 
 
