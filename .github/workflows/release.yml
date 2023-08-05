@@ -5,15 +5,14 @@ on:
     branches: ["main"]
 
 jobs:
-  versionnong:
+  versionning:
     name: Versionning
     runs-on: ubuntu-latest
     strategy:
       max-parallel: 4
 
-  steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    steps:
+    - uses: actions/checkout@v3
     - name: Semantic Release
       uses: cycjimmy/semantic-release-action@v3
       env:
