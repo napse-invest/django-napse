@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/napse-invest/django-napse/compare/v1.1.1...v1.1.2) (2023-08-05)
+
+
+### Bug Fixes
+
+* **workflow:** optimization of release.yml ([af45125](https://github.com/napse-invest/django-napse/commit/af45125c74b8d9ed58874eeb3d666841e27cb035))
+
 ## [1.1.1](https://github.com/napse-invest/django-napse/compare/v1.1.0...v1.1.1) (2023-08-05)
 
 
