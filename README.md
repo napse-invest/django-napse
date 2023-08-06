@@ -10,9 +10,6 @@
     <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/napse-investment/40fac957532fe3b731c99067467de842/raw/django-napse-coverage.json" alt="Coverage" />
   </a>
   <a>  
-    <img src="https://img.shields.io/github/v/tag/napse-invest/django-napse?label=version" alt="Version" />
-  </a>
-  <a>  
     <img src="https://img.shields.io/github/v/release/napse-invest/django-napse" alt="Release" />
   </a>
 </p>
@@ -22,8 +19,6 @@
   <a href="#usefull-commands"><strong>Usefull commands</strong></a>
 </p>
 <br/>
-
-[![Release](https://github.com/napse-invest/django-napse/actions/workflows/release.yml/badge.svg?branch=main&event=release)](https://github.com/napse-invest/django-napse/actions/workflows/release.yml)
 
 ## django-napse
 ...
