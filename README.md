@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="./branding/napse_white.svg" />
+<img src="./branding/napse_white.svg" width=500/>
 </h1><br>
 
 <p align="center">
@@ -12,14 +12,18 @@
   <a>  
     <img src="https://img.shields.io/github/v/tag/napse-invest/django-napse?label=version" alt="Version" />
   </a>
+  <a>  
+    <img src="https://img.shields.io/github/v/release/napse-invest/django-napse" alt="Release" />
+  </a>
 </p>
-
 
 <p align="center">
   <a href="#django-napse"><strong>Django Napse</strong></a> ·
   <a href="#usefull-commands"><strong>Usefull commands</strong></a>
 </p>
 <br/>
+
+[![Release](https://github.com/napse-invest/django-napse/actions/workflows/release.yml/badge.svg?branch=main&event=release)](https://github.com/napse-invest/django-napse/actions/workflows/release.yml)
 
 ## django-napse
 ...
