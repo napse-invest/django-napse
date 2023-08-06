@@ -18,5 +18,6 @@ jobs:
       if: [ "$HEAD_REF" != "dev" ] && [ "$BASE_REF" == "main" ]
       run: |
         echo "Merge requests to main branch are only allowed from dev branch."
-        exit 1
+        gh run cancel ${{ github.run_id }}
+        gh run watch ${{ github.run_id }}
         
