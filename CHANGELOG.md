@@ -1,3 +1,13 @@
+## [1.1.1](https://github.com/napse-invest/django-napse/compare/v1.1.0...v1.1.1) (2023-08-05)
+
+
+### Bug Fixes
+
+* **workflow:** release ([140ff74](https://github.com/napse-invest/django-napse/commit/140ff747fd9dfc648cf4c5caaafff7dc51d9d817))
+* **workflow:** release.yml ([7063c8c](https://github.com/napse-invest/django-napse/commit/7063c8c3bfb70ffce841bf3dcf53d555a707640d))
+* **workflow:** remove --ci params in release workflow ([7a11d54](https://github.com/napse-invest/django-napse/commit/7a11d54f97b5c512194e5832fa9fdf52d7486154))
+* **workflow:** remove test badge ([6a03ce4](https://github.com/napse-invest/django-napse/commit/6a03ce425e295a4cf357b639b2bcac64506c2d3e))
+
 # [1.1.0](https://github.com/napse-invest/django-napse/compare/v1.0.1...v1.1.0) (2023-08-05)
 
 
