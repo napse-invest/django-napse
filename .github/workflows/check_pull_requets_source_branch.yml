@@ -1,11 +1,7 @@
 name: Check pull request source branch
 on:
-  pull_request_target:
-    types:
-    - opened
-    - reopened
-    - synchronize
-    
+    pull_request:
+      branches: ["main", "dev"]
 jobs:
   check-branches:
     name: Check branches
