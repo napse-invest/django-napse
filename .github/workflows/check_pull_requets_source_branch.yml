@@ -1,7 +1,7 @@
 name: Check pull request source branch
 on:
     pull_request:
-      branches: ["main", "dev"]
+      branches: ["main"]
 jobs:
   check-branches:
     name: Check branches
