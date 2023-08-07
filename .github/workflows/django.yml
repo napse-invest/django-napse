@@ -62,7 +62,6 @@ jobs:
     - name: Tests and coverage
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
-        export IS_IN_PIPELINE=True
         cd test/test_app
         bash setup_secrets.sh
         cd ../..

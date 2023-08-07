@@ -62,13 +62,12 @@ class BaseExchangeAccountTestCase(ModelTestCase):
 class ExchangeUtilsTestCase:
     def test_ping(self):
         for exchange_account in self.model.objects.all():
+            print(exchange_account)
             exchange_account.ping()
 
-    @skipIf(napse_settings.NAPSE_IS_IN_PIPELINE, "IP will be refused")
     def test_enough_accounts(self):
         self.assertTrue(self.model.objects.count() >= 1)
 
-    @skipIf(napse_settings.NAPSE_IS_IN_PIPELINE, "IP will be refused")
     def test_error_in_ping(self):
         with self.assertRaises(ExchangeAccountError.APIPermissionError):
             self.simple_create().ping()
