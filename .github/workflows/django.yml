@@ -72,7 +72,7 @@ jobs:
     - name: Coverage value
       run: |
         cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
-        echo "cvg_result=$COVERAGE" >> $GITHUB_ENV
+        echo "COVERAGE=$cvg_result" >> $GITHUB_ENV
     - name: Coverage badge
       uses: Schneegans/dynamic-badges-action@v1.6.0
       with:
