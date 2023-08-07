@@ -1,4 +1,4 @@
-from django_napse.core.models import Currency, EmptyBotConfig, Exchange, ExchangeAccount, Fleet, NapseSpace, Order, Transaction
+from django_napse.core.models import Credit, ExchangeAccount, NapseSpace, Transaction
 from django_napse.utils.constants import TRANSACTION_TYPES
 from django_napse.utils.errors import TransactionError
 from django_napse.utils.model_test_case import ModelTestCase
@@ -8,34 +8,19 @@ python test/test_app/manage.py test test.django_tests.transactions.test_transact
 """
 
 
-class TransactionTestCase(ModelTestCase):
+class TransactionTestCase:
     model = Transaction
 
     def setUp(self):
-        self.exchange = Exchange.objects.create(
-            name="random exchange",
-            description="random description",
-        )
-        self.exchange_account = ExchangeAccount.objects.create(
-            exchange=self.exchange,
-            testing=True,
-            name="random exchange account 1",
-            description="random description",
-        )
-        self.space1 = NapseSpace.objects.create(
-            name="Test Space 1",
+        self.from_wallet = self.space.wallet
+        self.from_wallet.top_up(amount=10, ticker="BTC", force=True)
+        space = NapseSpace.objects.create(
+            name="Test Space 2",
             exchange_account=self.exchange_account,
             description="This is a test space",
         )
-
-        self.from_wallet = self.space1.wallet
-        Currency.objects.create(wallet=self.from_wallet, ticker="BTC", amount=1, mbp=20000)
-
-        config = EmptyBotConfig.objects.create(space=self.space1)
-        fleet = Fleet.objects.create(name="test_fleet", configs=[config], exchange_account=self.exchange_account)
-        bot = fleet.bots.first()
-        order = Order.objects.create(bot=bot, buy_amount=100, sell_amount=100, price=1)
-        self.to_wallet = order.wallet
+        Credit.objects.create(wallet=space.wallet, amount=10, ticker="BTC")
+        self.to_wallet = space.wallet
 
     def simple_create(self):
         return Transaction.objects.create(
@@ -48,7 +33,7 @@ class TransactionTestCase(ModelTestCase):
 
     def test_error_same_space(self):
         exchange_account2 = ExchangeAccount.objects.create(
-            exchange=self.exchange,
+            exchange=self.exchange_account.exchange,
             testing=True,
             name="random exchange account 2",
             description="random description",
@@ -87,3 +72,7 @@ class TransactionTestCase(ModelTestCase):
                 ticker="BTC",
                 transaction_type="random transaction type",
             )
+
+
+class TransactionBINANCETestCase(TransactionTestCase, ModelTestCase):
+    exchange = "BINANCE"

@@ -70,7 +70,7 @@ class BinanceAccount(ExchangeAccount):
         unique_together = ("public_key", "private_key")
 
     def ping(self):
-        request = self.exchange_controller.get_info()
+        request = self.exchange_controller().get_info()
         if "error" in request:
             error_msg = f"Error pinging {self.exchange.name}. Check that your API keys are correct and have the correct permissions."
             raise ExchangeAccountError.APIPermissionError(error_msg)

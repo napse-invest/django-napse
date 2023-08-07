@@ -11,6 +11,7 @@ from django_napse.utils.model_test_case import ModelTestCase
 
 class ExchangeTestCase(ModelTestCase):
     model = Exchange
+    skip_exchange_validation = True
 
     def simple_create(self):
         return self.model.objects.create(
@@ -43,6 +44,7 @@ class ExchangeTestCase(ModelTestCase):
 
 class BaseExchangeAccountTestCase(ModelTestCase):
     model = ExchangeAccount
+    skip_exchange_validation = True
 
     def simple_create(self):
         exchange = Exchange.objects.create(
@@ -72,8 +74,9 @@ class ExchangeUtilsTestCase:
             self.simple_create().ping()
 
 
-class BinanceAccountUtilsTestCase(ExchangeUtilsTestCase, ModelTestCase):
+class AccountUtilsBINANCETestCase(ExchangeUtilsTestCase, ModelTestCase):
     model = BinanceAccount
+    exchange = "BINANCE"
 
     def simple_create(self):
         exchange = Exchange.objects.create(

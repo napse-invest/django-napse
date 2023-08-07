@@ -25,7 +25,13 @@ class Fleet(models.Model):
 
     @property
     def bots(self):
-        return Bot.objects.filter(bot_in_cluster__cluster__fleet=self)
+        return Bot.objects.filter(link__cluster__fleet=self)
+
+    def bot_clusters(self):
+        bot_clusters = []
+        for cluster in self.cluster:
+            bot_clusters.append(Bot.objects.filter(link__cluster=cluster))
+        return bot_clusters
 
 
 class DefaultFleetOperator(models.Model):

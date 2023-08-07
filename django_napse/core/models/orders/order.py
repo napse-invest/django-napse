@@ -8,9 +8,10 @@ from django_napse.utils.errors import OrderError
 
 class Order(models.Model):
     connection = models.ForeignKey("Connection", on_delete=models.CASCADE, related_name="orders")
-    buy_amount = models.FloatField()
-    sell_amount = models.FloatField()
+    amount = models.FloatField()
     price = models.FloatField()
+    pair = models.CharField(max_length=10)
+    side = models.CharField(max_length=10)
     status = models.CharField(default=ORDER_STATUS.PENDING, max_length=15)
     completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -22,12 +23,12 @@ class Order(models.Model):
 
     def info(self, verbose=True, beacon=""):
         string = ""
-        string += f"{beacon}Transaction ({self.pk=}):\n"
+        string += f"{beacon}Order ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
         string += f"{beacon}\t{self.connection=}\n"
         string += f"{beacon}\t{self.pair=}\n"
-        string += f"{beacon}\t{self.buy_amount=}\n"
-        string += f"{beacon}\t{self.sell_amount=}\n"
+        string += f"{beacon}\t{self.amount=}\n"
+        string += f"{beacon}\t{self.side=}\n"
         string += f"{beacon}\t{self.price=}\n"
         string += f"{beacon}\t{self.status=}\n"
         string += f"{beacon}\t{self.completed=}\n"
@@ -54,16 +55,12 @@ class Order(models.Model):
         return string
 
     @property
-    def pair(self):
-        return self.connection.bot.pair
-
-    @property
     def testing(self):
-        return self.connection.bot.testing
+        return self.connection.testing
 
     @property
     def exchange_account(self):
-        return self.connection.bot.exchange_account
+        return self.connection.wallet.exchange_account
 
     def set_status_ready(self):
         if self.status == ORDER_STATUS.PENDING:

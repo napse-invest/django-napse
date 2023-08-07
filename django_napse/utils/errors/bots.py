@@ -37,5 +37,5 @@ class ClusterError:
     class MutableBotConfig(Exception):
         """Raised when a BotConfig in a cluster is mutable."""
 
-    class NotEmpty(Exception):
-        """Raised when a cluster is not empty and you try to cr."""
+    class MultipleConfigs(Exception):
+        """Raised when a cluster has multiple configs."""

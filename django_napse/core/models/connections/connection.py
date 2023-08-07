@@ -1,7 +1,6 @@
 from django.db import models
 
 from django_napse.core.models.connections.managers import ConnectionManager
-from django_napse.utils.usefull_functions import process_value_from_type
 
 
 class Connection(models.Model):
@@ -9,7 +8,6 @@ class Connection(models.Model):
     bot = models.ForeignKey("Bot", on_delete=models.CASCADE, related_name="connections")
     enabled = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True, blank=True)
 
     objects = ConnectionManager()
 
@@ -18,6 +16,10 @@ class Connection(models.Model):
 
     def __str__(self):  # pragma: no cover
         return f"CONNECTION: {self.pk=}, {self.bot.name=}, {self.space.name=}"
+
+    @property
+    def testing(self):
+        return self.space.testing
 
 
 class ConnectionSpecificArgs(models.Model):

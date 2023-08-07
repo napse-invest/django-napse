@@ -1,10 +1,12 @@
 from django.db import models
+from django.db.transaction import atomic
 
 from django_napse.utils.constants import TRANSACTION_TYPES
 from django_napse.utils.errors import TransactionError
 
 
 class TransactionManager(models.Manager):
+    @atomic()
     def create(self, from_wallet, to_wallet, amount, ticker, transaction_type):
         """Create a Transaction object and update the wallets accordingly."""
         if amount == 0:
@@ -17,7 +19,7 @@ class TransactionManager(models.Manager):
             transaction_type=transaction_type,
         )
         if from_wallet.exchange_account != to_wallet.exchange_account:
-            error_msg = "Wallets must be on the same space."
+            error_msg = "Wallets must be on the same exchange_account."
             raise TransactionError.DifferentAccountError(error_msg)
         if transaction_type not in TRANSACTION_TYPES:
             error_msg = f"Transaction type {transaction_type} not in {TRANSACTION_TYPES}."

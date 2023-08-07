@@ -1,4 +1,6 @@
-from django_napse.core.models import Bot, EmptyBotConfig, NapseSpace
+from django.test import TestCase
+
+from django_napse.core.models import Bot, Controller, EmptyBotConfig, EmptyStrategy, NapseSpace, Strategy
 from django_napse.utils.errors import BotConfigError
 from django_napse.utils.model_test_case import ModelTestCase
 
@@ -7,36 +9,51 @@ python test/test_app/manage.py test test.django_tests.bots.test_bot -v2 --keepdb
 """
 
 
-class BotConfigDefaultTestCase:
+class BotDefaultTestCase:
     def simple_create(self):
-        return self.model.objects.create(space=self.space, settings=self.settings)
+        return self.model.objects.create(name="Test Bot", strategy=self.strategy)
 
-    def test_error_duplicate(self):
-        self.simple_create()
-        with self.assertRaises(BotConfigError.DuplicateBotConfig):
-            self.simple_create()
+    @property
+    def config(self):
+        return self.strategy_class.config_class().objects.create(space=self.space, settings=self.config_settings)
 
-    def test_missing_setting(self):
-        with self.assertRaises(BotConfigError.MissingSettingError):
-            self.model.objects.create(space=self.space, settings={})
+    @property
+    def architechture(self):
+        return self.strategy_class.architechture_class().objects.create(**self.architechture_settings)
 
-    def test_duplicate_immutable(self):
-        config = self.simple_create()
-        config.duplicate_immutable()
-        config.duplicate_immutable()
-
-    def test_duplicate_other_space(self):
-        config = self.simple_create()
-        with self.assertRaises(ValueError):
-            config.duplicate_other_space(self.space)
-        new_space = NapseSpace.objects.create(name="Test Space 2", exchange_account=self.exchange_account, description="This is a test space")
-        config.duplicate_other_space(new_space)
+    @property
+    def strategy(self):
+        return self.strategy_class.objects.create(config=self.config, architechture=self.architechture)
 
 
-class EmptyBotTestCase(BotConfigDefaultTestCase):
+class BotTypeCkeck(TestCase):
+    def test_bot_type(self):
+        subclasses = []
+        for subclass_level in BotDefaultTestCase.__subclasses__():
+            subclasses += subclass_level.__subclasses__()
+        tested_strategies = {*[subclass.strategy_class for subclass in subclasses]}
+        strategies = {*Strategy.__subclasses__()}
+        if tested_strategies != strategies:
+            error_msg = "You have untested Strategies. Check out the documentation to see how to test them (spoiler, it's really easy!)."
+            raise ValueError(error_msg)
+
+
+### Empty Bot ###
+class EmptyBotTestCase(BotDefaultTestCase):
     model = Bot
-    config_model = EmptyBotConfig
-    settings = {"empty": True}
+    strategy_class = EmptyStrategy
+    config_settings = {"empty": True}
+
+    @property
+    def architechture_settings(self):
+        return {
+            "controller": Controller.objects.create(
+                space=self.space,
+                base="BTC",
+                quote="USDT",
+                interval="1m",
+            ),
+        }
 
 
 class EmptyBotBINANCETestCase(EmptyBotTestCase, ModelTestCase):

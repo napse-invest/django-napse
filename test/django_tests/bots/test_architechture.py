@@ -19,10 +19,6 @@ class ArchitechtureTestCase:
             ),
         )
 
-    def attributes(self):  # pragma: no cover
-        error_msg = "attributes not implemented for the Architechture base class, please implement it in the child class."
-        raise NotImplementedError(error_msg)
 
-
-class SinglePairArchitechtureTestCase(ArchitechtureTestCase, ModelTestCase):
+class SinglePairArchitechtureBINANCETestCase(ArchitechtureTestCase, ModelTestCase):
     exchange = "BINANCE"

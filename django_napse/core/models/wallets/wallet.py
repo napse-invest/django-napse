@@ -6,9 +6,10 @@ from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.wallets.currency import Currency
 from django_napse.core.models.wallets.managers import WalletManager
 from django_napse.utils.errors import WalletError
+from django_napse.utils.findable_class import FindableClass
 
 
-class Wallet(models.Model):
+class Wallet(models.Model, FindableClass):
     title = models.CharField(max_length=255, default="Wallet")
     locked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -19,6 +20,7 @@ class Wallet(models.Model):
         return f"WALLET: {self.pk=} - {self.title=} - {self.locked=}"
 
     def info(self, verbose=True, beacon=""):
+        self = self.find()
         string = ""
         string += f"{beacon}Wallet ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
@@ -169,7 +171,7 @@ class SpaceWallet(Wallet):
 
     @property
     def exchange_account(self):
-        return self.owner.exchange_account
+        return self.space.exchange_account.find()
 
 
 class OrderWallet(Wallet):
@@ -177,8 +179,16 @@ class OrderWallet(Wallet):
 
     @property
     def exchange_account(self):
-        return self.owner.exchange_account
+        return self.owner.exchange_account.find()
 
 
 class ConnectionWallet(Wallet):
     owner = models.OneToOneField("Connection", on_delete=models.CASCADE, related_name="wallet")
+
+    @property
+    def space(self):
+        return self.owner.space
+
+    @property
+    def exchange_account(self):
+        return self.space.exchange_account.find()

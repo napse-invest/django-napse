@@ -36,7 +36,7 @@ class TRANSACTION_TYPES(Enum, metaclass=CustomEnumMeta):
     TRANSFER = "TRANSFER"
     DEPOSIT = "DEPOSIT"
     WITHDRAW = "WITHDRAW"
-    TRADE = "TRADE"
+    ORDER_DEPOSIT = "ORDER_DEPOSIT"
     FLEET_REBALANCE = "FLEET_REBALANCE"
     DUST = "DUST"
 
@@ -48,10 +48,17 @@ class ORDER_STATUS(Enum, metaclass=CustomEnumMeta):
     FAILED = "FAILED"
 
 
+class SIDES(Enum, metaclass=CustomEnumMeta):
+    BUY = "BUY"
+    SELL = "SELL"
+    KEEP = "KEEP"
+
+
+ORDER_LEEWAY_PERCENTAGE = 10
+
 DEFAULT_TAX = {
     "BINANCE": 0.1,
 }
-
 
 EXCHANGE_TICKERS = {
     "BINANCE": ["BTC", "ETH", "USDT", "BNB", "XRP", "ADA", "DOGE", "MATIC", "SOL", "DOT", "LTC", "TRX", "SHIB", "AVAX", "LINK", "ATOM", "UNI", "XLM"],
