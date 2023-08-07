@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 if [ -f .env ]; then
     export $(xargs < .env)
 fi
