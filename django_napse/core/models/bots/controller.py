@@ -45,7 +45,7 @@ class Controller(models.Model):
         string += f"{beacon}\t{self.last_price_update=}\n"
         string += f"{beacon}\t{self.last_settings_update=}\n"
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string
 

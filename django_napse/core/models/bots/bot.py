@@ -29,7 +29,7 @@ class Bot(models.Model):
         new_beacon = beacon + "\t"
         string += f"{beacon}\t{self.strategy.info(verbose=False, beacon=new_beacon)}\n"
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string
 

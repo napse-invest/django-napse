@@ -7,6 +7,9 @@ class BotError:
     class NoSpace(Exception):
         """Raised when a bot is in a fleet and therefore doesn't have a space."""
 
+    class BuildNotPossible(Exception):
+        """Raised when a bot cannot be built due to bad parameters."""
+
 
 class BotConfigError:
     """Base class for bot config errors."""
