@@ -4,7 +4,7 @@ if [ -f .env ]; then
     export $(xargs < .env)
 fi
 
-cat << EOF > secret.json
+cat << EOF > secrets.json
 {
     "Exchange Accounts": {
         "BINANCE Test Account": {

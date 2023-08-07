@@ -30,7 +30,6 @@ def create_accounts(sender, **kwargs):
 
     with open(settings.NAPSE_SECRETS_FILE_PATH, "r") as json_file:
         secrets = json.load(json_file)
-    pprint(secrets)
     created_exchange_accounts = []
 
     with atomic():
