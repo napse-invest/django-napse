@@ -17,5 +17,3 @@ jobs:
         BASE_REF: ${{ github.base_ref }}
       run: |
         echo "Merge requests to the main branch are only allowed from the dev branch."
-        # if [ "$HEAD_REF" != "dev" ] && [ "$BASE_REF" == "main" ]; then
-        # fi
