@@ -38,6 +38,9 @@ jobs:
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
         export IS_IN_PIPELINE=True
+        cd test/test_app
+        bash setup_secrets.sh
+        cd ../..
         coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
 
     - name: Coverage value
