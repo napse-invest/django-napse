@@ -15,6 +15,6 @@ class SinglePairArchitechture(Architechture):
         new_beacon = beacon + "\t"
         string += f"{beacon}Controller:\n{beacon}{self.controller.info(beacon=new_beacon, verbose=False)}\n"
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string

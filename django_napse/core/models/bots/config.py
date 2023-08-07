@@ -24,7 +24,7 @@ class BotConfig(models.Model, FindableClass):
         string += f"{beacon}Settings:\n"
         for setting, value in self.settings.items():
             string += f"{beacon}\t" + setting + f"={value}\n"
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string
 

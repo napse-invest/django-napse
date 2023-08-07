@@ -1,11 +1,7 @@
 name: Check pull request source branch
 on:
-  pull_request_target:
-    types:
-    - opened
-    - reopened
-    - synchronize
-    
+    pull_request:
+      branches: ["main", "dev"]
 jobs:
   check-branches:
     name: Check branches
@@ -15,7 +11,8 @@ jobs:
       env:
         HEAD_REF: ${{ github.head_ref }}
         BASE_REF: ${{ github.base_ref }}
-      run: 
-        echo "Merge requests to main branch are only allowed from dev branch."
-        
-        
+      run: |
+        if [ "$HEAD_REF" != "dev" ] && [ "$BASE_REF" == "main" ]; then
+            echo "Merge requests to the main branch are only allowed from the dev branch."
+            exit 1
+        fi
