@@ -1,4 +1,5 @@
-from django_napse.core.models import BotConfig, Exchange, ExchangeAccount, Fleet, NapseSpace, Order
+from django_napse.core.models import Bot, Connection, Controller, EmptyBotConfig, EmptyStrategy, Order, SinglePairArchitechture
+from django_napse.utils.constants import SIDES
 from django_napse.utils.model_test_case import ModelTestCase
 
 """
@@ -6,24 +7,25 @@ python test/test_app/manage.py test test.django_tests.orders.test_orders -v2 --k
 """
 
 
-class OrderTestCase(ModelTestCase):
+class OrderTestCase:
     model = Order
 
-    def setUp(self):
-        self.exchange = Exchange.objects.create(
-            name="random exchange",
-            description="random description",
-        )
-        self.exchange_account = ExchangeAccount.objects.create(
-            exchange=self.exchange,
-            testing=True,
-            name="random exchange account 1",
-            description="random description",
-        )
-        self.space = NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
-
     def simple_create(self):
-        config = BotConfig.objects.create(bot_type="Bot", name="test_bot", pair="MATICUSDT", interval="1m", space=self.space)
-        fleet = Fleet.objects.create(name="test_fleet", configs=[config], exchange_account=self.exchange_account)
-        bot = fleet.bots.first()
-        return Order.objects.create(bot=bot, buy_amount=100, sell_amount=100, price=1)
+        config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
+        architechture = SinglePairArchitechture.objects.create(
+            controller=Controller.objects.create(
+                space=self.space,
+                base="BTC",
+                quote="USDT",
+                interval="1m",
+            ),
+        )
+        strategy = EmptyStrategy.objects.create(config=config, architechture=architechture)
+        bot = Bot.objects.create(name="Test Bot", strategy=strategy)
+        connection = Connection.objects.create(space=self.space, bot=bot)
+        connection.wallet.top_up(amount=10000, ticker="USDT", force=True)
+        return Order.objects.create(connection=connection, amount=0.1, price=30000, pair="BTCUSDT", side=SIDES.BUY)
+
+
+class OrderBINANCETestCase(OrderTestCase, ModelTestCase):
+    exchange = "BINANCE"

@@ -5,7 +5,7 @@ from django_napse.core.models.accounts.managers import NapseSpaceManager
 
 class NapseSpace(models.Model):
     name = models.CharField(max_length=200)
-    identifier = models.CharField(max_length=200)
+    identifier = models.CharField(max_length=20, unique=True)
     description = models.TextField()
     exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="spaces")
 
@@ -14,7 +14,7 @@ class NapseSpace(models.Model):
     objects = NapseSpaceManager()
 
     class Meta:
-        unique_together = ("name", "identifier")
+        unique_together = ("name", "exchange_account")
 
     def __str__(self):
         return f"SPACE: {self.name}"

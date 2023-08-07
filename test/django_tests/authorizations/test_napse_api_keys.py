@@ -4,7 +4,7 @@ from django_napse.core.models import NapseAPIKey
 from django_napse.utils.model_test_case import ModelTestCase
 
 
-class ExchangeTestCase(ModelTestCase):
+class NapseAPIKeyTestCase:
     model = NapseAPIKey
 
     def simple_create(self):
@@ -21,3 +21,7 @@ class ExchangeTestCase(ModelTestCase):
         key2.napse_API_key = key1.napse_API_key
         with self.assertRaises(IntegrityError):
             key2.save()
+
+
+class NapseAPIKeyBINANCETestCase(NapseAPIKeyTestCase, ModelTestCase):
+    exchange = "BINANCE"

@@ -24,6 +24,6 @@ class NapseAPIKey(models.Model):
         for permission in self.permissions.all():
             string += f"{permission.info(verbose=False, beacon=new_beacon)}\n"
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string

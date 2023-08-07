@@ -7,6 +7,9 @@ class BotError:
     class NoSpace(Exception):
         """Raised when a bot is in a fleet and therefore doesn't have a space."""
 
+    class BuildNotPossible(Exception):
+        """Raised when a bot cannot be built due to bad parameters."""
+
 
 class BotConfigError:
     """Base class for bot config errors."""
@@ -37,5 +40,5 @@ class ClusterError:
     class MutableBotConfig(Exception):
         """Raised when a BotConfig in a cluster is mutable."""
 
-    class NotEmpty(Exception):
-        """Raised when a cluster is not empty and you try to cr."""
+    class MultipleConfigs(Exception):
+        """Raised when a cluster has multiple configs."""

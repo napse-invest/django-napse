@@ -13,10 +13,10 @@ class Transaction(models.Model):
 
     objects = TransactionManager()
 
-    def __str__(self):  # pragma: no cover
+    def __str__(self):
         return f"TRANSACTION: {self.from_wallet.pk} -> {self.to_wallet.pk} ({self.amount=} - {self.ticker=})"
 
-    def info(self, verbose=True, beacon=""):  # pragma: no cover
+    def info(self, verbose=True, beacon=""):
         string = ""
         string += f"{beacon}Transaction {self.pk=}\n"
         string += f"{beacon}Args:\n"
@@ -29,6 +29,6 @@ class Transaction(models.Model):
         string += f"{beacon}To Wallet:\n"
         wall_str = self.to_wallet.info(verbose=False, beacon=beacon + "\t")
         string += f"{wall_str}\n"
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string

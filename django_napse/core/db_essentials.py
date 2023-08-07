@@ -1,10 +1,12 @@
 import json
+from pprint import pprint
 
 from django.apps import apps
-from django.conf import settings
 from django.db.models.signals import post_migrate
 from django.db.transaction import atomic
 from django.dispatch import receiver
+
+from django_napse.core.settings import napse_settings as settings
 
 
 @receiver(post_migrate)
@@ -28,7 +30,6 @@ def create_accounts(sender, **kwargs):
 
     with open(settings.NAPSE_SECRETS_FILE_PATH, "r") as json_file:
         secrets = json.load(json_file)
-
     created_exchange_accounts = []
 
     with atomic():

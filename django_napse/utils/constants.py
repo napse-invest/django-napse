@@ -36,21 +36,29 @@ class TRANSACTION_TYPES(Enum, metaclass=CustomEnumMeta):
     TRANSFER = "TRANSFER"
     DEPOSIT = "DEPOSIT"
     WITHDRAW = "WITHDRAW"
-    TRADE = "TRADE"
+    ORDER_DEPOSIT = "ORDER_DEPOSIT"
     FLEET_REBALANCE = "FLEET_REBALANCE"
     DUST = "DUST"
 
 
 class ORDER_STATUS(Enum, metaclass=CustomEnumMeta):
     PENDING = "PENDING"
+    READY = "READY"
     PASSED = "PASSED"
     FAILED = "FAILED"
-    ONLY_BUY_PASSED = "ONLY_BUY_PASSED"
-    ONLY_SELL_PASSED = "ONLY_SELL_PASSED"
 
 
-DEFAULT_TAX = {"BINANCE": 0.1}
+class SIDES(Enum, metaclass=CustomEnumMeta):
+    BUY = "BUY"
+    SELL = "SELL"
+    KEEP = "KEEP"
 
+
+ORDER_LEEWAY_PERCENTAGE = 10
+
+DEFAULT_TAX = {
+    "BINANCE": 0.1,
+}
 
 EXCHANGE_TICKERS = {
     "BINANCE": ["BTC", "ETH", "USDT", "BNB", "XRP", "ADA", "DOGE", "MATIC", "SOL", "DOT", "LTC", "TRX", "SHIB", "AVAX", "LINK", "ATOM", "UNI", "XLM"],
@@ -62,10 +70,10 @@ EXCHANGE_INTERVALS = {
     "BINANCE": ("1m", "3m", "5m", "15m", "30m", "1h", "2h", "4h", "6h", "8h", "12h", "1d", "3d", "1w", "1M"),
 }
 EXCHANGE_TESTING = {
-    "BINANCE": [False],
+    "BINANCE": [True],
 }
 EXCHANGE_SIMULATION = {
-    "BINANCE": [True, False],
+    "BINANCE": True,
 }
 
 STABLECOINS = {

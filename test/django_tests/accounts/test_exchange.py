@@ -11,6 +11,7 @@ from django_napse.utils.model_test_case import ModelTestCase
 
 class ExchangeTestCase(ModelTestCase):
     model = Exchange
+    skip_exchange_validation = True
 
     def simple_create(self):
         return self.model.objects.create(
@@ -43,6 +44,7 @@ class ExchangeTestCase(ModelTestCase):
 
 class BaseExchangeAccountTestCase(ModelTestCase):
     model = ExchangeAccount
+    skip_exchange_validation = True
 
     def simple_create(self):
         exchange = Exchange.objects.create(
@@ -62,18 +64,17 @@ class ExchangeUtilsTestCase:
         for exchange_account in self.model.objects.all():
             exchange_account.ping()
 
-    @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_enough_accounts(self):
         self.assertTrue(self.model.objects.count() >= 1)
 
-    @skipIf(napse_settings.IS_IN_PIPELINE, "IP will be refused")
     def test_error_in_ping(self):
         with self.assertRaises(ExchangeAccountError.APIPermissionError):
             self.simple_create().ping()
 
 
-class BinanceAccountUtilsTestCase(ExchangeUtilsTestCase, ModelTestCase):
+class AccountUtilsBINANCETestCase(ExchangeUtilsTestCase, ModelTestCase):
     model = BinanceAccount
+    exchange = "BINANCE"
 
     def simple_create(self):
         exchange = Exchange.objects.create(

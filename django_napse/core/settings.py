@@ -2,6 +2,7 @@ import json
 import logging
 
 import environ
+from django.apps import apps
 from django.conf import settings
 
 from django_napse.utils.constants import EXCHANGES
@@ -26,7 +27,7 @@ if settings.configured:
             with open(settings.NAPSE_SECRETS_FILE_PATH, "w") as secrets_file:
                 json.dump({"Exchange Accounts": {}}, secrets_file)
 
-    if list(settings.NAPSE_EXCHANGE_CONFIGS.keys()) != list(EXCHANGES):
+    if {*list(settings.NAPSE_EXCHANGE_CONFIGS.keys())} != set(EXCHANGES):
         error_msg = "NAPSE_EXCHANGE_CONFIGS does not match the list of exchanges. Can't start the server."
         raise NapseError.SettingsError(error_msg)
 
@@ -45,8 +46,16 @@ class DjangoNapseSettings:
         )
 
     @property
-    def IS_IN_PIPELINE(self):
-        return environ.Env().bool("IS_IN_PIPELINE", default=False)
+    def NAPSE_IS_IN_PIPELINE(self):
+        return environ.Env().bool("NAPSE_IS_IN_PIPELINE", default=False)
+
+    @property
+    def NAPSE_SECRETS_FILE_PATH(self):
+        return getattr(settings, "NAPSE_SECRETS_FILE_PATH", "secrets.json")
+
+    @property
+    def NAPSE_EXCHANGES_TO_TEST(self):
+        return getattr(settings, "NAPSE_EXCHANGES_TO_TEST", ["BINANCE"])
 
 
 napse_settings = DjangoNapseSettings()
