@@ -17,3 +17,4 @@ cat << EOF > secrets.json
     }
 }
 EOF
+cat secrets.json
