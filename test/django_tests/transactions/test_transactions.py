@@ -13,12 +13,12 @@ class TransactionTestCase:
 
     def setUp(self):
         self.from_wallet = self.space.wallet
-        self.from_wallet.top_up(amount=10, ticker="BTC", force=True)
         space = NapseSpace.objects.create(
             name="Test Space 2",
             exchange_account=self.exchange_account,
             description="This is a test space",
         )
+        Credit.objects.create(wallet=self.from_wallet, amount=10, ticker="BTC")
         Credit.objects.create(wallet=space.wallet, amount=10, ticker="BTC")
         self.to_wallet = space.wallet
 

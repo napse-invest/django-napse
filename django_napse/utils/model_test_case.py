@@ -59,7 +59,7 @@ class ModelTestCase(TestCase):
         if skip:
             self.skipTest(reason)
         instance = self.simple_create()
-        instance.info(verbose=False)
+        instance.info(verbose=True)
 
     def test_str(self):
         skip, reason = self.skip_condition()

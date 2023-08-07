@@ -13,7 +13,7 @@ class BotConfig(models.Model, FindableClass):
 
     objects = BotConfigManager()
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return f"BOT CONFIG: {self.pk}"
 
     def info(self, verbose=True, beacon=""):
@@ -22,11 +22,8 @@ class BotConfig(models.Model, FindableClass):
         string += f"{beacon}Args:\n"
         string += f"{beacon}\t{self.space=}\n"
         string += f"{beacon}Settings:\n"
-        if len(self.settings) > 0:
-            for setting, value in self.settings.items():
-                string += f"{beacon}\t" + setting + f"={value}\n"
-        else:
-            string += f"{beacon}\tNo settings\n"
+        for setting, value in self.settings.items():
+            string += f"{beacon}\t" + setting + f"={value}\n"
         if verbose:
             print(string)
         return string
