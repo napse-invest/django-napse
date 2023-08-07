@@ -2,7 +2,7 @@ name: Django CI
 
 on:
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: ["main", "dev"]
 
 jobs:
   build:
@@ -13,14 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python
+    - name: Set up python
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
         # x64 or x86
         architecture: 'x64'
 
-    - name: Install Dependencies
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install pip-tools
@@ -34,8 +34,25 @@ jobs:
         ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
       continue-on-error: true
 
-    - name: Run Tests
+    - name: Tests and coverage
       run: |
         export PYTHONPATH="$PYTHONPATH:./django-napse/"
-        export NAPSE_IS_IN_PIPELINE=True
-        python ./test/test_app/manage.py test -v2 --parallel
+        export IS_IN_PIPELINE=True
+        coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
+
+    - name: Coverage value
+      run: |
+        cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
+        echo "COVERAGE=$cvg_result" >> $GITHUB_ENV
+
+    - name: Coverage badge
+      uses: Schneegans/dynamic-badges-action@v1.6.0
+      with:
+        auth: ${{ secrets.NAPSE_SECRET_GIST }}
+        gistID: 40fac957532fe3b731c99067467de842
+        filename: django-napse-coverage.json
+        label: Coverage
+        message: ${{ env.COVERAGE }} %
+        valColorRange: ${{ env.COVERAGE }}
+        minColorRange: 50 
+        maxColorRange: 95
