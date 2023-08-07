@@ -57,7 +57,7 @@ class ExchangeAccount(models.Model, FindableClass):
         error_msg = f"create_client() not implemented for {self.__class__.__name__}"
         raise NotImplementedError(error_msg)
 
-    def exchange_controller(self):
+    def exchange_controller(self):  # pragma: no cover
         error_msg = f"exchange_controller() not implemented for {self.__class__.__name__}"
         raise NotImplementedError(error_msg)
 

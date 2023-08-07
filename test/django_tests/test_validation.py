@@ -23,7 +23,6 @@ class ValidateModelTestCaseSubclassesTestCase(TestCase):
         for subclass in ModelTestCase.__subclasses__():
             with suppress(AttributeError):
                 if subclass.skip_exchange_validation:
-                    print(f"Skipping {subclass.__name__}")
                     continue
             if subclass.exchange is None:
                 error_msg = f"ModelTestCase subclass {subclass.__name__} must have an exchange attribute."

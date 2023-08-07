@@ -25,6 +25,6 @@ class Credit(models.Model):
         wall_str = self.wallet.info(verbose=False, beacon=beacon + "\t")
         string += f"{wall_str}\n"
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string
