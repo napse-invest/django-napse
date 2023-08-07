@@ -1,8 +1,8 @@
 from django.apps import apps
 from django.db import models
 
-from django_napse.core.models.fleets.cluster import Cluster
-from django_napse.utils.constants import EXCHANGES, OPERATORS
+from django_napse.core.models.fleets.link import Link
+from django_napse.utils.constants import OPERATORS
 from django_napse.utils.errors import FleetError
 
 
@@ -13,7 +13,7 @@ class FleetManager(models.Manager):
         exchange_account,
         operator: str = "EQUILIBRIUM",
         operator_args=None,
-        configs=None,
+        bots=None,
     ):
         """Create a fleet.
 
@@ -23,7 +23,7 @@ class FleetManager(models.Manager):
         exchange_account(str): The exchange account of the fleet
         operator (str): The operator of the fleet (default: "EQUILIBRIUM")
         operator_args (dict): The arguments to pass down to the operator (default: {})
-        configs (list): The list of configs to use (default: None)
+        bots (list): The list of bots to use (default: None)
 
         Raises:
         ------
@@ -34,7 +34,7 @@ class FleetManager(models.Manager):
         Fleet: The created fleet
         """
         operator_args = operator_args or {}
-        configs = configs or []
+        bots = bots or []
 
         fleet = self.model(
             name=name,
@@ -55,8 +55,7 @@ class FleetManager(models.Manager):
                 SpecificSharesFleetOperator = apps.get_model("django_napse_core", "SpecificSharesFleetOperator")
                 SpecificSharesFleetOperator.objects.create(fleet=fleet, **operator_args)
 
-        for config in configs:
-            cluster = Cluster.objects.create(fleet=fleet, config=config.duplicate_immutable())
-            cluster.deploy()
+        for bot in bots:
+            Link.objects.create(bot=bot, fleet=fleet)
 
         return fleet

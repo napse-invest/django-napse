@@ -30,6 +30,25 @@ class Controller(models.Model):
     def __str__(self):
         return f"Controller {self.pair} - {self.interval}"
 
+    def info(self, verbose=True, beacon=""):
+        string = ""
+        string += f"{beacon}Controller {self.pk}:\n"
+        string += f"{beacon}Args:\n"
+        string += f"{beacon}\t{self.pair=}\n"
+        string += f"{beacon}\t{self.base=}\n"
+        string += f"{beacon}\t{self.quote=}\n"
+        string += f"{beacon}\t{self.interval=}\n"
+        string += f"{beacon}\t{self.min_notional=}\n"
+        string += f"{beacon}\t{self.min_trade=}\n"
+        string += f"{beacon}\t{self.lot_size=}\n"
+        string += f"{beacon}\t{self.price=}\n"
+        string += f"{beacon}\t{self.last_price_update=}\n"
+        string += f"{beacon}\t{self.last_settings_update=}\n"
+
+        if verbose:
+            print(string)
+        return string
+
     def save(self, *args, **kwargs):
         if not self.pk:
             self.base = self.base.upper()
@@ -66,7 +85,7 @@ class Controller(models.Model):
 
     @property
     def exchange_controller(self):
-        return self.space.exchange_account.find().exchange_controller
+        return self.space.exchange_account.find().exchange_controller()
 
     @property
     def exchange(self):
@@ -80,7 +99,10 @@ class Controller(models.Model):
     def _update_variables(self) -> None:
         """Update the variables of the controller."""
         exchange_controller = self.exchange_controller
-        if exchange_controller.__class__ == BinanceController:
+
+        if exchange_controller == "DEFAULT":
+            pass
+        elif exchange_controller.__class__ == BinanceController:
             try:
                 filters = exchange_controller.client.get_symbol_info(self.pair)["filters"]
                 last_price = exchange_controller.client.get_ticker(symbol=self.pair)["lastPrice"]
@@ -175,3 +197,17 @@ class Controller(models.Model):
         if self.last_price_update is None or self.last_price_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
             self._get_price()
         return self.price
+
+
+class Candle(models.Model):
+    controller = models.ForeignKey("Controller", on_delete=models.CASCADE, related_name="candles")
+    latest = models.BooleanField(default=False)
+    last_update = models.DateTimeField(auto_now=True)
+    open = models.FloatField()
+    high = models.FloatField()
+    low = models.FloatField()
+    close = models.FloatField()
+    volume = models.FloatField()
+
+    def __str__(self):
+        return f"CANDLE {self.pk}"

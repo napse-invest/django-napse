@@ -1,24 +1,17 @@
 from django.db.utils import IntegrityError
 
-from django_napse.core.models import Currency, Exchange, ExchangeAccount, NapseSpace
+from django_napse.core.models import Currency
 from django_napse.utils.model_test_case import ModelTestCase
 
+"""
+python test/test_app/manage.py test test.django_tests.wallets.test_currency -v2 --keepdb --parallel
+"""
 
-class CurrencyTestCase(ModelTestCase):
+
+class CurrencyTestCase:
     model = Currency
 
     def setUp(self) -> None:
-        self.exchange = Exchange.objects.create(
-            name="random exchange",
-            description="random description",
-        )
-        self.exchange_account = ExchangeAccount.objects.create(
-            exchange=self.exchange,
-            testing=True,
-            name="random exchange account 1",
-            description="random description",
-        )
-        self.space = NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
         self.wallet = self.space.wallet
 
     def simple_create(self):
@@ -35,3 +28,7 @@ class CurrencyTestCase(ModelTestCase):
     def test_property_testing(self):
         currency = Currency.objects.create(wallet=self.wallet, ticker="BTC", amount=1, mbp=20000)
         self.assertTrue(currency.testing)
+
+
+class CurrencyBINANCETestCase(CurrencyTestCase, ModelTestCase):
+    exchange = "BINANCE"
