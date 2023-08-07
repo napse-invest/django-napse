@@ -43,7 +43,7 @@ jobs:
       with:
         python-version: '3.11'
         # x64 or x86
-        architecture: 'x64'
+        architecture: 'x86'
 
     - name: Install dependencies
       run: |
