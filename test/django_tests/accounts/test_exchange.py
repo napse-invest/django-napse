@@ -62,7 +62,6 @@ class BaseExchangeAccountTestCase(ModelTestCase):
 class ExchangeUtilsTestCase:
     def test_ping(self):
         for exchange_account in self.model.objects.all():
-            print(exchange_account)
             exchange_account.ping()
 
     def test_enough_accounts(self):

@@ -76,7 +76,6 @@ class BinanceAccount(ExchangeAccount):
             raise ExchangeAccountError.APIPermissionError(error_msg)
 
     def exchange_controller(self):
-        print(self.public_key, self.private_key)
         return BinanceController(self.public_key, self.private_key)
 
 
