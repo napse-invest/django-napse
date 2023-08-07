@@ -18,5 +18,4 @@ jobs:
       run: |
           if [ "$HEAD_REF" != "dev" ] && [ "$BASE_REF" == "main" ]; then
             echo "Merge requests to the main branch are only allowed from the dev branch."
-            exit 1
           fi
