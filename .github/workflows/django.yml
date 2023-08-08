@@ -4,14 +4,7 @@ on:
   pull_request_target:
 
 jobs:
-  authorize:
-    environment: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && 'external' || 'internal' }}
-    runs-on: ubuntu-latest
-    steps:
-      - run: true
-
   start-runner:
-    needs: authorize
     name: Start self-hosted EC2 runner
     runs-on: ubuntu-latest
     outputs:
