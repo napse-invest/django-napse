@@ -21,6 +21,10 @@ jobs:
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -28,6 +32,11 @@ jobs:
       - name: Start EC2 runner
         id: start-ec2-runner
         uses: machulav/ec2-github-runner@v2
+        env:
+          GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          AWS_EC2_IMAGE_ID: ${{ secrets.AWS_EC2_IMAGE_ID }}
+          AWS_SUBNET_ID: ${{ secrets.AWS_SUBNET_ID }}
+          AWS_SECURITY_GROUP_ID: ${{ secrets.AWS_SECURITY_GROUP_ID }}
         with:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
@@ -71,6 +80,9 @@ jobs:
         continue-on-error: true
 
       - name: Tests and coverage
+        env:
+          BINANCE_PUBLIC_KEY: ${{ secrets.BINANCE_PUBLIC_KEY }}
+          BINANCE_PRIVATE_KEY: ${{ secrets.BINANCE_PRIVATE_KEY }}
         run: |
           export PYTHONPATH="$PYTHONPATH:./django-napse/"
           export BINANCE_PUBLIC_KEY=${{ secrets.BINANCE_PUBLIC_KEY }}
@@ -106,12 +118,18 @@ jobs:
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Stop EC2 runner
         uses: machulav/ec2-github-runner@v2
+        env:
+          GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
         with:
           mode: stop
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
