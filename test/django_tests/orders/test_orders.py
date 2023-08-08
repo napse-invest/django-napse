@@ -13,7 +13,7 @@ class OrderTestCase:
     def simple_create(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architechture = SinglePairArchitechture.objects.create(
-            controller=Controller.objects.create(
+            controller=Controller.get(
                 space=self.space,
                 base="BTC",
                 quote="USDT",

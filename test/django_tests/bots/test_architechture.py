@@ -11,7 +11,7 @@ class ArchitechtureTestCase:
 
     def simple_create(self):
         return self.model.objects.create(
-            controller=Controller.objects.create(
+            controller=Controller.get(
                 space=self.space,
                 base="BTC",
                 quote="USDT",

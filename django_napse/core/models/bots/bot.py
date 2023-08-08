@@ -82,7 +82,7 @@ class Bot(models.Model):
 
     def trigger_actions(self):
         connections = self.get_connections()
-        orders, modifictions = self.architechture.trigger_actions(bot=self, connections=connections)
+        orders, modifictions = self.architechture.trigger_actions(bot=self, data=self.architechture.prepare_data(), connections=connections)
         for order in orders:
             order.set_status_ready()
         for modification in modifictions:

@@ -28,8 +28,11 @@ class Wallet(models.Model, FindableClass):
         string += f"{beacon}\t{self.testing=}\n"
         string += f"{beacon}\t{self.locked=}\n"
         string += f"{beacon}Currencies\n"
-        for currency in self.currencies.all():
-            string += f"{beacon}\t{currency.ticker}: {currency.amount} @ ${currency.mbp}\n"
+        if self.currencies.count() == 0:
+            string += f"{beacon}\tNo currencies\n"
+        else:
+            for currency in self.currencies.all():
+                string += f"{beacon}\t{currency.ticker}: {currency.amount} @ ${currency.mbp}\n"
         if verbose:  # pragma: no cover
             print(string)
         return string
