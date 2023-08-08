@@ -1,6 +1,8 @@
 name: Check pull request source branch
+
 on:
   pull_request_target:
+
 jobs:
   check-branches:
     name: Check branches
