@@ -23,7 +23,7 @@
 ## django-napse
 ...
 
-## Usefull commands
+## Useful commands
 Unless otherwise specified, all commands are to be run at the root folder of the project.
 
 ### Create a new project
