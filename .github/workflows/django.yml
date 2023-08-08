@@ -72,7 +72,7 @@ jobs:
     - name: Coverage value
       run: |
         cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
-
+        echo "COVERAGE=$cvg_result" >> $GITHUB_ENV
     - name: Coverage badge
       uses: Schneegans/dynamic-badges-action@v1.6.0
       with:
@@ -80,8 +80,8 @@ jobs:
         gistID: 40fac957532fe3b731c99067467de842
         filename: django-napse-coverage.json
         label: Coverage
-        message: $cvg_result %
-        valColorRange: $cvg_result
+        message: ${{ env.COVERAGE }}%
+        valColorRange: ${{ env.COVERAGE }}
         minColorRange: 50 
         maxColorRange: 95
         
