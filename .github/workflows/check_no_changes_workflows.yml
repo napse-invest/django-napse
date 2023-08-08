@@ -1,6 +1,7 @@
 name: Check No Changes to workflow files
+
 on:
-  pull_request:
+  pull_request_target:
     paths:
       - .github/workflows/*
 jobs:
