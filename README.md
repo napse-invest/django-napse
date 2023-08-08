@@ -33,7 +33,7 @@ Unless otherwise specified, all commands are to be run at the root folder of the
 - Windows \
 ```.\setup-windows.ps1```
 
-### Run a test version of the project 
+### Run a test version of the project
 
 ```python test/test_app/manage.py makemigrations``` \
 ```python test/test_app/manage.py migrate``` \
