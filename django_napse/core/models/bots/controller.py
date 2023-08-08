@@ -198,6 +198,21 @@ class Controller(models.Model):
             self._get_price()
         return self.price
 
+    def download(
+        self,
+        start_date: datetime = None,
+        end_date: datetime = None,
+        squash: bool = False,
+        verbose: int = 0,
+    ):
+        return self.exchange_controller.download(
+            controller=self,
+            start_date=start_date,
+            end_date=end_date,
+            squash=squash,
+            verbose=verbose,
+        )
+
 
 class Candle(models.Model):
     controller = models.ForeignKey("Controller", on_delete=models.CASCADE, related_name="candles")
