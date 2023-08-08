@@ -14,7 +14,7 @@ jobs:
           BASE_REF: ${{ github.base_ref }}
           ENVIRONMENT: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && 'external' || 'internal' }}
         run: |
-
+          echo "$ENVIRONMENT" 
           if [[ "$ENVIRONMENT" == "internal" ]] && [[ "$HEAD_REF" != "dev" ]] && [[ "$BASE_REF" == "main" ]]; then
               echo "Merge requests to the main branch are only allowed from the dev branch."
               exit 1
