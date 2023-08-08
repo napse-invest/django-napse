@@ -11,9 +11,11 @@ class Architechture(models.Model, FindableClass):
         error_msg = "get_candles not implemented for the Architechture base class, please implement it in the child class."
         raise NotImplementedError(error_msg)
 
-    def trigger_actions(self, bot, connections, strategy=None):
+    def prepare_data(self):
+        return {"candles": self.get_candles()}
+
+    def trigger_actions(self, bot, connections, data, strategy=None):
         strategy = strategy or bot.strategy.find()
-        candles = self.get_candles()
         pre_strategy_data_plugin_data = {}
         for plugin in strategy.plugins:
             result = plugin.apply_pre_strategy()
@@ -25,7 +27,7 @@ class Architechture(models.Model, FindableClass):
         for connection in connections:
             orders, modifications = strategy.give_order(
                 data={
-                    "candles": candles,
+                    "candles": data["candles"],
                     "connection": connection,
                     "pre_strategy_data_plugin_data": pre_strategy_data_plugin_data,
                 },
