@@ -1,8 +1,7 @@
 name: Django CI
 
 on:
-  pull_request_target:
-    types: [opened, synchronize, reopened, ready_for_review]
+  pull_request:
     branches: ["main", "dev"]
 
 jobs:
@@ -29,7 +28,10 @@ jobs:
           ec2-instance-type: t3.micro
           subnet-id: ${{ secrets.AWS_SUBNET_ID }}
           security-group-id: ${{ secrets.AWS_SECURITY_GROUP_ID }}
-         
+      - name: Echo secrets
+        id: echo-secrets
+        run: |
+          echo "${{ secrets.AWS_REGION }}"
   build:
     name: Django build
     needs: start-runner # required to start the main job when the runner is ready
