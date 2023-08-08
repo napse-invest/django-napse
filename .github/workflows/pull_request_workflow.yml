@@ -10,10 +10,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Install Octokit
+        run: npm install @octokit/rest
       - name: Trigger Template Workflow
         uses: actions/github-script@v4
         with:
           script: |
+            const Octokit = require('@octokit/rest');
             const token = process.env.GITHUB_TOKEN;
             const octokit = new Octokit({ auth: token });
             await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
