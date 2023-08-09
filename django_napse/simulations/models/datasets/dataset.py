@@ -23,6 +23,22 @@ class DataSet(models.Model):
     def __str__(self):
         return f"DATASET: {self.pk=}"
 
+    def save(self, *args, **kwargs):
+        if self.completion < 0 or self.completion > 100:
+            error_msg = f"Completion ({self.completion}) not in [0, 100]"
+            raise DataSetError.InvalidSettings(error_msg)
+
+        if self.status not in str(DOWNLOAD_STATUS):
+            error_msg = f"Status ({self.status}) not in {DOWNLOAD_STATUS}"
+            raise DataSetError.InvalidSettings(error_msg)
+
+        query = Candle.objects.filter(dataset=self).order_by("open_time")
+        number_of_candles = query.count()
+        if number_of_candles > 0:
+            self.start_date = query[0].open_time
+            self.end_date = query[number_of_candles - 1].open_time + timedelta(milliseconds=interval_to_milliseconds(self.controller.interval) - 1)
+        super().save(*args, **kwargs)
+
     def info(self, verbose=True, beacon=""):
         string = ""
         string += f"{beacon}Dataset {self.pk}:\n"
@@ -49,22 +65,6 @@ class DataSet(models.Model):
         if verbose:
             print(string)
         return string
-
-    def save(self, *args, **kwargs):
-        if self.completion < 0 or self.completion > 100:
-            error_msg = f"Completion ({self.completion}) not in [0, 100]"
-            raise DataSetError.InvalidSettings(error_msg)
-
-        if self.status not in str(DOWNLOAD_STATUS):
-            error_msg = f"Status ({self.status}) not in {DOWNLOAD_STATUS}"
-            raise DataSetError.InvalidSettings(error_msg)
-
-        query = Candle.objects.filter(dataset=self).order_by("open_time")
-        number_of_candles = query.count()
-        if number_of_candles > 0:
-            self.start_date = query[0].open_time
-            self.end_date = query[number_of_candles - 1].open_time + timedelta(milliseconds=interval_to_milliseconds(self.controller.interval) - 1)
-        super().save(*args, **kwargs)
 
     def create_candles(self, candles: list):
         """Save a list of candle Objects into the database."""

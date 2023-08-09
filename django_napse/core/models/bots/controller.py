@@ -33,6 +33,20 @@ class Controller(models.Model):
     def __str__(self):
         return f"Controller {self.pair} - {self.interval}"
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.base = self.base.upper()
+            self.quote = self.quote.upper()
+            if self.base == self.quote:
+                error_msg = f"Base and quote cannot be the same: {self.base} - {self.quote}"
+                raise ControllerError.InvalidSetting(error_msg)
+            self.pair = self.base + self.quote
+            self._update_variables()
+            if self.interval not in EXCHANGE_INTERVALS[self.exchange.name]:
+                error_msg = f"Invalid interval: {self.interval}"
+                raise ControllerError.InvalidSetting(error_msg)
+        return super().save(*args, **kwargs)
+
     def info(self, verbose=True, beacon=""):
         string = ""
         string += f"{beacon}Controller {self.pk}:\n"
@@ -51,20 +65,6 @@ class Controller(models.Model):
         if verbose:  # pragma: no cover
             print(string)
         return string
-
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.base = self.base.upper()
-            self.quote = self.quote.upper()
-            if self.base == self.quote:
-                error_msg = f"Base and quote cannot be the same: {self.base} - {self.quote}"
-                raise ControllerError.InvalidSetting(error_msg)
-            self.pair = self.base + self.quote
-            self._update_variables()
-            if self.interval not in EXCHANGE_INTERVALS[self.exchange.name]:
-                error_msg = f"Invalid interval: {self.interval}"
-                raise ControllerError.InvalidSetting(error_msg)
-        return super().save(*args, **kwargs)
 
     @staticmethod
     def get(space, base: str, quote: str, interval: str = "1m") -> "Controller":
@@ -204,8 +204,8 @@ class Controller(models.Model):
 
     def download(
         self,
-        start_date: datetime = None,
-        end_date: datetime = None,
+        start_date: datetime,
+        end_date: datetime,
         squash: bool = False,
         verbose: int = 0,
     ):
