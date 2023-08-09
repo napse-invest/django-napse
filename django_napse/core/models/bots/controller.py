@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
 
+from django_napse.core.models.bots.managers.controller import ControllerManager
 from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, STABLECOINS
 from django_napse.utils.errors import ControllerError
 from django_napse.utils.trading.binance_controller import BinanceController
@@ -24,11 +25,27 @@ class Controller(models.Model):
     last_price_update = models.DateTimeField(null=True)
     last_settings_update = models.DateTimeField(null=True)
 
+    objects = ControllerManager()
+
     class Meta:
         unique_together = ("pair", "interval", "space")
 
     def __str__(self):
         return f"Controller {self.pair} - {self.interval}"
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.base = self.base.upper()
+            self.quote = self.quote.upper()
+            if self.base == self.quote:
+                error_msg = f"Base and quote cannot be the same: {self.base} - {self.quote}"
+                raise ControllerError.InvalidSetting(error_msg)
+            self.pair = self.base + self.quote
+            self._update_variables()
+            if self.interval not in EXCHANGE_INTERVALS[self.exchange.name]:
+                error_msg = f"Invalid interval: {self.interval}"
+                raise ControllerError.InvalidSetting(error_msg)
+        return super().save(*args, **kwargs)
 
     def info(self, verbose=True, beacon=""):
         string = ""
@@ -49,20 +66,6 @@ class Controller(models.Model):
             print(string)
         return string
 
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            self.base = self.base.upper()
-            self.quote = self.quote.upper()
-            if self.base == self.quote:
-                error_msg = f"Base and quote cannot be the same: {self.base} - {self.quote}"
-                raise ControllerError.InvalidSetting(error_msg)
-            self.pair = self.base + self.quote
-            self._update_variables()
-            if self.interval not in EXCHANGE_INTERVALS[self.exchange.name]:
-                error_msg = f"Invalid interval: {self.interval}"
-                raise ControllerError.InvalidSetting(error_msg)
-        return super().save(*args, **kwargs)
-
     @staticmethod
     def get(space, base: str, quote: str, interval: str = "1m") -> "Controller":
         """Return a controller object from the database."""
@@ -79,6 +82,7 @@ class Controller(models.Model):
                 base=base,
                 quote=quote,
                 interval=interval,
+                bypass=True,
             )
         controller.update_variables()
         return controller
@@ -200,8 +204,8 @@ class Controller(models.Model):
 
     def download(
         self,
-        start_date: datetime = None,
-        end_date: datetime = None,
+        start_date: datetime,
+        end_date: datetime,
         squash: bool = False,
         verbose: int = 0,
     ):

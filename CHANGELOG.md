@@ -1,3 +1,34 @@
+# [1.1.0](https://github.com/napse-invest/django-napse/compare/v1.0.0...v1.1.0) (2023-08-08)
+
+
+### Bug Fixes
+
+* **ci:** branch workflow ([29e562d](https://github.com/napse-invest/django-napse/commit/29e562de813f6e1d6f557e9878c71b3bfa57d1da))
+* **ci:** checks ([7a8d078](https://github.com/napse-invest/django-napse/commit/7a8d078329c9d59f2fc0698b88fddeb43fdff1c5))
+* **ci:** concluding t3.micro is the smallest we can go ([b4382e0](https://github.com/napse-invest/django-napse/commit/b4382e0761676a0761896b87df3c6a262f0022b3))
+* **ci:** fixed django.yml ([1e84881](https://github.com/napse-invest/django-napse/commit/1e84881aebba0a168715ca8c3375200819c84d55))
+* **ci:** gh actions ([1dfcb12](https://github.com/napse-invest/django-napse/commit/1dfcb12e1270ba8ac481f913e5da02c5ad3adf4d))
+* **ci:** secrets in pipelines ([706c1f6](https://github.com/napse-invest/django-napse/commit/706c1f6226debd04468005e371add80c6ac45e98))
+* **ci:** secrets not found ([0af933a](https://github.com/napse-invest/django-napse/commit/0af933af8b8b7f3928d565ce8f076b3a2516d488))
+* **ci:** secrets.json ([77b463a](https://github.com/napse-invest/django-napse/commit/77b463af19c3791a2c4143196d519014560d8ad4))
+* **ci:** secrets.json ([b6d5930](https://github.com/napse-invest/django-napse/commit/b6d5930828bc1918f287540abf8bb488e707e15e))
+* **ci:** self hosted runners ([2409a67](https://github.com/napse-invest/django-napse/commit/2409a678e4a73e8e3853c3d71e2d47da6c90434a))
+* **ci:** t3.small -> t3.micro ([313f27d](https://github.com/napse-invest/django-napse/commit/313f27d9d434838e9c04fe2ababd5a1206bbe991))
+* **ci:** testing t3.nano ([f66c5ca](https://github.com/napse-invest/django-napse/commit/f66c5cac05f1b22230f877475802c81080daf4b7))
+* **merge:** resolved conflicts ([fb8b499](https://github.com/napse-invest/django-napse/commit/fb8b499f7364d6545bf3de593f6e13b84e8a299c))
+* **node:** max old space 1400 ([db40cfe](https://github.com/napse-invest/django-napse/commit/db40cfedcea9130253bd6a585d2e4471f44b5134))
+* **tests:** wallet tests refactored ([800d6a1](https://github.com/napse-invest/django-napse/commit/800d6a15a630bf95f9193e0479b95a31ecd5a8fd))
+
+
+### Features
+
+* **bot-config:** reworked into individual classes for each config type ([2a0bd32](https://github.com/napse-invest/django-napse/commit/2a0bd323c170ae8d340dad50cb44844f73760067))
+* **bots-and-tests:** New bot architecture works and clean tests are setup ([54fdfca](https://github.com/napse-invest/django-napse/commit/54fdfca5ac31c06ffdb02be636b4b48170a4ab53))
+* **bots:** rework partially implemented ([34d0c6d](https://github.com/napse-invest/django-napse/commit/34d0c6de61df60ae1448f67a45ddc3a9277434e1))
+* **ci:** self hosted runners ([fe1a456](https://github.com/napse-invest/django-napse/commit/fe1a4567844b29dedad8b50082187812336c7fb8))
+* **DataSet:** Initial functionality and tests ([7e074f0](https://github.com/napse-invest/django-napse/commit/7e074f07cdbe0d5f378f9d1f3bf96715d71c37cd))
+* **tests:** refactoring tests and added the exchange variation ([78dcbfb](https://github.com/napse-invest/django-napse/commit/78dcbfbca3d87dbae698db4b0b7b6548dd5d817d))
+
 # 1.0.0 (2023-08-06)
 
 

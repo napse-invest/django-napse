@@ -8,6 +8,10 @@ from django_napse.core.settings import napse_settings
 from django_napse.utils.errors import ExchangeAccountError
 from django_napse.utils.model_test_case import ModelTestCase
 
+"""
+python test/test_app/manage.py test test.django_tests.accounts.test_exchange -v2 --keepdb --parallel
+"""
+
 
 class ExchangeTestCase(ModelTestCase):
     model = Exchange
@@ -60,6 +64,7 @@ class BaseExchangeAccountTestCase(ModelTestCase):
 
 
 class ExchangeUtilsTestCase:
+    @skipIf(napse_settings.NAPSE_IS_IN_PIPELINE, "No creadentials in pipelines")
     def test_ping(self):
         for exchange_account in self.model.objects.all():
             exchange_account.ping()

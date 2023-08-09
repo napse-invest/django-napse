@@ -166,3 +166,4 @@ cython_debug/
 
 secrets.json
 full-requirements.txt
+.ruff_cache/

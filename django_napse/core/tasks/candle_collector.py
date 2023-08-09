@@ -55,7 +55,7 @@ class CandleCollectorTask(BaseTask):
         closed_candle: dict[str, int | float] = {}
         current_candle: dict[str, int | float] = {}
         for i, label in enumerate(dico_structure_label):
-            if type(request_json[0][i]) is int:
+            if isinstance(request_json[0][i], int):
                 closed_candle[label] = request_json[0][i]
                 current_candle[label] = request_json[1][i]
             else:
