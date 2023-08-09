@@ -1,4 +1,4 @@
-from enum import Enum, EnumMeta
+from enum import EnumMeta, StrEnum
 
 
 class CustomEnumMeta(EnumMeta):
@@ -19,20 +19,20 @@ class CustomEnumMeta(EnumMeta):
         return f"{[cls._member_map_[name].value for name in cls._member_names_]}"
 
 
-class OPERATORS(Enum, metaclass=CustomEnumMeta):
+class OPERATORS(StrEnum, metaclass=CustomEnumMeta):
     """The operator for a fleet."""
 
     EQUILIBRIUM = "EQUILIBRIUM"
     SPECIFIC_SHARES = "SPECIFIC_SHARES"
 
 
-class EXCHANGES(Enum, metaclass=CustomEnumMeta):
+class EXCHANGES(StrEnum, metaclass=CustomEnumMeta):
     """The exchange for a fleet or a bot."""
 
     BINANCE = "BINANCE"
 
 
-class TRANSACTION_TYPES(Enum, metaclass=CustomEnumMeta):
+class TRANSACTION_TYPES(StrEnum, metaclass=CustomEnumMeta):
     TRANSFER = "TRANSFER"
     DEPOSIT = "DEPOSIT"
     WITHDRAW = "WITHDRAW"
@@ -41,17 +41,22 @@ class TRANSACTION_TYPES(Enum, metaclass=CustomEnumMeta):
     DUST = "DUST"
 
 
-class ORDER_STATUS(Enum, metaclass=CustomEnumMeta):
+class ORDER_STATUS(StrEnum, metaclass=CustomEnumMeta):
     PENDING = "PENDING"
     READY = "READY"
     PASSED = "PASSED"
     FAILED = "FAILED"
 
 
-class SIDES(Enum, metaclass=CustomEnumMeta):
+class SIDES(StrEnum, metaclass=CustomEnumMeta):
     BUY = "BUY"
     SELL = "SELL"
     KEEP = "KEEP"
+
+
+class DOWNLOAD_STATUS(StrEnum, metaclass=CustomEnumMeta):
+    IDLE = "IDLE"
+    DOWNLOADING = "DOWNLOADING"
 
 
 ORDER_LEEWAY_PERCENTAGE = 10

@@ -45,7 +45,7 @@ class Controller(models.Model):
         string += f"{beacon}\t{self.last_price_update=}\n"
         string += f"{beacon}\t{self.last_settings_update=}\n"
 
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string
 
@@ -197,6 +197,21 @@ class Controller(models.Model):
         if self.last_price_update is None or self.last_price_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
             self._get_price()
         return self.price
+
+    def download(
+        self,
+        start_date: datetime = None,
+        end_date: datetime = None,
+        squash: bool = False,
+        verbose: int = 0,
+    ):
+        return self.exchange_controller.download(
+            controller=self,
+            start_date=start_date,
+            end_date=end_date,
+            squash=squash,
+            verbose=verbose,
+        )
 
 
 class Candle(models.Model):

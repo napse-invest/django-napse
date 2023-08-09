@@ -29,6 +29,6 @@ class Transaction(models.Model):
         string += f"{beacon}To Wallet:\n"
         wall_str = self.to_wallet.info(verbose=False, beacon=beacon + "\t")
         string += f"{wall_str}\n"
-        if verbose:
+        if verbose:  # pragma: no cover
             print(string)
         return string
