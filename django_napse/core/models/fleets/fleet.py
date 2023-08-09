@@ -54,11 +54,11 @@ class SpecificShare(models.Model):
     operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_shares")
     share = models.FloatField()
 
-    def __str__(self) -> str:
-        return f"SPECIFIC_SHARE: {self.pk=}, operator={self.operator}, share={self.share}"
-
     class Meta:
         unique_together = ("cluster", "operator")
+
+    def __str__(self) -> str:
+        return f"SPECIFIC_SHARE: {self.pk=}, operator={self.operator}, share={self.share}"
 
 
 class SpecificBreakPoint(models.Model):
@@ -66,11 +66,11 @@ class SpecificBreakPoint(models.Model):
     operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_breakpoints")
     scale_up_breakpoint = models.FloatField()
 
-    def __str__(self) -> str:
-        return f"SPECIFIC_BREAKPOINT: {self.pk=}, operator={self.operator}, scale_up_breakpoint={self.scale_up_breakpoint}"
-
     class Meta:
         unique_together = ("cluster", "operator")
+
+    def __str__(self) -> str:
+        return f"SPECIFIC_BREAKPOINT: {self.pk=}, operator={self.operator}, scale_up_breakpoint={self.scale_up_breakpoint}"
 
 
 class SpecificAutoscale(models.Model):
@@ -78,8 +78,8 @@ class SpecificAutoscale(models.Model):
     operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_autoscales")
     autoscale = models.BooleanField(default=True)
 
-    def __str__(self) -> str:
-        return f"SPECIFIC_AUTOSCALE: {self.pk=}, operator={self.operator}, autoscale={self.autoscale}"
-
     class Meta:
         unique_together = ("cluster", "operator")
+
+    def __str__(self) -> str:
+        return f"SPECIFIC_AUTOSCALE: {self.pk=}, operator={self.operator}, autoscale={self.autoscale}"
