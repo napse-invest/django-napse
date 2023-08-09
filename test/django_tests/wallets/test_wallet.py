@@ -1,10 +1,7 @@
-from unittest import skipIf
-
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
 from django_napse.core.models import Currency, EmptyBotConfig, Fleet, Order, OrderWallet, SpaceWallet, Wallet
-from django_napse.core.settings import napse_settings
 from django_napse.utils.errors import WalletError
 from django_napse.utils.model_test_case import ModelTestCase
 
@@ -144,17 +141,14 @@ class SpaceWalletTestCase(BaseWalletTestCase):
         wallet = self.simple_create()
         self.assertEqual(wallet.space, self.owner)
 
-    @skipIf(napse_settings.NAPSE_IS_IN_PIPELINE, "IP will be refused")
     def test_value_market_BTC(self):
         Currency.objects.create(wallet=self.space.wallet, ticker="BTC", amount=1, mbp=20000)
         self.assertTrue(self.space.wallet.value_market() > 0)
 
-    @skipIf(napse_settings.NAPSE_IS_IN_PIPELINE, "IP will be refused")
     def test_value_market_USDT(self):
         Currency.objects.create(wallet=self.space.wallet, ticker="USDT", amount=1, mbp=1)
         self.assertEqual(self.space.wallet.value_market(), 1)
 
-    @skipIf(napse_settings.NAPSE_IS_IN_PIPELINE, "IP will be refused")
     def test_value_zero(self):
         Currency.objects.create(wallet=self.space.wallet, ticker="BTC", amount=0, mbp=1)
         Currency.objects.create(wallet=self.space.wallet, ticker="USDT", amount=0, mbp=1)
@@ -187,4 +181,6 @@ class SpaceWalletBINANCETestCase(SpaceWalletTestCase, ModelTestCase):
 #     wallet_class = ConnectionWallet
 
 #     def setUp(self) -> None:
+#         self.owner = Conne.objects.create(name="Test Space", testing=True)
+#         self.owner = Conne.objects.create(name="Test Space", testing=True)
 #         self.owner = Conne.objects.create(name="Test Space", testing=True)

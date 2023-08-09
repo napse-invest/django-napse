@@ -72,8 +72,7 @@ jobs:
       - name: Tests and coverage
         run: |
           export PYTHONPATH="$PYTHONPATH:./django-napse/"
-          export BINANCE_PUBLIC_KEY=${{ secrets.BINANCE_PUBLIC_KEY }}
-          export BINANCE_PRIVATE_KEY=${{ secrets.BINANCE_PRIVATE_KEY }}
+          export NAPSE_IS_IN_PIPELINE=True
           cd test/test_app
           bash setup_secrets.sh
           cd ../..

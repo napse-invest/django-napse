@@ -60,6 +60,7 @@ class BaseExchangeAccountTestCase(ModelTestCase):
 
 
 class ExchangeUtilsTestCase:
+    @skipIf(napse_settings.NAPSE_IS_IN_PIPELINE, "No creadentials in pipelines")
     def test_ping(self):
         for exchange_account in self.model.objects.all():
             exchange_account.ping()
