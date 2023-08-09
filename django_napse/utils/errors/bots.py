@@ -24,6 +24,9 @@ class BotConfigError:
 class ControllerError:
     """Base class for controller errors."""
 
+    class BypassError(Exception):
+        """Raised when a bypass isn't used."""
+
     class InvalidSetting(Exception):
         """Raised when a controller is invalid."""
 

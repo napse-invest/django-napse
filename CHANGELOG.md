@@ -23,7 +23,7 @@
 ### Features
 
 * **bot-config:** reworked into individual classes for each config type ([2a0bd32](https://github.com/napse-invest/django-napse/commit/2a0bd323c170ae8d340dad50cb44844f73760067))
-* **bots-and-tests:** New bot architechture works and clean tests are setup ([54fdfca](https://github.com/napse-invest/django-napse/commit/54fdfca5ac31c06ffdb02be636b4b48170a4ab53))
+* **bots-and-tests:** New bot architecture works and clean tests are setup ([54fdfca](https://github.com/napse-invest/django-napse/commit/54fdfca5ac31c06ffdb02be636b4b48170a4ab53))
 * **bots:** rework partially implemented ([34d0c6d](https://github.com/napse-invest/django-napse/commit/34d0c6de61df60ae1448f67a45ddc3a9277434e1))
 * **ci:** self hosted runners ([fe1a456](https://github.com/napse-invest/django-napse/commit/fe1a4567844b29dedad8b50082187812336c7fb8))
 * **DataSet:** Initial functionality and tests ([7e074f0](https://github.com/napse-invest/django-napse/commit/7e074f07cdbe0d5f378f9d1f3bf96715d71c37cd))

@@ -1,4 +1,4 @@
-from django_napse.core.models import Bot, Connection, Controller, EmptyBotConfig, EmptyStrategy, Order, SinglePairArchitechture
+from django_napse.core.models import Bot, Connection, Controller, EmptyBotConfig, EmptyStrategy, Order, SinglePairArchitecture
 from django_napse.utils.constants import SIDES
 from django_napse.utils.model_test_case import ModelTestCase
 
@@ -12,7 +12,7 @@ class OrderTestCase:
 
     def simple_create(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
-        architechture = SinglePairArchitechture.objects.create(
+        architecture = SinglePairArchitecture.objects.create(
             controller=Controller.get(
                 space=self.space,
                 base="BTC",
@@ -20,7 +20,7 @@ class OrderTestCase:
                 interval="1m",
             ),
         )
-        strategy = EmptyStrategy.objects.create(config=config, architechture=architechture)
+        strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)
         connection = Connection.objects.create(space=self.space, bot=bot)
         connection.wallet.top_up(amount=10000, ticker="USDT", force=True)
