@@ -1,6 +1,6 @@
 from django_napse.core.tasks import BaseTask
 from django_napse.simulations.models import BotSimQueue
-from django_napse.utils.errors import SimError
+from django_napse.utils.errors import SimulationError
 
 
 class BotSimQueueTask(BaseTask):
@@ -25,7 +25,7 @@ class BotSimQueueTask(BaseTask):
         try:
             queue.run_quicksim()
             queue = BotSimQueue.objects.get(simulation_reference=queue.simulation_reference)
-        except SimError.CancelledSimulationError:
+        except SimulationError.CancelledSimulationError:
             print("BotSimQueueTask: cancelled")
             queue.delete()
             return
@@ -41,7 +41,7 @@ class BotSimQueueTask(BaseTask):
             queue.delete()
         else:
             error_msg = f"SimQueueTask: {queue} status {queue.status} completion {queue.completion}"
-            raise SimError.BotSimQueueError(error_msg)
+            raise SimulationError.BotSimQueueError(error_msg)
 
 
 BotSimQueueTask().delete_task()

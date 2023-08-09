@@ -46,7 +46,7 @@ class DataSet(models.Model):
             for candle in candles:
                 string += f"{beacon}\tO:{candle.open_time}\t H: {candle.high}\t L: {candle.close}\t C: {candle.low}\t V: {candle.volume}\n"
 
-        if verbose:  # pragma: no cover
+        if verbose:
             print(string)
         return string
 

@@ -230,6 +230,3 @@ class Candle(models.Model):
 
     def __str__(self):
         return f"CANDLE {self.pk}"
-        return f"CANDLE {self.pk}"
-        return f"CANDLE {self.pk}"
-        return f"CANDLE {self.pk}"

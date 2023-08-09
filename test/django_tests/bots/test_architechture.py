@@ -1,13 +1,13 @@
-from django_napse.core.models import Controller, SinglePairArchitechture
+from django_napse.core.models import Controller, SinglePairArchitecture
 from django_napse.utils.model_test_case import ModelTestCase
 
 """
-python test/test_app/manage.py test test.django_tests.bots.test_architechture -v2 --keepdb --parallel
+python test/test_app/manage.py test test.django_tests.bots.test_architecture -v2 --keepdb --parallel
 """
 
 
-class ArchitechtureTestCase:
-    model = SinglePairArchitechture
+class ArchitectureTestCase:
+    model = SinglePairArchitecture
 
     def simple_create(self):
         return self.model.objects.create(
@@ -20,5 +20,5 @@ class ArchitechtureTestCase:
         )
 
 
-class SinglePairArchitechtureBINANCETestCase(ArchitechtureTestCase, ModelTestCase):
+class SinglePairArchitectureBINANCETestCase(ArchitectureTestCase, ModelTestCase):
     exchange = "BINANCE"

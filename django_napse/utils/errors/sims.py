@@ -1,5 +1,8 @@
-class SimError:
+class SimulationError:
     """Base class for simulation errors."""
+
+    class InvalidData(Exception):
+        """Raised when invalid data is passed."""
 
     class BotSimQueueError(Exception):
         """Raised when an error occurs in a BotSimQueue."""
