@@ -5,6 +5,7 @@ from django.db import models
 
 from django_napse.simulations.models.datasets.managers.dataset import DataSetManager
 from django_napse.utils.constants import DOWNLOAD_STATUS
+from django_napse.utils.errors import DataSetError
 
 
 class DataSet(models.Model):
@@ -52,11 +53,11 @@ class DataSet(models.Model):
     def save(self, *args, **kwargs):
         if self.completion < 0 or self.completion > 100:
             error_msg = f"Completion ({self.completion}) not in [0, 100]"
-            raise ValueError(error_msg)
+            raise DataSetError.InvalidSettings(error_msg)
 
         if self.status not in str(DOWNLOAD_STATUS):
             error_msg = f"Status ({self.status}) not in {DOWNLOAD_STATUS}"
-            raise ValueError(error_msg)
+            raise DataSetError.InvalidSettings(error_msg)
 
         query = Candle.objects.filter(dataset=self).order_by("open_time")
         number_of_candles = query.count()
@@ -82,7 +83,7 @@ class DataSet(models.Model):
             self.save()
         else:
             error_msg = "Dataset is already downloading."
-            raise ValueError(error_msg)
+            raise DataSetError.InvalidSettings(error_msg)
 
     def set_idle(self):
         """Set the dataset status to idle."""
@@ -91,7 +92,7 @@ class DataSet(models.Model):
             self.save()
         else:
             error_msg = "Dataset is not downloading."
-            raise ValueError(error_msg)
+            raise DataSetError.InvalidSettings(error_msg)
 
     def is_finished(self):
         return self.status == DOWNLOAD_STATUS.IDLE and self.completion == 100
@@ -112,6 +113,21 @@ class Candle(models.Model):
     def __str__(self):
         return f"CANDLE: {self.pk=}"
 
+    def info(self, verbose=True, beacon=""):
+        string = ""
+        string += f"{beacon}Candle {self.pk}:\n"
+        string += f"{beacon}\t{self.dataset=}\n"
+        string += f"{beacon}\t{self.open_time=}\n"
+        string += f"{beacon}\t{self.open=}\n"
+        string += f"{beacon}\t{self.high=}\n"
+        string += f"{beacon}\t{self.low=}\n"
+        string += f"{beacon}\t{self.close=}\n"
+        string += f"{beacon}\t{self.volume=}\n"
+
+        if verbose:
+            print(string)
+        return string
+
 
 class DataSetQueue(models.Model):
     controller = models.ForeignKey("django_napse_core.Controller", on_delete=models.CASCADE, related_name="dataset_queues")
@@ -127,4 +143,5 @@ class DataSetQueue(models.Model):
         try:
             return DataSet.objects.get(controller=self.controller)
         except DataSet.DoesNotExist:
+            return None
             return None

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
 
+from django_napse.core.models.bots.managers.controller import ControllerManager
 from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, STABLECOINS
 from django_napse.utils.errors import ControllerError
 from django_napse.utils.trading.binance_controller import BinanceController
@@ -23,6 +24,8 @@ class Controller(models.Model):
     price = models.FloatField(null=True)
     last_price_update = models.DateTimeField(null=True)
     last_settings_update = models.DateTimeField(null=True)
+
+    objects = ControllerManager()
 
     class Meta:
         unique_together = ("pair", "interval", "space")
@@ -79,6 +82,7 @@ class Controller(models.Model):
                 base=base,
                 quote=quote,
                 interval=interval,
+                bypass=True,
             )
         controller.update_variables()
         return controller
@@ -225,4 +229,7 @@ class Candle(models.Model):
     volume = models.FloatField()
 
     def __str__(self):
+        return f"CANDLE {self.pk}"
+        return f"CANDLE {self.pk}"
+        return f"CANDLE {self.pk}"
         return f"CANDLE {self.pk}"

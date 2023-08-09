@@ -47,7 +47,7 @@ class EmptyBotTestCase(BotDefaultTestCase):
     @property
     def architechture_settings(self):
         return {
-            "controller": Controller.objects.create(
+            "controller": Controller.get(
                 space=self.space,
                 base="BTC",
                 quote="USDT",
@@ -57,4 +57,5 @@ class EmptyBotTestCase(BotDefaultTestCase):
 
 
 class EmptyBotBINANCETestCase(EmptyBotTestCase, ModelTestCase):
+    exchange = "BINANCE"
     exchange = "BINANCE"
