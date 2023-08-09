@@ -18,12 +18,12 @@ from django_napse.utils.usefull_functions import round_up
 class BinanceController:
     """Commmunication interface with binance account."""
 
-    def __init__(self, clef_api, clef_secrete):
+    def __init__(self, public_key, private_key):
         client_created = False
         retries = 0
         while not client_created:
             try:
-                self.client = Client(clef_api, clef_secrete)
+                self.client = Client(public_key, private_key)
                 client_created = True
             except ConnectTimeout:
                 print(f"ConnectionTimout error while creating client (try: {retries}), retrying...")
@@ -71,19 +71,6 @@ class BinanceController:
                 continue
         return {"error": 408}
 
-    def get_trades(self, pair) -> dict:
-        """Return trades of the selected pair."""
-        meter = 0
-        while meter < self.nb_retry:
-            meter += 1
-            try:
-                return self.client.get_my_trades(symbol=pair.upper(), recvWindow=self.recv)
-            except ReadTimeout:
-                continue
-            except BinanceAPIException:
-                continue
-        return {"error": 408}
-
     def get_tickers(self) -> list[dict]:
         """Return all available tickers."""
         meter = 0
@@ -95,22 +82,6 @@ class BinanceController:
             except ConnectionError:
                 continue
         return [{"error": 408}]
-
-    def cancel_order(self, pair: str, order_id: str) -> dict:
-        """Cancel an order via its id."""
-        return self.client.cancel_order(
-            symbol=pair.upper(),
-            orderId=order_id,
-            recvWindow=self.recv,
-        )
-
-    def get_all_order(self, pair) -> dict:
-        """Return all orders of a selected pair."""
-        return self.client.get_all_orders(symbol=pair, recvWindow=self.recv)
-
-    def fetch_all_order(self, pair, limit=10):
-        """Fetch all orders of a selected pair."""
-        return self.client.get_all_orders(symbol=pair, limit=limit, recvWindow=self.recv)
 
     def buy_market(self, pair: str, quantity: float) -> dict:
         """Place a spot buy market order.

@@ -1,7 +1,7 @@
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
-from django_napse.core.models import Currency, EmptyBotConfig, Fleet, Order, OrderWallet, SpaceWallet, Wallet
+from django_napse.core.models import Currency, SpaceWallet, Wallet
 from django_napse.utils.errors import WalletError
 from django_napse.utils.model_test_case import ModelTestCase
 

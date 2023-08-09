@@ -74,15 +74,15 @@ class Bot(models.Model):
         return self.strategy.find()
 
     @property
-    def architechture(self):
-        return self._strategy.architechture.find()
+    def architecture(self):
+        return self._strategy.architecture.find()
 
     def get_connections(self):
         return list(self.connections.all())
 
     def trigger_actions(self):
         connections = self.get_connections()
-        orders, modifictions = self.architechture.trigger_actions(bot=self, data=self.architechture.prepare_data(), connections=connections)
+        orders, modifictions = self.architecture.trigger_actions(bot=self, data=self.architecture.prepare_data(), connections=connections)
         for order in orders:
             order.set_status_ready()
         for modification in modifictions:

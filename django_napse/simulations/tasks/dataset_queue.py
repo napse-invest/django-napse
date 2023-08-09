@@ -1,6 +1,6 @@
 from django_napse.core.tasks import BaseTask
 from django_napse.simulations.models import DataSetQueue
-from django_napse.utils.errors import SimError
+from django_napse.utils.errors import SimulationError
 
 
 class DataSetQueueTask(BaseTask):
@@ -28,7 +28,7 @@ class DataSetQueueTask(BaseTask):
         else:
             dataset = queue.get_dataset()
             error_msg = f"DataSetQueueTask: {queue} status {dataset.status} completion {dataset.completion}"
-            raise SimError.DataSetQueueError(error_msg)
+            raise SimulationError.DataSetQueueError(error_msg)
 
 
 DataSetQueueTask().delete_task()

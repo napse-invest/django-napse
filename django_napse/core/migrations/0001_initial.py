@@ -8,14 +8,13 @@ import uuid
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name="Architechture",
+            name="Architecture",
             fields=[
                 (
                     "id",
@@ -866,29 +865,29 @@ class Migration(migrations.Migration):
             bases=("django_napse_core.wallet",),
         ),
         migrations.CreateModel(
-            name="SinglePairArchitechture",
+            name="SinglePairArchitecture",
             fields=[
                 (
-                    "architechture_ptr",
+                    "architecture_ptr",
                     models.OneToOneField(
                         auto_created=True,
                         on_delete=django.db.models.deletion.CASCADE,
                         parent_link=True,
                         primary_key=True,
                         serialize=False,
-                        to="django_napse_core.architechture",
+                        to="django_napse_core.architecture",
                     ),
                 ),
                 (
                     "controller",
                     models.ForeignKey(
                         on_delete=django.db.models.deletion.CASCADE,
-                        related_name="single_pair_architechtures",
+                        related_name="single_pair_architectures",
                         to="django_napse_core.controller",
                     ),
                 ),
             ],
-            bases=("django_napse_core.architechture",),
+            bases=("django_napse_core.architecture",),
         ),
         migrations.CreateModel(
             name="OrderWallet",
@@ -930,11 +929,11 @@ class Migration(migrations.Migration):
                     ),
                 ),
                 (
-                    "architechture",
+                    "architecture",
                     models.OneToOneField(
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="strategy",
-                        to="django_napse_core.singlepairarchitechture",
+                        to="django_napse_core.singlepairarchitecture",
                     ),
                 ),
                 (

@@ -1,8 +1,6 @@
 from django.test import TestCase
 
-from django_napse.core.models import Bot, Controller, EmptyBotConfig, EmptyStrategy, NapseSpace, Strategy
-from django_napse.utils.errors import BotConfigError
-from django_napse.utils.model_test_case import ModelTestCase
+from django_napse.core.models import Strategy
 
 """
 python test/test_app/manage.py test test.django_tests.bots.test_bot -v2 --keepdb --parallel
@@ -18,12 +16,12 @@ class BotDefaultTestCase:
         return self.strategy_class.config_class().objects.create(space=self.space, settings=self.config_settings)
 
     @property
-    def architechture(self):
-        return self.strategy_class.architechture_class().objects.create(**self.architechture_settings)
+    def architecture(self):
+        return self.strategy_class.architecture_class().objects.create(**self.architecture_settings)
 
     @property
     def strategy(self):
-        return self.strategy_class.objects.create(config=self.config, architechture=self.architechture)
+        return self.strategy_class.objects.create(config=self.config, architecture=self.architecture)
 
 
 class BotTypeCkeck(TestCase):
@@ -36,25 +34,3 @@ class BotTypeCkeck(TestCase):
         if tested_strategies != strategies:
             error_msg = "You have untested Strategies. Check out the documentation to see how to test them (spoiler, it's really easy!)."
             raise ValueError(error_msg)
-
-
-### Empty Bot ###
-class EmptyBotTestCase(BotDefaultTestCase):
-    model = Bot
-    strategy_class = EmptyStrategy
-    config_settings = {"empty": True}
-
-    @property
-    def architechture_settings(self):
-        return {
-            "controller": Controller.objects.create(
-                space=self.space,
-                base="BTC",
-                quote="USDT",
-                interval="1m",
-            ),
-        }
-
-
-class EmptyBotBINANCETestCase(EmptyBotTestCase, ModelTestCase):
-    exchange = "BINANCE"

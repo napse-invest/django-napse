@@ -65,8 +65,7 @@ jobs:
         run: |
           pip install ruff
           # stop the build if there are Python syntax errors or undefined names
-          ruff --format=github --select=E9,F63,F7,F82 --target-version=py37 .
-        continue-on-error: true
+          ruff .
 
       - name: Tests and coverage
         run: |
@@ -77,11 +76,13 @@ jobs:
           cd ../..
           coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
 
-      - name: Coverage value
+      - name: Coverage value 
         run: |
           cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
           echo "COVERAGE=$cvg_result" >> $GITHUB_ENV
+
       - name: Coverage badge
+        if: ${{ github.base_ref == 'main' }} 
         uses: Schneegans/dynamic-badges-action@v1.6.0
         with:
           auth: ${{ secrets.NAPSE_SECRET_GIST }}

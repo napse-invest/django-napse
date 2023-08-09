@@ -18,5 +18,5 @@ class Strategy(models.Model, FindableClass):
         return cls._meta.get_field("config").related_model
 
     @classmethod
-    def architechture_class(cls):
-        return cls._meta.get_field("architechture").related_model
+    def architecture_class(cls):
+        return cls._meta.get_field("architecture").related_model

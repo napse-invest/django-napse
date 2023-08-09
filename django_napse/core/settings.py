@@ -2,7 +2,6 @@ import json
 import logging
 
 import environ
-from django.apps import apps
 from django.conf import settings
 
 from django_napse.utils.constants import EXCHANGES

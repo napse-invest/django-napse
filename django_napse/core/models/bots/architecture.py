@@ -3,12 +3,12 @@ from django.db import models
 from django_napse.utils.findable_class import FindableClass
 
 
-class Architechture(models.Model, FindableClass):
+class Architecture(models.Model, FindableClass):
     def __str__(self) -> str:
         return f"ARCHITECHTURE {self.pk}"
 
     def get_candles(self):  # pragma: no cover
-        error_msg = "get_candles not implemented for the Architechture base class, please implement it in the child class."
+        error_msg = "get_candles not implemented for the Architecture base class, please implement it in the child class."
         raise NotImplementedError(error_msg)
 
     def prepare_data(self):
