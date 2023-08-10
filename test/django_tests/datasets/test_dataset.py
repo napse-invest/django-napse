@@ -48,7 +48,7 @@ class DataSetTestCase:
             start_date=datetime(2021, 1, 1, tzinfo=UTC),
             end_date=datetime(2021, 1, 3, tzinfo=UTC),
         )
-        dataset.info(verbose=True)
+        dataset.info(verbose=False)
 
     def test_error_save_completion_lt_0(self):
         dataset = self.simple_create()
