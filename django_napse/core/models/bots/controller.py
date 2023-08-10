@@ -11,7 +11,7 @@ from django_napse.utils.trading.binance_controller import BinanceController
 
 
 class Controller(models.Model):
-    space = models.ForeignKey("NapseSpace", on_delete=models.CASCADE, related_name="controller")
+    exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="controller")
 
     pair = models.CharField(max_length=10)
     base = models.CharField(max_length=10)
@@ -28,7 +28,7 @@ class Controller(models.Model):
     objects = ControllerManager()
 
     class Meta:
-        unique_together = ("pair", "interval", "space")
+        unique_together = ("pair", "interval", "exchange_account")
 
     def __str__(self):
         return f"Controller {self.pair} - {self.interval}"
@@ -67,18 +67,18 @@ class Controller(models.Model):
         return string
 
     @staticmethod
-    def get(space, base: str, quote: str, interval: str = "1m") -> "Controller":
+    def get(exchange_account, base: str, quote: str, interval: str = "1m") -> "Controller":
         """Return a controller object from the database."""
         try:
             controller = Controller.objects.get(
-                space=space,
+                exchange_account=exchange_account,
                 base=base,
                 quote=quote,
                 interval=interval,
             )
         except Controller.DoesNotExist:
             controller = Controller.objects.create(
-                space=space,
+                exchange_account=exchange_account,
                 base=base,
                 quote=quote,
                 interval=interval,
@@ -89,11 +89,11 @@ class Controller(models.Model):
 
     @property
     def exchange_controller(self):
-        return self.space.exchange_account.find().exchange_controller()
+        return self.exchange_account.find().exchange_controller()
 
     @property
     def exchange(self):
-        return self.space.exchange_account.exchange
+        return self.exchange_account.exchange
 
     def update_variables(self) -> None:
         """If the variables are older than 1 minute, update them."""
@@ -151,14 +151,14 @@ class Controller(models.Model):
         return orders
 
     @staticmethod
-    def get_asset_price(space, base: str, quote: str = "USDT") -> float:
+    def get_asset_price(exchange_account, base: str, quote: str = "USDT") -> float:
         """Get the price of an asset."""
-        if base in STABLECOINS[space.exchange_account.exchange.name]:
+        if base in STABLECOINS[exchange_account.exchange.name]:
             return 1
-        if base + quote not in EXCHANGE_PAIRS[space.exchange_account.exchange.name]:
-            error_msg = f"Invalid pair: {base+quote} on {space.exchange_account.exchange.name}"
+        if base + quote not in EXCHANGE_PAIRS[exchange_account.exchange.name]:
+            error_msg = f"Invalid pair: {base+quote} on {exchange_account.exchange.name}"
             raise ControllerError.InvalidPair(error_msg)
-        controller = Controller.get(space=space, base=base, quote=quote, interval="1m")
+        controller = Controller.get(exchange_account=exchange_account, base=base, quote=quote, interval="1m")
 
         return float(controller.get_price())
 

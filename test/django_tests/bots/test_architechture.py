@@ -12,7 +12,7 @@ class ArchitectureTestCase:
     def simple_create(self):
         return self.model.objects.create(
             controller=Controller.get(
-                space=self.space,
+                exchange_account=self.exchange_account,
                 base="BTC",
                 quote="USDT",
                 interval="1m",

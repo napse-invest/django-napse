@@ -17,7 +17,7 @@ class EmptyBotTestCase(BotDefaultTestCase):
     def architecture_settings(self):
         return {
             "controller": Controller.get(
-                space=self.space,
+                exchange_account=self.exchange_account,
                 base="BTC",
                 quote="USDT",
                 interval="1m",

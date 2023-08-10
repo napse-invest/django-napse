@@ -19,7 +19,7 @@ class SimulationTestCase:
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
             controller=Controller.get(
-                space=self.space,
+                exchange_account=self.exchange_account,
                 base="BTC",
                 quote="USDT",
                 interval="1m",
@@ -41,7 +41,7 @@ class SimulationTestCase:
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
             controller=Controller.get(
-                space=self.space,
+                exchange_account=self.exchange_account,
                 base="BTC",
                 quote="USDT",
                 interval="1m",
@@ -69,7 +69,7 @@ class SimulationTestCase:
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
             controller=Controller.get(
-                space=self.space,
+                exchange_account=self.exchange_account,
                 base="BTC",
                 quote="USDT",
                 interval="1m",

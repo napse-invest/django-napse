@@ -17,7 +17,7 @@ class DataSetTestCase:
 
     def simple_create(self):
         controller = Controller.get(
-            space=self.space,
+            exchange_account=self.exchange_account,
             base="BTC",
             quote="USDT",
             interval="1d",
@@ -38,7 +38,7 @@ class DataSetTestCase:
 
     def test_info_small(self):
         controller = Controller.get(
-            space=self.space,
+            exchange_account=self.exchange_account,
             base="BTC",
             quote="USDT",
             interval="1d",

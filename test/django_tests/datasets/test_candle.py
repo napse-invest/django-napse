@@ -16,7 +16,7 @@ class CandleTestCase:
 
     def simple_create(self):
         controller = Controller.get(
-            space=self.space,
+            exchange_account=self.exchange_account,
             base="BTC",
             quote="USDT",
             interval="1d",

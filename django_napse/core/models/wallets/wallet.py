@@ -98,7 +98,7 @@ class Wallet(models.Model, FindableClass):
             raise ValueError(error_msg)
 
         if mbp is None:
-            mbp = Controller.get_asset_price(space=self.space, base=ticker)
+            mbp = Controller.get_asset_price(exchange_account=self.exchange_account, base=ticker)
 
         start_time = time.time()
         while self.locked:
@@ -146,7 +146,7 @@ class Wallet(models.Model, FindableClass):
         for currency in self.currencies.all():
             if currency.amount == 0:
                 continue
-            value += currency.amount * Controller.get_asset_price(space=self.space, base=currency.ticker)
+            value += currency.amount * Controller.get_asset_price(exchange_account=self.exchange_account, base=currency.ticker)
         return value
 
     def to_dict(self):
