@@ -1,4 +1,5 @@
-name: Check pull request source branch
+name: Check Source Branch
+
 on:
   pull_request_target:
 
