@@ -7,6 +7,9 @@ jobs:
     name: Check branches
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
       - name: Check branches
         env:
           HEAD_REF: ${{ github.head_ref }}
