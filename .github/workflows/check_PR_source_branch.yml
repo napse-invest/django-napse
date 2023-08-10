@@ -1,15 +1,12 @@
 name: Check pull request source branch
 on:
-  pull_request:
+  pull_request_target:
 
 jobs:
   check-branches:
     name: Check branches
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.base_ref }}
       - name: Check branches
         env:
           HEAD_REF: ${{ github.head_ref }}
