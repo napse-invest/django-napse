@@ -22,7 +22,7 @@ class OrderTestCase:
         )
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)
-        connection = Connection.objects.create(space=self.space, bot=bot)
+        connection = Connection.objects.create(owner=self.space.wallet, bot=bot)
         connection.wallet.top_up(amount=10000, ticker="USDT", force=True)
         return Order.objects.create(connection=connection, amount=0.1, price=30000, pair="BTCUSDT", side=SIDES.BUY)
 

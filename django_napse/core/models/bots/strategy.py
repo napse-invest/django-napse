@@ -20,3 +20,9 @@ class Strategy(models.Model, FindableClass):
     @classmethod
     def architecture_class(cls):
         return cls._meta.get_field("architecture").related_model
+
+    def copy(self):
+        return self.find().__class__.objects.create(
+            config=self.config.duplicate_immutable(),
+            architecture=self.architecture.copy(),
+        )

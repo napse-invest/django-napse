@@ -30,7 +30,6 @@ class SimulationTestCase:
         return Simulation.objects.create(
             space=self.space,
             bot=bot,
-            investment=1000,
             start_date=datetime(2021, 1, 1, tzinfo=UTC),
             end_date=datetime(2021, 1, 3, tzinfo=UTC),
             simulation_reference=uuid.uuid4(),
@@ -52,7 +51,6 @@ class SimulationTestCase:
         simulation = Simulation.objects.create(
             space=self.space,
             bot=bot,
-            investment=1000,
             start_date=datetime(2021, 1, 1, tzinfo=UTC),
             end_date=datetime(2021, 1, 3, tzinfo=UTC),
             simulation_reference=uuid.uuid4(),
@@ -80,7 +78,6 @@ class SimulationTestCase:
         simulation = Simulation.objects.create(
             space=self.space,
             bot=bot,
-            investment=1000,
             start_date=datetime(2021, 1, 1, tzinfo=UTC),
             end_date=datetime(2021, 1, 3, tzinfo=UTC),
             simulation_reference=uuid.uuid4(),

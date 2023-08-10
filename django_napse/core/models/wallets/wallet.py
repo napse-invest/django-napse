@@ -3,6 +3,7 @@ import time
 from django.db import models
 
 from django_napse.core.models.bots.controller import Controller
+from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.wallets.currency import Currency
 from django_napse.core.models.wallets.managers import WalletManager
 from django_napse.utils.errors import WalletError
@@ -176,6 +177,31 @@ class SpaceWallet(Wallet):
     @property
     def exchange_account(self):
         return self.space.exchange_account.find()
+
+    def connect_to(self, bot):
+        return Connection.objects.create(wallet=self, bot=bot)
+
+
+class SpaceSimulationWallet(Wallet):
+    owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="simulation_wallet")
+
+    @property
+    def testing(self):
+        return True
+
+    @property
+    def space(self):
+        return self.owner
+
+    @property
+    def exchange_account(self):
+        return self.space.exchange_account.find()
+
+    def reset(self):
+        self.currencies.all().delete()
+
+    def connect_to(self, bot):
+        return Connection.objects.create(wallet=self, bot=bot)
 
 
 class OrderWallet(Wallet):

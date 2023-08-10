@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import pandas as pd
 from binance.helpers import interval_to_milliseconds
 from django.db import models
 
@@ -96,6 +97,21 @@ class DataSet(models.Model):
 
     def is_finished(self):
         return self.status == DOWNLOAD_STATUS.IDLE and self.completion == 100
+
+    def to_dataframe(self, start_date=None, end_date=None):
+        start_date = start_date or self.start_date
+        end_date = end_date or self.end_date
+        candles = self.candles.filter(start_date__gte=start_date, end_date__lte=end_date).order_by("open_time")
+        return pd.DataFrame(
+            data={
+                "open_time": [candle.open_time for candle in candles],
+                "open": [candle.open for candle in candles],
+                "high": [candle.high for candle in candles],
+                "low": [candle.low for candle in candles],
+                "close": [candle.close for candle in candles],
+                "volume": [candle.volume for candle in candles],
+            },
+        )
 
 
 class Candle(models.Model):

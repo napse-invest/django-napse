@@ -11,11 +11,20 @@ class Architecture(models.Model, FindableClass):
         error_msg = "get_candles not implemented for the Architecture base class, please implement it in the child class."
         raise NotImplementedError(error_msg)
 
+    def copy(self):
+        error_msg = "copy not implemented for the Architecture base class, please implement it in the child class."
+        raise NotImplementedError(error_msg)
+
+    def list_controllers(self):
+        error_msg = "list_controllers not implemented for the Architecture base class, please implement it in the child class."
+        raise NotImplementedError(error_msg)
+
     def prepare_data(self):
         return {"candles": self.get_candles()}
 
-    def trigger_actions(self, bot, connections, data, strategy=None):
-        strategy = strategy or bot.strategy.find()
+    def trigger_actions(self, connections, data: dict):
+        strategy = self.strategy.find()
+
         pre_strategy_data_plugin_data = {}
         for plugin in strategy.plugins:
             result = plugin.apply_pre_strategy()
@@ -27,7 +36,7 @@ class Architecture(models.Model, FindableClass):
         for connection in connections:
             orders, modifications = strategy.give_order(
                 data={
-                    "candles": data["candles"],
+                    "candles": data.pop("candles"),
                     "connection": connection,
                     "pre_strategy_data_plugin_data": pre_strategy_data_plugin_data,
                 },

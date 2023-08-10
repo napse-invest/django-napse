@@ -18,3 +18,11 @@ class SinglePairArchitecture(Architecture):
         if verbose:  # pragma: no cover
             print(string)
         return string
+
+    def copy(self):
+        return SinglePairArchitecture.objects.create(
+            controller=self.controller,
+        )
+
+    def list_controllers(self):
+        return [self.controller]

@@ -2,15 +2,18 @@ import uuid
 
 from django.db import models
 
-from django_napse.simulations.models.simulations.managers import SimulationDataPointManager, SimulationManager
+from django_napse.core.models import Credit
+from django_napse.simulations.models import DataSet
+from django_napse.simulations.models.simulations.managers import SimulationDataPointManager, SimulationManager, SimulationQueueManager
+from django_napse.utils.constants import SIMULATION_STATUS
 from django_napse.utils.usefull_functions import process_value_from_type
 
 
 class Simulation(models.Model):
-    simulation_reference = models.UUIDField(unique=True, editable=False, default=uuid.uuid4, null=True)
+    simulation_reference = models.UUIDField(unique=True, editable=False, null=True)
     space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE, null=True)
     bot = models.OneToOneField("django_napse_core.Bot", on_delete=models.CASCADE, null=True, related_name="simulation")
-    investment = models.FloatField(default=1000)
+
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -25,7 +28,7 @@ class Simulation(models.Model):
         string += f"{beacon}Simulation {self.pk}:\n"
         string += f"{beacon}\t{self.bot=}\n"
         string += f"{beacon}\t{self.space=}\n"
-        string += f"{beacon}\t{self.investment=}\n"
+
         string += f"{beacon}\t{self.start_date=}\n"
         string += f"{beacon}\t{self.end_date=}\n"
         string += f"{beacon}\t{self.created_at=}\n"
@@ -94,13 +97,14 @@ class SimulationDataPointExtraInfo(models.Model):
 
 class SimulationQueue(models.Model):
     simulation_reference = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
+    space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE, null=True)
     bot = models.OneToOneField("django_napse_core.Bot", on_delete=models.CASCADE, null=True)
-    investment = models.FloatField(default=1000)
-    start_date = models.DateTimeField(null=True)
-    end_date = models.DateTimeField(null=True)
+
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
     canceled = models.BooleanField(default=False)
 
-    status = models.CharField(max_length=12, default="IDLE")
+    status = models.CharField(max_length=12, default=SIMULATION_STATUS.IDLE)
     completion = models.FloatField(default=0.0)
     eta = models.DurationField(blank=True, null=True)
 
@@ -108,5 +112,95 @@ class SimulationQueue(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
 
+    objects = SimulationQueueManager()
+
     def __str__(self) -> str:
         return f"BOT SIM QUEUE {self.pk}"
+
+    def info(self, verbose=True, beacon=""):
+        string = ""
+        string += f"{beacon}SimulationQueue {self.pk}:\n"
+        string += f"{beacon}\t{self.bot=}\n"
+        string += f"{beacon}\t{self.space=}\n"
+
+        string += f"{beacon}\t{self.start_date=}\n"
+        string += f"{beacon}\t{self.end_date=}\n"
+        string += f"{beacon}\t{self.created_at=}\n"
+
+        string += f"{beacon}Investments:\n"
+        investments = self.investments.all()
+        if investments.count() > 0:
+            for investment in investments:
+                string += f"{beacon}\t{investment}\n"
+        else:
+            string += f"{beacon}\tNo investments\n"
+        if verbose:
+            print(string)
+        return string
+
+    def setup_simulation(self):
+        print(self.space.simulation_wallet)
+        self.space.simulation_wallet.find().reset()
+        for investment in self.investments.all():
+            Credit.objects.create(
+                wallet=self.space.simulation_wallet,
+                ticker=investment.ticker,
+                amount=investment.amount,
+            )
+        new_bot = self.bot.copy()
+        connection = new_bot.connect_to(self.space.simulation_wallet)
+        for investment in self.investments.all():
+            connection.deposit(investment.ticker, investment.amount)
+        return new_bot
+
+    def cleanup_simulation(self, bot):
+        self.space.simulation_wallet.reset()
+        bot.hibernate()
+
+    def quick_simulation(self, bot):
+        dataset = DataSet.objects.create(controller=bot.controller, start_date=self.start_date, end_date=self.end_date)
+        dataframe = dataset.to_dataframe(start_date=self.start_date, end_date=self.end_date)
+        for index, row in dataframe.iterrows():
+            print(index, row)
+
+    def run_quicksim(self):
+        self.status = SIMULATION_STATUS.RUNNING
+        self.save()
+        bot = self.setup_simulation()
+
+        simulation = self.quicksim(bot=self.bot)
+
+        self.cleanup_simulation(bot)
+        self.status = SIMULATION_STATUS.IDLE
+        self.save()
+        return simulation
+
+    def is_finished(self):
+        return self.status == SIMULATION_STATUS.IDLE and self.completion == 100
+
+    def get_status(self):
+        """Return a dictionary with the status of the BotSimQueue.
+
+        Dict shape:
+        ```json
+        {
+            "status": "RUNNING",
+            "completion": 56.9,
+            "eta": 00:01:04,
+            "position_in_queue": 0,
+            "error": false,
+        }
+        ```
+        """
+        return {
+            "status": self.status,
+            "completion": self.completion,
+            "eta": self.eta,
+            "position_in_queue": SimulationQueue.objects.filter(created_at__lt=self.created_at, error=False).count(),
+            "error": self.error,
+        }
+
+    def cancel(self):
+        """Stop the BotSim."""
+        self.canceled = True
+        self.save()

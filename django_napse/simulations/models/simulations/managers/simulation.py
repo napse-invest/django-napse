@@ -5,14 +5,13 @@ from django_napse.utils.errors import SimulationError
 
 
 class SimulationManager(models.Manager):
-    def create(self, space, bot, investment, start_date, end_date, simulation_reference, data):
+    def create(self, space, bot, start_date, end_date, simulation_reference, data):
         SimulationDataPoint = apps.get_model("django_napse_simulations", "SimulationDataPoint")
         SimulationDataPointExtraInfo = apps.get_model("django_napse_simulations", "SimulationDataPointExtraInfo")
 
         simulation = self.model(
             space=space,
             bot=bot,
-            investment=investment,
             start_date=start_date,
             end_date=end_date,
             simulation_reference=simulation_reference,
