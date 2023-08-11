@@ -1,3 +1,18 @@
+# [1.2.0](https://github.com/napse-invest/django-napse/compare/v1.1.0...v1.2.0) (2023-08-10)
+
+
+### Bug Fixes
+
+* **ci:** removed BINANCE keys from pipelines ([aeeacc3](https://github.com/napse-invest/django-napse/commit/aeeacc3e184bb2747be53b3c5a09974eb5ecb7c7))
+* **ci:** test if changes to secrets worked ([b91d1c4](https://github.com/napse-invest/django-napse/commit/b91d1c4a39c6623351c989d3fa475e1182fd7fde))
+* **controller:** moved to exchange_account level ([ebff8f7](https://github.com/napse-invest/django-napse/commit/ebff8f7d4ed03ac6dd05369870717dfb6c7076e1))
+
+
+### Features
+
+* **simulations:** models added and tested ([d75da60](https://github.com/napse-invest/django-napse/commit/d75da60624a8bb09cf44c84e2220e4fe666fce12))
+* **tests:** Dataset ([89f83e7](https://github.com/napse-invest/django-napse/commit/89f83e777d94880dc906c0da734e67e0725686ed))
+
 # [1.1.0](https://github.com/napse-invest/django-napse/compare/v1.0.0...v1.1.0) (2023-08-08)
 
 
