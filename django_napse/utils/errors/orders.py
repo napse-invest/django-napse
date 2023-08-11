@@ -6,3 +6,6 @@ class OrderError:
 
     class StatusError(Exception):
         """Raised when the status of an order is changed at the wrong time."""
+
+    class ProcessError(Exception):
+        """Raised when an error occurs during the processing of an order."""

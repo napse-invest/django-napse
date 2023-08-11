@@ -34,17 +34,21 @@ class EXCHANGES(StrEnum, metaclass=CustomEnumMeta):
 
 class TRANSACTION_TYPES(StrEnum, metaclass=CustomEnumMeta):
     TRANSFER = "TRANSFER"
-    DEPOSIT = "DEPOSIT"
-    WITHDRAW = "WITHDRAW"
+    CONNECTION_DEPOSIT = "CONNECTION_DEPOSIT"
+    CONNECTION_WITHDRAW = "CONNECTION_WITHDRAW"
     ORDER_DEPOSIT = "ORDER_DEPOSIT"
+    ORDER_PAYOUT = "ORDER_PAYOUT"
+    ORDER_REFUND = "ORDER_REFUND"
+    ORDER_DUST = "ORDER_DUST"
     FLEET_REBALANCE = "FLEET_REBALANCE"
-    DUST = "DUST"
 
 
 class ORDER_STATUS(StrEnum, metaclass=CustomEnumMeta):
     PENDING = "PENDING"
     READY = "READY"
     PASSED = "PASSED"
+    ONLY_BUY_PASSED = "ONLY_BUY_PASSED"
+    ONLY_SELL_PASSED = "ONLY_SELL_PASSED"
     FAILED = "FAILED"
 
 
@@ -57,6 +61,11 @@ class SIDES(StrEnum, metaclass=CustomEnumMeta):
 class DOWNLOAD_STATUS(StrEnum, metaclass=CustomEnumMeta):
     IDLE = "IDLE"
     DOWNLOADING = "DOWNLOADING"
+
+
+class SIMULATION_STATUS(StrEnum, metaclass=CustomEnumMeta):
+    IDLE = "IDLE"
+    RUNNING = "RUNNING"
 
 
 ORDER_LEEWAY_PERCENTAGE = 10

@@ -1,6 +1,7 @@
 from django.db import models
 
 from django_napse.core.models.bots.strategy import Strategy
+from django_napse.utils.constants import SIDES
 
 
 class EmptyStrategy(Strategy):
@@ -19,3 +20,28 @@ class EmptyStrategy(Strategy):
         if verbose:  # pragma: no cover
             print(string)
         return string
+
+    def give_order(self, data: dict) -> list[dict]:
+        controller = next(iter(data["candles"].keys()))
+        return [
+            {
+                "controller": controller,
+                "modifications": [],
+                "connection": data["connection"],
+                "asked_for_amount": 0,
+                "asked_for_ticker": controller.quote,
+                "pair": controller.pair,
+                "price": data["candles"][controller]["latest"]["close"],
+                "side": SIDES.KEEP,
+            },
+            {
+                "controller": controller,
+                "modifications": [],
+                "connection": data["connection"],
+                "asked_for_amount": 15,
+                "asked_for_ticker": controller.quote,
+                "pair": controller.pair,
+                "price": data["candles"][controller]["latest"]["close"],
+                "side": SIDES.BUY,
+            },
+        ]
