@@ -17,7 +17,7 @@ class BotDefaultTestCase:
 
     @property
     def architecture(self):
-        return self.strategy_class.architecture_class().objects.create(**self.architecture_settings)
+        return self.strategy_class.architecture_class().objects.create(constants=self.architecture_constants)
 
     @property
     def strategy(self):

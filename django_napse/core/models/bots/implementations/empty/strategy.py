@@ -22,11 +22,13 @@ class EmptyStrategy(Strategy):
         return string
 
     def give_order(self, data: dict) -> list[dict]:
-        controller = next(iter(data["candles"].keys()))
+        controller = data["controllers"]["main"]
         return [
             {
                 "controller": controller,
-                "modifications": [],
+                "ArchitectureModifications": [],
+                "StrategyModifications": [],
+                "ConnectionModifications": [],
                 "connection": data["connection"],
                 "asked_for_amount": 0,
                 "asked_for_ticker": controller.quote,
@@ -36,7 +38,9 @@ class EmptyStrategy(Strategy):
             },
             {
                 "controller": controller,
-                "modifications": [],
+                "ArchitectureModifications": [],
+                "StrategyModifications": [],
+                "ConnectionModifications": [],
                 "connection": data["connection"],
                 "asked_for_amount": 15,
                 "asked_for_ticker": controller.quote,

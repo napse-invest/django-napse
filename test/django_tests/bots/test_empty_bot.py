@@ -14,7 +14,7 @@ class EmptyBotTestCase(BotDefaultTestCase):
     config_settings = {"empty": True}
 
     @property
-    def architecture_settings(self):
+    def architecture_constants(self):
         return {
             "controller": Controller.get(
                 exchange_account=self.exchange_account,

@@ -4,6 +4,7 @@ from typing import Optional
 from django.db import models
 
 from django_napse.core.models.connections.connection import Connection
+from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.utils.errors import BotError
 
@@ -87,7 +88,7 @@ class Bot(models.Model):
 
     @property
     def controllers(self):
-        return self.architecture.list_controllers()
+        return self.architecture.controllers_dict()
 
     def hibernate(self):
         if not self.active:
@@ -114,10 +115,16 @@ class Bot(models.Model):
             batches[controller] = OrderBatch.objects.create(controller=controller)
         for order in orders:
             controller = order.pop("controller")
-            modifications = order.pop("modifications")
+            strategy_modifications = order.pop("StrategyModifications")
+            connection_modifications = order.pop("ConnectionModifications")
+            architecture_modifications = order.pop("ArchitectureModifications")
             order = Order.objects.create(batch=batches[controller], **order)
-            for modification in modifications:
-                modification.save()  # TODO: Rewrite using the Modification Model
+            for modification in strategy_modifications:
+                StrategyModification.objects.create(order=order, **modification)
+            for modification in connection_modifications:
+                ConnectionModification.objects.create(order=order, **modification)
+            for modification in architecture_modifications:
+                ArchitectureModification.objects.create(order=order, **modification)
         for batch in batches.values():
             batch.set_status_ready()
 
