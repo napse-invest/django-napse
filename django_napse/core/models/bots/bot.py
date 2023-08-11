@@ -1,8 +1,10 @@
 import uuid
+from typing import Optional
 
 from django.db import models
 
 from django_napse.core.models.connections.connection import Connection
+from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.utils.errors import BotError
 
 
@@ -97,16 +99,30 @@ class Bot(models.Model):
     def get_connections(self):
         return list(self.connections.all())
 
+    def get_connection_data(self):
+        return {connection: connection.to_dict() for connection in self.get_connections()}
+
     def trigger_actions(self):
         if not self.active:
             error_msg = "Bot is hibernating."
             raise BotError.InvalidSetting(error_msg)
-        connections = self.get_connections()
-        orders, modifictions = self.architecture.trigger_actions(connections=connections, data=self.architecture.prepare_data())
+
+        orders = self._get_orders()
+        batches = {}
         for order in orders:
-            order.set_status_ready()
-        for modification in modifictions:
-            modification.save()
+            controller = order["controller"]
+            batches[controller] = OrderBatch.objects.create(controller=controller)
+        for order in orders:
+            controller = order.pop("controller")
+            modifications = order.pop("modifications")
+            order = Order.objects.create(batch=batches[controller], **order)
+            for modification in modifications:
+                modification.save()  # TODO: Rewrite using the Modification Model
+        for batch in batches.values():
+            batch.set_status_ready()
+
+    def _get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):
+        return self.architecture._get_orders(data=data, no_db_data=no_db_data)
 
     def connect_to(self, wallet):
         return Connection.objects.create(owner=wallet, bot=self)

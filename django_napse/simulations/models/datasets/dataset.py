@@ -101,7 +101,7 @@ class DataSet(models.Model):
     def to_dataframe(self, start_date=None, end_date=None):
         start_date = start_date or self.start_date
         end_date = end_date or self.end_date
-        candles = self.candles.filter(start_date__gte=start_date, end_date__lte=end_date).order_by("open_time")
+        candles = self.candles.filter(open_time__gte=start_date, open_time__lt=end_date).order_by("open_time")
         return pd.DataFrame(
             data={
                 "open_time": [candle.open_time for candle in candles],
@@ -143,6 +143,18 @@ class Candle(models.Model):
         if verbose:
             print(string)
         return string
+
+    def to_dict(self):
+        return {
+            "controller": self.dataset.controller,
+            "open_time": self.open_time,
+            "open": self.open,
+            "high": self.high,
+            "low": self.low,
+            "close": self.close,
+            "volume": self.volume,
+            "extra": {},
+        }
 
 
 class DataSetQueue(models.Model):

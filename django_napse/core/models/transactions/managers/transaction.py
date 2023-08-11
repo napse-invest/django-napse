@@ -25,7 +25,7 @@ class TransactionManager(models.Manager):
         if from_wallet == to_wallet:
             error_msg = "Wallets must be different."
             raise TransactionError.SameWalletError(error_msg)
-        print(from_wallet, to_wallet)
+
         if from_wallet.testing != to_wallet.testing:
             error_msg = f"Wallets must be both testing or both not testing. Here: {from_wallet.testing} -> {to_wallet.testing}."
             raise TransactionError.TestingError(error_msg)

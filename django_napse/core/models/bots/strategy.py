@@ -9,8 +9,8 @@ class Strategy(models.Model, FindableClass):
     def __str__(self) -> str:  # pragma: no cover
         return f"STRATEGY {self.pk}"
 
-    def give_order(self, data: dict):
-        error_msg = "give_order not implemented for the Strategy base class, please implement it in the child class."
+    def give_order(self, data: dict) -> list[dict]:
+        error_msg = f"give_order not implemented for the Strategy base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
 
     @classmethod

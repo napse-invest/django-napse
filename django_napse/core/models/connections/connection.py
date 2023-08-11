@@ -21,11 +21,11 @@ class Connection(models.Model):
 
     @property
     def testing(self):
-        return self.wallet.space.testing
+        return self.space.testing
 
     @property
     def space(self):
-        return self.owner.space
+        return self.owner.find().space
 
     def deposit(self, ticker, amount):
         return Transaction.objects.create(
@@ -44,6 +44,13 @@ class Connection(models.Model):
             ticker=ticker,
             transaction_type=TRANSACTION_TYPES.CONNECTION_WITHDRAW,
         )
+
+    def to_dict(self):
+        return {
+            "connection": self,
+            "wallet": self.wallet.find().to_dict(),
+            "connection_specific_args": self.specific_args.all(),
+        }
 
 
 class ConnectionSpecificArgs(models.Model):

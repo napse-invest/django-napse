@@ -18,7 +18,7 @@ class Wallet(models.Model, FindableClass):
     objects = WalletManager()
 
     def __str__(self):
-        return f"WALLET: {self.pk=} - {self.title=} - {self.locked=}"
+        return f"WALLET: {self.pk=}"
 
     def info(self, verbose=True, beacon=""):
         self = self.find()
@@ -44,7 +44,7 @@ class Wallet(models.Model, FindableClass):
 
     @property
     def space(self):  # pragma: no cover
-        error_msg = "space() not implemented by default. Please implement in a subclass of Wallet."
+        error_msg = f"space() not implemented by default. Please implement it in {self.__class__}."
         raise NotImplementedError(error_msg)
 
     @property
@@ -158,11 +158,11 @@ class Wallet(models.Model, FindableClass):
             "locked": self.locked,
             "created_at": self.created_at,
             "currencies": {
-                curr.ticker: {
-                    "amount": curr.amount,
-                    "mbp": curr.mbp,
+                currency.ticker: {
+                    "amount": currency.amount,
+                    "mbp": currency.mbp,
                 }
-                for curr in currencies
+                for currency in currencies
             },
         }
 

@@ -118,7 +118,7 @@ class BaseWalletTestCase:
         self.assertEqual(
             wallet.to_dict(),
             {
-                "title": "Main Wallet for space Test Space",
+                "title": "Wallet for space Test Space",
                 "testing": True,
                 "locked": False,
                 "created_at": wallet.created_at,

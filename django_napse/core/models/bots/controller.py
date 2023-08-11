@@ -1,11 +1,13 @@
 import math
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
 
 from django_napse.core.models.bots.managers.controller import ControllerManager
-from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, STABLECOINS
+from django_napse.core.models.orders.order import Order, OrderBatch
+from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, ORDER_STATUS, SIDES, STABLECOINS
 from django_napse.utils.errors import ControllerError
 from django_napse.utils.trading.binance_controller import BinanceController
 
@@ -31,7 +33,7 @@ class Controller(models.Model):
         unique_together = ("pair", "interval", "exchange_account")
 
     def __str__(self):
-        return f"Controller {self.pair} - {self.interval}"
+        return f"Controller {self.pk=}"
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -131,6 +133,99 @@ class Controller(models.Model):
 
         if self.pk:
             self.save()
+
+    def process_orders(self, testing: bool, no_db_data: Optional[dict] = None) -> list[Order]:
+        in_simulation = no_db_data is not None
+        no_db_data = no_db_data or {
+            "buy_orders": Order.objects.filter(
+                order__batch__status=ORDER_STATUS.READY,
+                order__side=SIDES.BUY,
+                order__batch__controller=self,
+                order__testing=testing,
+            ),
+            "sell_orders": Order.objects.filter(
+                order__batch__status=ORDER_STATUS.READY,
+                order__side=SIDES.SELL,
+                order__batch__controller=self,
+                order__testing=testing,
+            ),
+            "keep_orders": Order.objects.filter(
+                order__batch__status=ORDER_STATUS.READY,
+                order__side=SIDES.KEEP,
+                order__batch__controller=self,
+                order__testing=testing,
+            ),
+            "batches": OrderBatch.objects.filter(status=ORDER_STATUS.READY, batch__controller=self),
+            "exchange_controller": self.exchange_controller,
+            "min_trade": self.min_trade,
+            "price": self.get_price(),
+        }
+
+        aggregated_order = {
+            "buy_amount": 0,
+            "sell_amount": 0,
+            "min_trade": no_db_data["min_trade"],
+            "price": no_db_data["price"],
+            "min_notional": self.min_notional,
+            "pair": self.pair,
+        }
+
+        for order in no_db_data["buy_orders"]:
+            aggregated_order["buy_amount"] += order.asked_for_amount
+        for order in no_db_data["sell_orders"]:
+            aggregated_order["sell_amount"] += order.asked_for_amount
+
+        if aggregated_order["buy_amount"] > 0:
+            for order in no_db_data["buy_orders"]:
+                order.calculate_batch_share(total=aggregated_order["buy_amount"], save=not in_simulation)
+        if aggregated_order["sell_amount"]:
+            for order in no_db_data["sell_orders"]:
+                order.calculate_batch_share(total=aggregated_order["sell_amount"], save=not in_simulation)
+        for order in no_db_data["keep_orders"]:
+            order.batch_share = 0
+            if not in_simulation:
+                order.save()
+
+        receipt, executed_amounts_buy, executed_amounts_sell = no_db_data["exchange_controller"].submit_order(
+            controller=self,
+            aggregated_order=aggregated_order,
+            testing=in_simulation or testing,
+        )
+
+        all_orders = []
+        for order in no_db_data["buy_orders"]:
+            order.calculate_exit_amounts(
+                controller=self,
+                executed_amounts=executed_amounts_buy,
+                save=not in_simulation,
+            )
+            all_orders.append(order)
+        for order in no_db_data["sell_orders"]:
+            order.calculate_exit_amounts(
+                controller=self,
+                executed_amounts=executed_amounts_sell,
+                save=not in_simulation,
+            )
+            all_orders.append(order)
+        for order in no_db_data["keep_orders"]:
+            order.calculate_exit_amounts(
+                controller=self,
+                executed_amounts={},
+                save=not in_simulation,
+            )
+            all_orders.append(order)
+
+        for batch in no_db_data["batches"]:
+            batch.set_status_post_process(
+                executed_amounts_buy=executed_amounts_buy,
+                executed_amounts_sell=executed_amounts_sell,
+                save=not in_simulation,
+            )
+
+        return all_orders
+
+    def apply_orders(self, orders):
+        pass
 
     def send_candles_to_bots(self, closed_candle, current_candle) -> list:
         """Scan all bots (that are allowed to trade) and get their orders.

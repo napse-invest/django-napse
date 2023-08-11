@@ -1,11 +1,17 @@
+import time
 import uuid
+from contextlib import suppress
+from datetime import timedelta
 
 from django.db import models
 
-from django_napse.core.models import Credit
-from django_napse.simulations.models import DataSet
+from django_napse.core.models.bots.controller import Controller
+from django_napse.core.models.orders.order import Order, OrderBatch
+from django_napse.core.models.transactions.credit import Credit
+from django_napse.simulations.models.datasets.dataset import Candle, DataSet
 from django_napse.simulations.models.simulations.managers import SimulationDataPointManager, SimulationManager, SimulationQueueManager
-from django_napse.utils.constants import SIMULATION_STATUS
+from django_napse.utils.constants import ORDER_LEEWAY_PERCENTAGE, ORDER_STATUS, SIDES, SIMULATION_STATUS
+from django_napse.utils.errors import ControllerError
 from django_napse.utils.usefull_functions import process_value_from_type
 
 
@@ -139,7 +145,6 @@ class SimulationQueue(models.Model):
         return string
 
     def setup_simulation(self):
-        print(self.space.simulation_wallet)
         self.space.simulation_wallet.find().reset()
         for investment in self.investments.all():
             Credit.objects.create(
@@ -151,24 +156,150 @@ class SimulationQueue(models.Model):
         connection = new_bot.connect_to(self.space.simulation_wallet)
         for investment in self.investments.all():
             connection.deposit(investment.ticker, investment.amount)
-        return new_bot
+        no_db_data = new_bot.architecture.prepare_db_data()
+        return new_bot, no_db_data
 
     def cleanup_simulation(self, bot):
         self.space.simulation_wallet.reset()
         bot.hibernate()
 
-    def quick_simulation(self, bot):
-        dataset = DataSet.objects.create(controller=bot.controller, start_date=self.start_date, end_date=self.end_date)
-        dataframe = dataset.to_dataframe(start_date=self.start_date, end_date=self.end_date)
-        for index, row in dataframe.iterrows():
-            print(index, row)
+    def quick_simulation(self, bot, no_db_data):
+        currencies = next(iter(no_db_data["connection_data"].values()))["wallet"]["currencies"]
 
-    def run_quicksim(self):
+        exchange_controllers = {controller: controller.exchange_controller for controller in bot.controllers}
+
+        data = {}
+        datasets = []
+        for controller in bot.controllers:
+            datasets.append(DataSet.objects.create(controller=controller, start_date=self.start_date, end_date=self.end_date))
+            with suppress(ControllerError.InvalidSetting):
+                datasets.append(
+                    DataSet.objects.create(
+                        controller=Controller.get(exchange_account=controller.exchange_account, base=controller.base, quote="USDT", interval="1m"),
+                        start_date=self.start_date,
+                        end_date=self.end_date,
+                    ),
+                )
+            with suppress(ControllerError.InvalidSetting):
+                datasets.append(
+                    DataSet.objects.create(
+                        controller=Controller.get(exchange_account=controller.exchange_account, base=controller.quote, quote="USDT", interval="1m"),
+                        start_date=self.start_date,
+                        end_date=self.end_date,
+                    ),
+                )
+        datasets = set(datasets)
+        candles = Candle.objects.filter(dataset__in=datasets).order_by("open_time")
+        open_times = candles.values_list("open_time", flat=True).distinct()
+        for open_time in open_times:
+            data[open_time] = {}
+            for controller in bot.controllers:
+                data[open_time][controller] = None
+        for candle in candles:
+            candle_dict = candle.to_dict()
+            controller = candle_dict.pop("controller")
+            data[candle.open_time][controller] = candle_dict
+
+        for controller in bot.controllers:
+            last_candle = None
+            for open_time in open_times:
+                if data[open_time][controller] is None:
+                    data[open_time][controller] = last_candle
+                else:
+                    last_candle = data[open_time][controller]
+
+        _time = time.time()
+        tpi = []
+        dates = []
+        values = []
+        actions = []
+        prices = {}
+        amounts = {}
+        for date, candle_data in data.items():
+            processed_data = {"candles": {}, "extras": {}}
+            current_prices = {}
+            current_amounts = {}
+            for controller, candle in candle_data.items():
+                processed_data["candles"][controller] = {"current": candle, "latest": candle}
+                if controller.quote == "USDT" and controller.interval == "1m":
+                    price = candle["close"]
+                    current_prices[f"{controller.base}_price"] = price
+                    current_amounts[f"{controller.base}_amount"] = currencies.get(controller.base, {"amount": 0})["amount"]
+                    current_amounts[f"{controller.quote}_amount"] = currencies.get(controller.quote, {"amount": 0})["amount"]
+
+            orders = bot._get_orders(data=processed_data, no_db_data=no_db_data)
+            batches = {}
+
+            for order in orders:
+                currencies[order["asked_for_ticker"]]["amount"] -= order["asked_for_amount"] * (1 + ORDER_LEEWAY_PERCENTAGE / 100)
+                order["debited_amount"] = order["asked_for_amount"] * (1 + ORDER_LEEWAY_PERCENTAGE / 100)
+
+                controller = order["controller"]
+                batches[controller] = OrderBatch(controller=controller)
+
+            for batch in batches.values():
+                batch.status = ORDER_STATUS.READY
+
+            all_orders = []
+            for controller, batch in batches.items():
+                controller_orders = [order for order in orders if order["controller"] == controller]
+                for order in controller_orders:
+                    order.pop("controller")
+                    order.pop("modifications")
+
+                orders = controller.process_orders(
+                    no_db_data={
+                        "buy_orders": [Order(batch=batch, **order) for order in controller_orders if order["side"] == SIDES.BUY],
+                        "sell_orders": [Order(batch=batch, **order) for order in controller_orders if order["side"] == SIDES.SELL],
+                        "keep_orders": [Order(batch=batch, **order) for order in controller_orders if order["side"] == SIDES.KEEP],
+                        "batches": [batch],
+                        "exchange_controller": exchange_controllers[controller],
+                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"]["close"],
+                        "price": processed_data["candles"][controller]["latest"]["close"],
+                    },
+                    testing=True,
+                )
+                for order in orders:
+                    currencies[controller.base] = currencies.get(controller.base, {"amount": 0, "mbp": 0})
+                    currencies[controller.quote] = currencies.get(controller.quote, {"amount": 0, "mbp": 0})
+                    currencies[controller.base]["amount"] += order.exit_amount_base
+                    currencies[controller.quote]["amount"] += order.exit_amount_quote
+
+                all_orders += orders
+
+            wallet_value = 0
+            for ticker, currency in currencies.items():
+                amount = currency["amount"]
+                price = 1 if ticker == "USDT" else current_prices[f"{ticker}_price"]
+                wallet_value += amount * price
+
+            for index, order in enumerate(all_orders):
+                dates.append(date + index * timedelta(seconds=1))
+                values.append(round(wallet_value, 5))
+                actions.append(order.side)
+                for ticker_price in current_prices:
+                    prices[ticker_price] = [*prices.get(ticker_price, []), 1 if ticker_price == "USDT" else round(current_prices[ticker_price], 5)]
+                for ticker_amount in current_amounts:
+                    amounts[ticker_amount] = [*amounts.get(ticker_amount, []), round(current_amounts[ticker_amount], 5)]
+
+            tpi.append(time.time() - _time)
+            _time = time.time()
+        print(sum(tpi) / len(tpi))
+        return Simulation.objects.create(
+            space=self.space,
+            bot=bot,
+            start_date=self.start_date,
+            end_date=self.end_date,
+            simulation_reference=self.simulation_reference,
+            data={"dates": dates, "values": values, "actions": actions, **prices, **amounts},
+        )
+
+    def run_quick_simulation(self):
         self.status = SIMULATION_STATUS.RUNNING
         self.save()
-        bot = self.setup_simulation()
+        bot, no_db_data = self.setup_simulation()
 
-        simulation = self.quicksim(bot=self.bot)
+        simulation = self.quick_simulation(bot=self.bot, no_db_data=no_db_data)
 
         self.cleanup_simulation(bot)
         self.status = SIMULATION_STATUS.IDLE
