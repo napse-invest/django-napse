@@ -18,12 +18,14 @@ class SimulationTestCase:
     def simple_create(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
-            controller=Controller.get(
-                exchange_account=self.exchange_account,
-                base="BTC",
-                quote="USDT",
-                interval="1m",
-            ),
+            constants={
+                "controller": Controller.get(
+                    exchange_account=self.exchange_account,
+                    base="BTC",
+                    quote="USDT",
+                    interval="1m",
+                ),
+            },
         )
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)
@@ -39,12 +41,14 @@ class SimulationTestCase:
     def test_with_data(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
-            controller=Controller.get(
-                exchange_account=self.exchange_account,
-                base="BTC",
-                quote="USDT",
-                interval="1m",
-            ),
+            constants={
+                "controller": Controller.get(
+                    exchange_account=self.exchange_account,
+                    base="BTC",
+                    quote="USDT",
+                    interval="1m",
+                ),
+            },
         )
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)
@@ -66,12 +70,14 @@ class SimulationTestCase:
     def test_with_more_data(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
-            controller=Controller.get(
-                exchange_account=self.exchange_account,
-                base="BTC",
-                quote="USDT",
-                interval="1m",
-            ),
+            constants={
+                "controller": Controller.get(
+                    exchange_account=self.exchange_account,
+                    base="BTC",
+                    quote="USDT",
+                    interval="1m",
+                ),
+            },
         )
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)

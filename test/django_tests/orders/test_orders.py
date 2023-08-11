@@ -18,7 +18,7 @@ class OrderTestCase:
             quote="USDT",
             interval="1m",
         )
-        architecture = SinglePairArchitecture.objects.create(controller=controller)
+        architecture = SinglePairArchitecture.objects.create(constants={"controller": controller})
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)
         connection = Connection.objects.create(owner=self.space.wallet, bot=bot)

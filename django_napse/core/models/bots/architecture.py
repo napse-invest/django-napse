@@ -2,14 +2,26 @@ from typing import Optional
 
 from django.db import models
 
+from django_napse.core.models.bots.managers import ArchitectureManager
 from django_napse.utils.constants import ORDER_LEEWAY_PERCENTAGE, SIDES
 from django_napse.utils.errors.orders import OrderError
 from django_napse.utils.findable_class import FindableClass
 
 
 class Architecture(models.Model, FindableClass):
+    objects = ArchitectureManager()
+
     def __str__(self) -> str:
         return f"ARCHITECHTURE {self.pk}"
+
+    @property
+    def variables(self):
+        self = self.find(self.pk)
+        variables = {}
+        for variable in self._meta.get_fields():
+            if variable.name.startswith("variable_"):
+                variables[variable.name[8:]] = getattr(self, variable.name)
+        return variables
 
     def get_candles(self):  # pragma: no cover
         if self.__class__ == Architecture:
@@ -32,16 +44,28 @@ class Architecture(models.Model, FindableClass):
             error_msg = f"copy not implemented for the Architecture base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
 
-    def list_controllers(self):  # pragma: no cover
+    def controllers_dict(self):  # pragma: no cover
         if self.__class__ == Architecture:
-            error_msg = "list_controllers not implemented for the Architecture base class, please implement it in a subclass."
+            error_msg = "controllers_dict not implemented for the Architecture base class, please implement it in a subclass."
         else:
-            error_msg = f"list_controllers not implemented for the Architecture base class, please implement it in the {self.__class__} class."
+            error_msg = f"controllers_dict not implemented for the Architecture base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
+
+    def skip(self, data: dict) -> bool:
+        return False
+
+    def strategy_modifications(self, order: dict, data) -> list[dict]:
+        return []
+
+    def connection_modifications(self, order: dict, data) -> list[dict]:
+        return []
+
+    def architecture_modifications(self, order: dict, data) -> list[dict]:
+        return []
 
     def prepare_data(self):
         return {
-            "candles": {controller: self.get_candles(controller) for controller in self.list_controllers()},
+            "candles": {controller: self.get_candles(controller) for controller in self.controllers_dict().values()},
             "extras": {},
         }
 
@@ -49,7 +73,7 @@ class Architecture(models.Model, FindableClass):
         return {
             "strategy": self.strategy.find(),
             "architecture": self.find(),
-            "controllers": self.list_controllers(),
+            "controllers": self.controllers_dict(),
             "connections": self.strategy.bot.get_connections(),
             "connection_data": self.strategy.bot.get_connection_data(),
             # "plugins": self.plugins.all(),
@@ -61,16 +85,19 @@ class Architecture(models.Model, FindableClass):
 
         strategy = no_db_data["strategy"]
         connections = no_db_data["connections"]
-
+        architecture = no_db_data["architecture"]
         all_orders = []
         for connection in connections:
+            new_data = {**data, **no_db_data, "connection": connection}
+            if architecture.skip(data=new_data):
+                continue
             orders = strategy.give_order(
-                data={
-                    **data,
-                    **no_db_data,
-                    "connection": connection,
-                },
+                data=new_data,
             )
+            for order in orders:
+                order["StrategyModifications"] += architecture.strategy_modifications(order=order, data=new_data)
+                order["ConnectionModifications"] += architecture.connection_modifications(order=order, data=new_data)
+                order["ArchitectureModifications"] += architecture.architecture_modifications(order=order, data=new_data)
             required_amount = {}
             for order in orders:
                 required_amount[order["asked_for_ticker"]] = required_amount.get(order["asked_for_ticker"], 0) + order["asked_for_amount"]

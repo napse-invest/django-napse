@@ -4,8 +4,6 @@ from django_napse.utils.findable_class import FindableClass
 
 
 class Strategy(models.Model, FindableClass):
-    plugins = []
-
     def __str__(self) -> str:  # pragma: no cover
         return f"STRATEGY {self.pk}"
 

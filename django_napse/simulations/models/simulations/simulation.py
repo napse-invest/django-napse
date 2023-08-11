@@ -6,6 +6,7 @@ from datetime import timedelta
 from django.db import models
 
 from django_napse.core.models.bots.controller import Controller
+from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.core.models.transactions.credit import Credit
 from django_napse.simulations.models.datasets.dataset import Candle, DataSet
@@ -166,11 +167,11 @@ class SimulationQueue(models.Model):
     def quick_simulation(self, bot, no_db_data):
         currencies = next(iter(no_db_data["connection_data"].values()))["wallet"]["currencies"]
 
-        exchange_controllers = {controller: controller.exchange_controller for controller in bot.controllers}
+        exchange_controllers = {controller: controller.exchange_controller for controller in bot.controllers.values()}
 
         data = {}
         datasets = []
-        for controller in bot.controllers:
+        for controller in bot.controllers.values():
             datasets.append(DataSet.objects.create(controller=controller, start_date=self.start_date, end_date=self.end_date))
             with suppress(ControllerError.InvalidSetting):
                 datasets.append(
@@ -193,14 +194,14 @@ class SimulationQueue(models.Model):
         open_times = candles.values_list("open_time", flat=True).distinct()
         for open_time in open_times:
             data[open_time] = {}
-            for controller in bot.controllers:
+            for controller in bot.controllers.values():
                 data[open_time][controller] = None
         for candle in candles:
             candle_dict = candle.to_dict()
             controller = candle_dict.pop("controller")
             data[candle.open_time][controller] = candle_dict
 
-        for controller in bot.controllers:
+        for controller in bot.controllers.values():
             last_candle = None
             for open_time in open_times:
                 if data[open_time][controller] is None:
@@ -229,7 +230,6 @@ class SimulationQueue(models.Model):
 
             orders = bot._get_orders(data=processed_data, no_db_data=no_db_data)
             batches = {}
-
             for order in orders:
                 currencies[order["asked_for_ticker"]]["amount"] -= order["asked_for_amount"] * (1 + ORDER_LEEWAY_PERCENTAGE / 100)
                 order["debited_amount"] = order["asked_for_amount"] * (1 + ORDER_LEEWAY_PERCENTAGE / 100)
@@ -242,16 +242,28 @@ class SimulationQueue(models.Model):
 
             all_orders = []
             for controller, batch in batches.items():
+                all_modifications = []
                 controller_orders = [order for order in orders if order["controller"] == controller]
+                order_objects = []
                 for order in controller_orders:
                     order.pop("controller")
-                    order.pop("modifications")
+                    strategy_modifications = order.pop("StrategyModifications")
+                    connection_modifications = order.pop("ConnectionModifications")
+                    architecture_modifications = order.pop("ArchitectureModifications")
+                    order = Order(batch=batch, **order)
+                    order_objects.append(order)
+                    for modification in strategy_modifications:
+                        all_modifications.append(StrategyModification(order=order, **modification))
+                    for modification in connection_modifications:
+                        all_modifications.append(ConnectionModification(order=order, **modification))
+                    for modification in architecture_modifications:
+                        all_modifications.append(ArchitectureModification(order=order, **modification))
 
                 orders = controller.process_orders(
                     no_db_data={
-                        "buy_orders": [Order(batch=batch, **order) for order in controller_orders if order["side"] == SIDES.BUY],
-                        "sell_orders": [Order(batch=batch, **order) for order in controller_orders if order["side"] == SIDES.SELL],
-                        "keep_orders": [Order(batch=batch, **order) for order in controller_orders if order["side"] == SIDES.KEEP],
+                        "buy_orders": [order for order in order_objects if order.side == SIDES.BUY],
+                        "sell_orders": [order for order in order_objects if order.side == SIDES.SELL],
+                        "keep_orders": [order for order in order_objects if order.side == SIDES.KEEP],
                         "batches": [batch],
                         "exchange_controller": exchange_controllers[controller],
                         "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"]["close"],
@@ -260,6 +272,12 @@ class SimulationQueue(models.Model):
                     testing=True,
                 )
                 for order in orders:
+                    if order.side == SIDES.BUY and (batch.status == ORDER_STATUS.PASSED or batch.status == ORDER_STATUS.ONLY_BUY_PASSED):
+                        for modification in [modification for modification in all_modifications if modification.order == order]:
+                            modification._apply(
+                                strategy=no_db_data["strategy"],
+                                architecture=no_db_data["architecture"],
+                            )
                     currencies[controller.base] = currencies.get(controller.base, {"amount": 0, "mbp": 0})
                     currencies[controller.quote] = currencies.get(controller.quote, {"amount": 0, "mbp": 0})
                     currencies[controller.base]["amount"] += order.exit_amount_base
