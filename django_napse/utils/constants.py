@@ -39,7 +39,6 @@ class TRANSACTION_TYPES(StrEnum, metaclass=CustomEnumMeta):
     ORDER_DEPOSIT = "ORDER_DEPOSIT"
     ORDER_PAYOUT = "ORDER_PAYOUT"
     ORDER_REFUND = "ORDER_REFUND"
-    ORDER_DUST = "ORDER_DUST"
     FLEET_REBALANCE = "FLEET_REBALANCE"
 
 
@@ -66,6 +65,12 @@ class DOWNLOAD_STATUS(StrEnum, metaclass=CustomEnumMeta):
 class SIMULATION_STATUS(StrEnum, metaclass=CustomEnumMeta):
     IDLE = "IDLE"
     RUNNING = "RUNNING"
+
+
+class MODIFICATION_STATUS(StrEnum, metaclass=CustomEnumMeta):
+    PENDING = "PENDING"
+    APPLIED = "APPLIED"
+    REJECTED = "REJECTED"
 
 
 ORDER_LEEWAY_PERCENTAGE = 10

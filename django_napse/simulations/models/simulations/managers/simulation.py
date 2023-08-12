@@ -20,8 +20,7 @@ class SimulationManager(models.Manager):
 
         if data == {}:
             return simulation
-
-        must_have = ["dates", "values", "actions"]
+        must_have = ["dates", "values", "actions", "amounts", "tickers"]
         for key in must_have:
             if key not in data:
                 error_msg = f"Key {key} not in data"
@@ -42,19 +41,25 @@ class SimulationManager(models.Manager):
             data["dates"],
             data["values"],
             data["actions"],
+            data["amounts"],
+            data["tickers"],
             *[data[key] for key in extra_info_keys],
             strict=True,
         ):
             date = info[0]
             value = info[1]
             action = info[2]
-            extra_info = {key: info[i + 3] for i, key in enumerate(extra_info_keys)}
+            amount = info[3]
+            ticker = info[4]
+            extra_info = {key: info[i + 5] for i, key in enumerate(extra_info_keys)}
             bulk_list_data_point.append(
                 SimulationDataPoint(
                     simulation=simulation,
                     date=date,
                     value=value,
                     action=action,
+                    amount=amount,
+                    ticker=ticker,
                 ),
             )
             for key, value in extra_info.items():

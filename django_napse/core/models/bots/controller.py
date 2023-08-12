@@ -177,55 +177,53 @@ class Controller(models.Model):
 
         if aggregated_order["buy_amount"] > 0:
             for order in no_db_data["buy_orders"]:
-                order.calculate_batch_share(total=aggregated_order["buy_amount"], save=not in_simulation)
-        if aggregated_order["sell_amount"]:
+                order._calculate_batch_share(total=aggregated_order["buy_amount"])
+        if aggregated_order["sell_amount"] > 0:
             for order in no_db_data["sell_orders"]:
-                order.calculate_batch_share(total=aggregated_order["sell_amount"], save=not in_simulation)
+                order._calculate_batch_share(total=aggregated_order["sell_amount"])
         for order in no_db_data["keep_orders"]:
             order.batch_share = 0
-            if not in_simulation:
-                order.save()
 
-        receipt, executed_amounts_buy, executed_amounts_sell = no_db_data["exchange_controller"].submit_order(
+        receipt, executed_amounts_buy, executed_amounts_sell, fees_buy, fees_sell = no_db_data["exchange_controller"].submit_order(
             controller=self,
             aggregated_order=aggregated_order,
             testing=in_simulation or testing,
         )
-
         all_orders = []
         for order in no_db_data["buy_orders"]:
-            order.calculate_exit_amounts(
+            order._calculate_exit_amounts(
                 controller=self,
                 executed_amounts=executed_amounts_buy,
-                save=not in_simulation,
+                fees=fees_buy,
             )
             all_orders.append(order)
         for order in no_db_data["sell_orders"]:
-            order.calculate_exit_amounts(
+            order._calculate_exit_amounts(
                 controller=self,
                 executed_amounts=executed_amounts_sell,
-                save=not in_simulation,
+                fees=fees_sell,
             )
             all_orders.append(order)
         for order in no_db_data["keep_orders"]:
-            order.calculate_exit_amounts(
+            order._calculate_exit_amounts(
                 controller=self,
                 executed_amounts={},
-                save=not in_simulation,
+                fees={},
             )
             all_orders.append(order)
 
         for batch in no_db_data["batches"]:
-            batch.set_status_post_process(
+            batch._set_status_post_process(
                 executed_amounts_buy=executed_amounts_buy,
                 executed_amounts_sell=executed_amounts_sell,
-                save=not in_simulation,
             )
 
         return all_orders
 
     def apply_orders(self, orders):
-        pass
+        for order in orders:
+            order.save()
+            order.apply_swap()
 
     def send_candles_to_bots(self, closed_candle, current_candle) -> list:
         """Scan all bots (that are allowed to trade) and get their orders.

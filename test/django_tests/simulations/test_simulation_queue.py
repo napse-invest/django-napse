@@ -22,7 +22,7 @@ class SimulationQueueTestCase:
                     exchange_account=self.exchange_account,
                     base="BTC",
                     quote="USDT",
-                    interval="1d",
+                    interval="1m",
                 ),
             },
         )
@@ -31,8 +31,8 @@ class SimulationQueueTestCase:
         return SimulationQueue.objects.create(
             space=self.space,
             bot=bot,
-            start_date=datetime(2021, 1, 1, tzinfo=UTC),
-            end_date=datetime(2021, 1, 2, tzinfo=UTC),
+            start_date=datetime(2020, 1, 1, tzinfo=UTC),
+            end_date=datetime(2020, 1, 5, tzinfo=UTC),
             investments={"USDT": 10000},
         )
 
@@ -40,6 +40,11 @@ class SimulationQueueTestCase:
         simulation_queue = self.simple_create()
         simulation = simulation_queue.run_quick_simulation()
         simulation.info()
+
+    # def test_irl_simulation(self):
+    #     simulation_queue = self.simple_create()
+    #     simulation = simulation_queue.run_irl_simulation()
+    #     simulation.info()
 
 
 class SimulationQueueBINANCETestCase(SimulationQueueTestCase, ModelTestCase):

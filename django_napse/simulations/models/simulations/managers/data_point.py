@@ -3,7 +3,7 @@ from django.db import models
 
 
 class SimulationDataPointManager(models.Manager):
-    def create(self, simulation, date, value: float, action: str, extra_info=None):
+    def create(self, simulation, date, value: float, action: str, amount: float, ticker: str, extra_info=None):
         SimulationDataPointExtraInfo = apps.get_model("django_napse_simulations", "SimulationDataPointExtraInfo")
 
         extra_info = extra_info or {}
@@ -13,6 +13,8 @@ class SimulationDataPointManager(models.Manager):
             date=date,
             value=value,
             action=action,
+            amount=amount,
+            ticker=ticker,
         )
         data_point.save()
         for key, value in extra_info.items():
