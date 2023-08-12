@@ -62,6 +62,8 @@ class SimulationTestCase:
                 "dates": [datetime.now(tz=UTC)],
                 "values": [1],
                 "actions": ["BUY"],
+                "amounts": [1],
+                "tickers": ["USDT"],
                 "mbp": [10],
             },
         )
@@ -102,6 +104,8 @@ class SimulationTestCase:
                 ],
                 "values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                 "actions": ["BUY", "SELL", "SELL", "BUY", "KEEP", "KEEP", "BUY", "SELL", "BUY", "SELL"],
+                "amounts": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "tickers": ["USDT", "USDT", "USDT", "USDT", "USDT", "USDT", "USDT", "USDT", "USDT", "USDT"],
                 "mbp": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
             },
         )
