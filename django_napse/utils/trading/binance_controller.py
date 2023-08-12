@@ -380,7 +380,7 @@ class BinanceController:
         testing: bool,
     ) -> tuple[dict, dict, dict]:
         receipt = {}
-        receipt[SIDES.BUY], executed_amounts_buy = self.send_order_to_exchange(
+        receipt[SIDES.BUY], executed_amounts_buy, fees_buy = self.send_order_to_exchange(
             side=SIDES.BUY,
             amount=aggregated_order["buy_amount"],
             controller=controller,
@@ -388,7 +388,7 @@ class BinanceController:
             price=aggregated_order["price"],
             testing=testing,
         )
-        receipt[SIDES.SELL], executed_amounts_sell = self.send_order_to_exchange(
+        receipt[SIDES.SELL], executed_amounts_sell, feel_sell = self.send_order_to_exchange(
             side=SIDES.SELL,
             amount=aggregated_order["sell_amount"],
             controller=controller,
@@ -396,7 +396,7 @@ class BinanceController:
             price=aggregated_order["price"],
             testing=testing,
         )
-        return receipt, executed_amounts_buy, executed_amounts_sell
+        return receipt, executed_amounts_buy, executed_amounts_sell, fees_buy, feel_sell
 
     def send_order_to_exchange(
         self,
@@ -407,8 +407,11 @@ class BinanceController:
         testing: bool,
         price: float,
     ) -> tuple[dict, dict]:
-        executed_amounts = {}
+        if amount == 0:
+            return {"error": "Amount too low"}, {}, {}
 
+        executed_amounts = {}
+        fees = {}
         if testing:
             if side == SIDES.BUY:
                 amount /= price
@@ -419,12 +422,12 @@ class BinanceController:
                     exec_base = 0
                     for elem in receipt["fills"]:
                         exec_base += float(elem["qty"]) - float(elem["commission"])
-
+                        fees[elem["commissionAsset"]] = fees.get(elem["commissionAsset"], 0) + float(elem["commission"])
                     executed_amounts[controller.quote] = exec_quote
                     executed_amounts[controller.base] = exec_base
+
                 else:
                     receipt = {"error": "Amount too low"}
-                    executed_amounts = {}
 
             elif side == SIDES.SELL:
                 amount = round_down(amount, controller.lot_size)
@@ -434,17 +437,17 @@ class BinanceController:
                     exec_base = -float(receipt["origQty"])
                     for elem in receipt["fills"]:
                         exec_quote -= float(elem["commission"])
+                        fees[elem["commissionAsset"]] = fees.get(elem["commissionAsset"], 0) + float(elem["commission"])
                     executed_amounts[controller.quote] = exec_quote
                     executed_amounts[controller.base] = exec_base
                 else:
                     receipt = {"error": "Amount too low"}
-                    executed_amounts = {}
+
         else:
             # TODO: implement real orders
             error_msg = "IRL orders are not implemented yet. (failsafe to prevent accidental irl orders)."
             raise NotImplementedError(error_msg)
-
-        return receipt, executed_amounts
+        return receipt, executed_amounts, fees
 
     def current_free_assets(self) -> dict:
         assets = self.get_info()["balances"]
@@ -466,6 +469,7 @@ class BinanceController:
         executed_qty = amount
         cummulative_quote_qty = amount * price
         commission = executed_qty * DEFAULT_TAX["BINANCE"] / 100 if side_buy else cummulative_quote_qty * DEFAULT_TAX["BINANCE"] / 100
+
         commission_asset = base if side_buy else quote
         return {
             "symbol": pair,

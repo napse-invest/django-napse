@@ -43,5 +43,6 @@ class SinglePairArchitecture(Architecture):
                 "key": "last_candle_date",
                 "value": str(data["candles"][data["controllers"]["main"]]["current"]["open_time"]),
                 "target_type": "datetime",
+                "ignore_failed_order": True,
             },
         ]

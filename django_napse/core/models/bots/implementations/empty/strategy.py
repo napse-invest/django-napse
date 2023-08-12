@@ -42,10 +42,10 @@ class EmptyStrategy(Strategy):
                 "StrategyModifications": [],
                 "ConnectionModifications": [],
                 "connection": data["connection"],
-                "asked_for_amount": 15,
-                "asked_for_ticker": controller.quote,
+                "asked_for_amount": 15 / data["candles"][controller]["latest"]["close"],
+                "asked_for_ticker": controller.base,
                 "pair": controller.pair,
                 "price": data["candles"][controller]["latest"]["close"],
-                "side": SIDES.BUY,
+                "side": SIDES.SELL,
             },
         ]

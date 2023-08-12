@@ -1,10 +1,13 @@
 from django.db import models
 
+from django_napse.utils.constants import MODIFICATION_STATUS
+from django_napse.utils.findable_class import FindableClass
 
-class Modification(models.Model):
+
+class Modification(models.Model, FindableClass):
     order = models.ForeignKey("Order", on_delete=models.CASCADE, related_name="modifications")
 
-    applied = models.BooleanField(default=False)
+    status = models.CharField(default=MODIFICATION_STATUS.PENDING, max_length=15)
     created_at = models.DateTimeField(auto_now_add=True)
     ignore_failed_order = models.BooleanField(default=False)
 

@@ -28,8 +28,8 @@ class OrderManager(models.Manager):
             error_msg = f"Ticker {asked_for_ticker} is not valid for a sell order. Should be {batch.controller.base}."
             raise OrderError.InvalidOrder(error_msg)
 
-        if side == SIDES.KEEP:
-            return None
+        # if side == SIDES.KEEP:
+        #     return None
 
         order = self.model(
             batch=batch,

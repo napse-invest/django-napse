@@ -19,6 +19,30 @@ class Connection(models.Model):
     def __str__(self):  # pragma: no cover
         return f"CONNECTION: {self.pk=}"
 
+    def info(self, verbose=True, beacon=""):
+        string = ""
+        string += f"{beacon}Connection {self.pk}:\n"
+        string += f"{beacon}Args:\n"
+        string += f"{beacon}\t{self.owner=}\n"
+        string += f"{beacon}\t{self.bot=}\n"
+        string += f"{beacon}\t{self.created_at=}\n"
+
+        string += f"{beacon}Wallet:\n"
+        new_beacon = beacon + "\t"
+        string += f"{beacon}\t{self.wallet.info(verbose=False, beacon=new_beacon)}\n"
+
+        string += f"{beacon}ConnectionSpecificArgs:\n"
+        query = self.specific_args.all()
+        if query.count() == 0:
+            string += f"{beacon}\tNone\n"
+        else:
+            for connection_specific_arg in query:
+                string += f"{beacon}\t{connection_specific_arg.info(verbose=False, beacon=new_beacon)}\n"
+
+        if verbose:  # pragma: no cover
+            print(string)
+        return string
+
     @property
     def testing(self):
         return self.space.testing

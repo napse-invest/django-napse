@@ -103,13 +103,14 @@ class Bot(models.Model):
     def get_connection_data(self):
         return {connection: connection.to_dict() for connection in self.get_connections()}
 
-    def trigger_actions(self):
+    def get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):
         if not self.active:
             error_msg = "Bot is hibernating."
             raise BotError.InvalidSetting(error_msg)
 
-        orders = self._get_orders()
+        orders = self._get_orders(data=data, no_db_data=no_db_data)
         batches = {}
+        order_objects = []
         for order in orders:
             controller = order["controller"]
             batches[controller] = OrderBatch.objects.create(controller=controller)
@@ -119,6 +120,7 @@ class Bot(models.Model):
             connection_modifications = order.pop("ConnectionModifications")
             architecture_modifications = order.pop("ArchitectureModifications")
             order = Order.objects.create(batch=batches[controller], **order)
+            order_objects.append(order)
             for modification in strategy_modifications:
                 StrategyModification.objects.create(order=order, **modification)
             for modification in connection_modifications:
@@ -127,6 +129,8 @@ class Bot(models.Model):
                 ArchitectureModification.objects.create(order=order, **modification)
         for batch in batches.values():
             batch.set_status_ready()
+
+        return order_objects, batches
 
     def _get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):
         return self.architecture._get_orders(data=data, no_db_data=no_db_data)
