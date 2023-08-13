@@ -30,13 +30,6 @@ class Architecture(models.Model, FindableClass):
             error_msg = f"get_candles not implemented for the Architecture base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
 
-    def get_extras(self):  # pragma: no cover
-        if self.__class__ == Architecture:
-            error_msg = "get_extras not implemented for the Architecture base class, please implement it in a subclass."
-        else:
-            error_msg = f"get_extras not implemented for the Architecture base class, please implement it in the {self.__class__} class."
-        raise NotImplementedError(error_msg)
-
     def copy(self):  # pragma: no cover
         if self.__class__ == Architecture:
             error_msg = "copy not implemented for the Architecture base class, please implement it in a subclass."
@@ -50,6 +43,9 @@ class Architecture(models.Model, FindableClass):
         else:
             error_msg = f"controllers_dict not implemented for the Architecture base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
+
+    def get_extras(self):
+        return {}
 
     def skip(self, data: dict) -> bool:
         return False
@@ -66,7 +62,7 @@ class Architecture(models.Model, FindableClass):
     def prepare_data(self):
         return {
             "candles": {controller: self.get_candles(controller) for controller in self.controllers_dict().values()},
-            "extras": {},
+            "extras": self.get_extras(),
         }
 
     def prepare_db_data(self):
@@ -76,7 +72,7 @@ class Architecture(models.Model, FindableClass):
             "controllers": self.controllers_dict(),
             "connections": self.strategy.bot.get_connections(),
             "connection_data": self.strategy.bot.get_connection_data(),
-            # "plugins": self.plugins.all(),
+            # "plugins": self.strategy.plugins.all(),
         }
 
     def _get_orders(self, data: dict, no_db_data: Optional[dict] = None) -> list[dict]:
