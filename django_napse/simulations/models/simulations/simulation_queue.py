@@ -267,6 +267,7 @@ class SimulationQueue(models.Model):
                         modifications=[modification for modification in all_modifications if modification.order == order],
                         strategy=no_db_data["strategy"],
                         architecture=no_db_data["architecture"],
+                        currencies=currencies,
                     )
 
                     currencies[controller.base] = currencies.get(controller.base, {"amount": 0, "mbp": 0})

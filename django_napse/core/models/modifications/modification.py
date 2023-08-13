@@ -2,6 +2,7 @@ from django.db import models
 
 from django_napse.utils.constants import MODIFICATION_STATUS
 from django_napse.utils.findable_class import FindableClass
+from django_napse.utils.usefull_functions import process_value_from_type
 
 
 class Modification(models.Model, FindableClass):
@@ -17,3 +18,6 @@ class Modification(models.Model, FindableClass):
 
     def __str__(self) -> str:
         return f"MODIFICATION: {self.pk=}"
+
+    def get_value(self, **kwargs):
+        return process_value_from_type(self.value, self.target_type, **kwargs)
