@@ -89,8 +89,8 @@ jobs:
           gistID: 40fac957532fe3b731c99067467de842
           filename: django-napse-coverage.json
           label: Coverage
-          message: ${{ env.COVERAGE }}% 
-          valColorRange: ${{ env.COVERAGE }}
+          message: $COVERAGE % 
+          valColorRange: $COVERAGE
           minColorRange: 50
           maxColorRange: 95
 

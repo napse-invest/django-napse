@@ -73,6 +73,12 @@ class MODIFICATION_STATUS(StrEnum, metaclass=CustomEnumMeta):
     REJECTED = "REJECTED"
 
 
+class PLUGIN_CATEGORIES(StrEnum, metaclass=CustomEnumMeta):
+    """The category for a plugin."""
+
+    PRE_PROCESSING = "PRE_PROCESSING"
+
+
 ORDER_LEEWAY_PERCENTAGE = 10
 
 DEFAULT_TAX = {
