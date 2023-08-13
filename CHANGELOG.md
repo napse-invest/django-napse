@@ -1,3 +1,17 @@
+# [1.3.0](https://github.com/napse-invest/django-napse/compare/v1.2.0...v1.3.0) (2023-08-13)
+
+
+### Bug Fixes
+
+* **tests:** fixed simulation test breaking because of lacking keys "amounts" & "tickers" ([1b45b02](https://github.com/napse-invest/django-napse/commit/1b45b0229955360ef7280158892dcdba5e271563))
+
+
+### Features
+
+* **modifications:** first modification implemented and tested in quicksim ([bd0b157](https://github.com/napse-invest/django-napse/commit/bd0b1577cc229e4778ba57a1364fb411e4a7f21d))
+* **simulations:** First implementation of simutions and tests ([e0622eb](https://github.com/napse-invest/django-napse/commit/e0622eb9e12416dafa7be0fb37a76292f6bd2df4))
+* **simulations:** polished the feature, just lacks plugins ([6a052c3](https://github.com/napse-invest/django-napse/commit/6a052c3c8d93a19b603aee5d351a0f2d396e9c3d))
+
 # [1.2.0](https://github.com/napse-invest/django-napse/compare/v1.1.0...v1.2.0) (2023-08-10)
 
 
