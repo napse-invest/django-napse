@@ -72,7 +72,7 @@ class Architecture(models.Model, FindableClass):
             "controllers": self.controllers_dict(),
             "connections": self.strategy.bot.get_connections(),
             "connection_data": self.strategy.bot.get_connection_data(),
-            "plugins": self.strategy.plugins.all(),
+            # "plugins": self.strategy.plugins.all(),
         }
 
     def _get_orders(self, data: dict, no_db_data: Optional[dict] = None) -> list[dict]:
