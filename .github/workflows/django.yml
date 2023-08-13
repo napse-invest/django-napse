@@ -84,13 +84,15 @@ jobs:
       - name: Coverage badge
         if: ${{ github.base_ref == 'main' }} 
         uses: Schneegans/dynamic-badges-action@v1.6.0
+        env:
+          COVERAGE: ${{ env.COVERAGE }}
         with:
           auth: ${{ secrets.NAPSE_SECRET_GIST }}
           gistID: 40fac957532fe3b731c99067467de842
           filename: django-napse-coverage.json
           label: Coverage
-          message: $COVERAGE % 
-          valColorRange: $COVERAGE
+          message: ${{ env.COVERAGE }} % 
+          valColorRange: ${{ env.COVERAGE }}
           minColorRange: 50
           maxColorRange: 95
 
