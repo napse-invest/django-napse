@@ -7,6 +7,6 @@ celery==5.3.1
 redis==4.6.0
 
 python-binance==1.0.19 # https://github.com/sammchardy/python-binance
-shortuuid==1.0.0 # https://github.com/skorokithakis/shortuuid
+shortuuid==1.0.11 # https://github.com/skorokithakis/shortuuid
 
 anybadge==1.14.0 # https://github.com/jongracecox/anybadge
