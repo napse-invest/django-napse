@@ -76,7 +76,8 @@ class MODIFICATION_STATUS(StrEnum, metaclass=CustomEnumMeta):
 class PLUGIN_CATEGORIES(StrEnum, metaclass=CustomEnumMeta):
     """The category for a plugin."""
 
-    PRE_PROCESSING = "PRE_PROCESSING"
+    PRE_ORDER = "PRE_ORDER"
+    POST_ORDER = "POST_ORDER"
 
 
 ORDER_LEEWAY_PERCENTAGE = 10

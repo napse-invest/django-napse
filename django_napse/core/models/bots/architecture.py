@@ -3,7 +3,7 @@ from typing import Optional
 from django.db import models
 
 from django_napse.core.models.bots.managers import ArchitectureManager
-from django_napse.utils.constants import ORDER_LEEWAY_PERCENTAGE, SIDES
+from django_napse.utils.constants import ORDER_LEEWAY_PERCENTAGE, PLUGIN_CATEGORIES, SIDES
 from django_napse.utils.errors.orders import OrderError
 from django_napse.utils.findable_class import FindableClass
 
@@ -72,7 +72,7 @@ class Architecture(models.Model, FindableClass):
             "controllers": self.controllers_dict(),
             "connections": self.strategy.bot.get_connections(),
             "connection_data": self.strategy.bot.get_connection_data(),
-            # "plugins": self.strategy.plugins.all(),
+            "plugins": {category: self.strategy.plugins.filter(category=category) for category in PLUGIN_CATEGORIES},
         }
 
     def _get_orders(self, data: dict, no_db_data: Optional[dict] = None) -> list[dict]:
@@ -84,11 +84,15 @@ class Architecture(models.Model, FindableClass):
         all_orders = []
         for connection in connections:
             new_data = {**data, **no_db_data, "connection": connection}
-
+            # pprint(new_data)
             if architecture.skip(data=new_data):
                 continue
+            for plugin in no_db_data["plugins"][PLUGIN_CATEGORIES.PRE_ORDER]:
+                plugin.apply(data=new_data)
             orders = strategy.give_order(data=new_data)
             for order in orders:
+                for plugin in no_db_data["plugins"][PLUGIN_CATEGORIES.POST_ORDER]:
+                    plugin.apply(data={**new_data, "order": order})
                 order["StrategyModifications"] += architecture.strategy_modifications(order=order, data=new_data)
                 order["ConnectionModifications"] += architecture.connection_modifications(order=order, data=new_data)
                 order["ArchitectureModifications"] += architecture.architecture_modifications(order=order, data=new_data)

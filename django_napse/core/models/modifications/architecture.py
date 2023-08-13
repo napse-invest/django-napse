@@ -7,7 +7,7 @@ from .modification import Modification
 class ArchitectureModification(Modification):
     def apply(self):
         architecture = self.order.connection.bot.architecture.find()
-        self._apply(architecture)
+        architectur, self = self._apply(architecture)
         architecture.save()
         self.save()
 
@@ -19,3 +19,4 @@ class ArchitectureModification(Modification):
 
         setattr(architecture, f"variable_{self.key}", process_value_from_type(self.value, self.target_type))
         self.status = MODIFICATION_STATUS.APPLIED
+        return architecture, self
