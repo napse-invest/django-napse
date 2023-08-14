@@ -213,10 +213,7 @@ class Controller(models.Model):
             all_orders.append(order)
 
         for batch in no_db_data["batches"]:
-            batch._set_status_post_process(
-                executed_amounts_buy=executed_amounts_buy,
-                executed_amounts_sell=executed_amounts_sell,
-            )
+            batch._set_status_post_process(receipt=receipt)
 
         return all_orders
 

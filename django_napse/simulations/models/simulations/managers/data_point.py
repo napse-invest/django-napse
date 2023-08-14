@@ -18,10 +18,11 @@ class SimulationDataPointManager(models.Manager):
         )
         data_point.save()
         for key, value in extra_info.items():
+            print(key, value)
             SimulationDataPointExtraInfo.objects.create(
                 data_point=data_point,
                 key=key,
-                value=value,
+                value=str(value),
                 target_type=type(value).__name__,
             )
         return data_point

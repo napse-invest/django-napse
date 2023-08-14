@@ -25,15 +25,15 @@ class OrderBatch(models.Model):
             error_msg = f"Order {self.pk} is not pending."
             raise OrderError.StatusError(error_msg)
 
-    def _set_status_post_process(self, executed_amounts_buy: dict, executed_amounts_sell: dict) -> None:
+    def _set_status_post_process(self, receipt: dict) -> None:
         if self.status != ORDER_STATUS.READY:
             error_msg = f"Order {self.pk} is not ready."
             raise OrderError.StatusError(error_msg)
         buy_failed = False
         sell_failed = False
-        if "error" in executed_amounts_buy:
+        if "error" in receipt[SIDES.BUY]:
             buy_failed = True
-        if "error" in executed_amounts_sell:
+        if "error" in receipt[SIDES.SELL]:
             sell_failed = True
         if buy_failed and sell_failed:
             self.status = ORDER_STATUS.FAILED
