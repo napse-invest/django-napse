@@ -24,4 +24,4 @@ class MBPPlugin(Plugin):
         return data
 
     def _connect(self, connection):
-        ConnectionSpecificArgs.objects.create(connection=connection, key="mbp", value="0", target_type="float")
+        ConnectionSpecificArgs.objects.create(connection=connection, key="mbp", value="None", target_type="float")

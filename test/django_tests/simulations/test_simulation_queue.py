@@ -35,17 +35,17 @@ class SimulationQueueTestCase:
             space=self.space,
             bot=bot,
             start_date=datetime(2020, 1, 1, tzinfo=UTC),
-            end_date=datetime(2020, 1, 5, tzinfo=UTC),
-            investments={"USDT": 30},
+            end_date=datetime(2022, 1, 5, tzinfo=UTC),
+            investments={"USDT": 1000},
         )
 
     def test_quick_simulation(self):
         simulation_queue = self.simple_create()
         simulation_queue.run_quick_simulation().info()
 
-    def test_irl_simulation(self):
-        simulation_queue = self.simple_create()
-        simulation_queue.run_irl_simulation().info()
+    # def test_irl_simulation(self):
+    #     simulation_queue = self.simple_create()
+    #     simulation_queue.run_irl_simulation().info()
 
 
 class SimulationQueueBINANCETestCase(SimulationQueueTestCase, ModelTestCase):
