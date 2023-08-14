@@ -19,7 +19,7 @@ ignore = [
     "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
     ]
 
-# Allow autofix for all enabled rules (when `--fix`) is provided.
+# Allow autofix for all enabled rules (when `--fix`) is provided
 fixable = ["A", "B", "C", "D", "E", "F", "DTZ", "RUF", "S", "COM", "C4", "DJ", "EM", "ISC", "ICN", "PIE", "RET", "SLF", "SIM", "TID", "PD", "NPY"]
 unfixable = []
 
