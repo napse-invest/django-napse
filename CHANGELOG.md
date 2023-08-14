@@ -1,3 +1,20 @@
+# [1.4.0](https://github.com/napse-invest/django-napse/compare/v1.3.0...v1.4.0) (2023-08-14)
+
+
+### Bug Fixes
+
+* **ci:** added timeout ([8ed9571](https://github.com/napse-invest/django-napse/commit/8ed95712ce0b7eaec600ed472e240f3f572f4a9b))
+* **plugins:** minor adjustments ([cc130a3](https://github.com/napse-invest/django-napse/commit/cc130a3aa4f74d5cf321182386e0eeefb51ae26c))
+* **test:** tests too long because of sims ([a7ce1b7](https://github.com/napse-invest/django-napse/commit/a7ce1b782ce275a6e46c9eb255a9e0dab7ec89ae))
+
+
+### Features
+
+* **dca-bot:** implemented model and tests ([78b67f0](https://github.com/napse-invest/django-napse/commit/78b67f0c0f6465af636018570a60facedbb71bd2))
+* **plugins:** implemented mbp plugin ([0bf8431](https://github.com/napse-invest/django-napse/commit/0bf8431ab455a6eaca0b5f3455c94a0030c623a8))
+* **plugins:** mbp, sbv, lbo itegrated and tested. ([51a7e8c](https://github.com/napse-invest/django-napse/commit/51a7e8c77f26d3111eeaa1908c74a9fc9a439b85))
+* **turbo-dca:** enhanced version of the dca bot ([801d1e0](https://github.com/napse-invest/django-napse/commit/801d1e05b28ac84412628a4643903b8ac9c5627c))
+
 # [1.3.0](https://github.com/napse-invest/django-napse/compare/v1.2.0...v1.3.0) (2023-08-13)
 
 
