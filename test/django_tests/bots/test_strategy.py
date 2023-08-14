@@ -28,8 +28,8 @@ class StrategyDefaultTestCase:
         simulation_queue = SimulationQueue.objects.create(
             space=self.space,
             bot=bot,
-            start_date=datetime(2020, 1, 1, tzinfo=UTC),
-            end_date=datetime(2020, 1, 5, tzinfo=UTC),
+            start_date=datetime(2022, 1, 1, tzinfo=UTC),
+            end_date=datetime(2024, 1, 5, tzinfo=UTC),
             investments={"USDT": 10000},
         )
 

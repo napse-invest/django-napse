@@ -57,12 +57,7 @@ class Strategy(models.Model, FindableClass):
         return
 
     def copy(self):
-        new_strategy = self.find().__class__.objects.create(
+        return self.find().__class__.objects.create(
             config=self.config.duplicate_immutable(),
             architecture=self.architecture.copy(),
         )
-
-        for plugin in self.plugins.all():
-            plugin = plugin.find()
-            plugin.__class__.objects.create(strategy=new_strategy)
-        return new_strategy
