@@ -3,6 +3,7 @@ from django.db import models
 from django_napse.core.models.connections.managers import ConnectionManager
 from django_napse.core.models.transactions.transaction import Transaction
 from django_napse.utils.constants import TRANSACTION_TYPES
+from django_napse.utils.usefull_functions import process_value_from_type
 
 
 class Connection(models.Model):
@@ -73,7 +74,7 @@ class Connection(models.Model):
         return {
             "connection": self,
             "wallet": self.wallet.find().to_dict(),
-            "connection_specific_args": self.specific_args.all(),
+            "connection_specific_args": {arg.key: arg for arg in self.specific_args.all()},
         }
 
 
@@ -89,3 +90,18 @@ class ConnectionSpecificArgs(models.Model):
     def __str__(self):  # pragma: no cover
         string = f"CONNECTION_SPECIFIC_ARGS: {self.pk=},"
         return string + f"connection__pk={self.connection.pk}, key={self.key}, value={self.value}, target_type={self.target_type}"
+
+    def info(self, verbose=True, beacon=""):
+        string = ""
+        string += f"{beacon}ConnectionSpecificArgs {self.pk}:\n"
+        string += f"{beacon}Args:\n"
+        string += f"{beacon}\t{self.connection=}\n"
+        string += f"{beacon}\t{self.key=}\n"
+        string += f"{beacon}\t{self.value=}\n"
+        string += f"{beacon}\t{self.target_type=}\n"
+        if verbose:  # pragma: no cover
+            print(string)
+        return string
+
+    def get_value(self):
+        return process_value_from_type(self.value, self.target_type)

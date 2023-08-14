@@ -67,7 +67,7 @@ class SimulationManager(models.Manager):
                     SimulationDataPointExtraInfo(
                         data_point=bulk_list_data_point[-1],
                         key=key,
-                        value=value,
+                        value=str(value),
                         target_type=type(value).__name__,
                     ),
                 )

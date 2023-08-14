@@ -154,6 +154,7 @@ class SimulationQueue(models.Model):
 
     def append_data(
         self,
+        connection_specific_args: dict,
         candle_data: dict,
         current_prices: dict,
         currencies: dict,
@@ -168,6 +169,7 @@ class SimulationQueue(models.Model):
         amounts: list,
         tickers: list,
         taxes: list,
+        extras: dict,
     ):
         current_amounts = {}
         for controller in candle_data:
@@ -197,6 +199,8 @@ class SimulationQueue(models.Model):
             taxes.append(round(order.fees * (current_prices[f"{order.fee_ticker}_price"] if order.fee_ticker != "USDT" else 1), 5))
             amounts.append(round(order.asked_for_amount, 5))
             tickers.append(order.asked_for_ticker)
+            for plugin in extras:
+                extras[plugin] = [*extras[plugin], connection_specific_args[plugin].get_value()]
 
     def quick_simulation(self, bot, no_db_data):
         data, currencies, exchange_controllers, min_interval = self.preparation(bot, no_db_data)
@@ -210,6 +214,7 @@ class SimulationQueue(models.Model):
         taxes = []
         amounts = []
         tickers = []
+        extras = {csa.key: [] for csa in next(iter(no_db_data["connection_data"].values()))["connection_specific_args"].values()}
         for date, candle_data in data.items():
             currencies_before = deepcopy(currencies)
             processed_data, current_prices = self.process_candle_data(
@@ -267,6 +272,7 @@ class SimulationQueue(models.Model):
                         modifications=[modification for modification in all_modifications if modification.order == order],
                         strategy=no_db_data["strategy"],
                         architecture=no_db_data["architecture"],
+                        currencies=currencies,
                     )
 
                     currencies[controller.base] = currencies.get(controller.base, {"amount": 0, "mbp": 0})
@@ -277,6 +283,7 @@ class SimulationQueue(models.Model):
                 all_orders += orders
 
             self.append_data(
+                connection_specific_args=next(iter(no_db_data["connection_data"].values()))["connection_specific_args"],
                 candle_data=candle_data,
                 current_prices=current_prices,
                 currencies=currencies,
@@ -291,6 +298,7 @@ class SimulationQueue(models.Model):
                 taxes=taxes,
                 amounts=amounts,
                 tickers=tickers,
+                extras=extras,
             )
             tpi.append(time.time() - _time)
             _time = time.time()
@@ -310,6 +318,7 @@ class SimulationQueue(models.Model):
                 "tickers": tickers,
                 **prices,
                 **total_amounts,
+                **extras,
             },
         )
 
@@ -325,6 +334,7 @@ class SimulationQueue(models.Model):
         taxes = []
         amounts = []
         tickers = []
+        extras = {csa.key: [] for csa in next(iter(no_db_data["connection_data"].values()))["connection_specific_args"].values()}
         currencies = bot.connections.all()[0].wallet.to_dict()["currencies"]
         for date, candle_data in data.items():
             currencies_before = deepcopy(currencies)
@@ -358,6 +368,7 @@ class SimulationQueue(models.Model):
 
             currencies = bot.connections.all()[0].wallet.to_dict()["currencies"]
             self.append_data(
+                connection_specific_args=bot.connections.all()[0].to_dict()["connection_specific_args"],
                 candle_data=candle_data,
                 current_prices=current_prices,
                 currencies_before=currencies_before,
@@ -372,6 +383,7 @@ class SimulationQueue(models.Model):
                 taxes=taxes,
                 amounts=amounts,
                 tickers=tickers,
+                extras=extras,
             )
             tpi.append(time.time() - _time)
             _time = time.time()
@@ -391,6 +403,7 @@ class SimulationQueue(models.Model):
                 "tickers": tickers,
                 **prices,
                 **total_amounts,
+                **extras,
             },
         )
 

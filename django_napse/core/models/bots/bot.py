@@ -136,7 +136,11 @@ class Bot(models.Model):
         return self.architecture._get_orders(data=data, no_db_data=no_db_data)
 
     def connect_to(self, wallet):
-        return Connection.objects.create(owner=wallet, bot=self)
+        connection = Connection.objects.create(owner=wallet, bot=self)
+        for plugin in self._strategy.plugins.all():
+            plugin.connect(connection)
+        self._strategy.connect(connection)
+        return connection
 
     def copy(self):
         return self.__class__.objects.create(

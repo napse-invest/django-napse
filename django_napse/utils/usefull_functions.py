@@ -4,10 +4,19 @@ from datetime import datetime, timedelta
 from pytz import UTC
 
 
-def process_value_from_type(value, target_type):
+def calculate_mbp(value: str, current_value: float, order, currencies: dict) -> float:
+    ticker, value = value.split("|")
+    value = value.replace("c", str(order.debited_amount - order.exit_amount_quote))
+    value = value.replace("b", str(current_value if current_value is not None else 0))
+    value = value.replace("a", str(currencies.get(ticker, {"amount": 0})["amount"]))
+    return eval(value)  # noqa S307
+
+
+def process_value_from_type(value, target_type, **kwargs):
     """Convert a value to a specific type."""
     target_type = target_type.lower()
-
+    if value == "None":
+        return None
     if target_type == "int":
         return int(value)
     if target_type == "float":
@@ -35,8 +44,15 @@ def process_value_from_type(value, target_type):
         days = int(days.split(" ")[0])
         t = datetime.strptime(timestamp, "%H:%M:%S").astimezone()
         return timedelta(days=days, hours=t.hour, minutes=t.minute, seconds=t.second)
-    elif target_type == "none":
+    elif target_type == "None":
         return None
+    elif target_type == "plugin_mbp":
+        return calculate_mbp(
+            value=value,
+            current_value=kwargs["current_value"],
+            order=kwargs["order"],
+            currencies=kwargs["currencies"],
+        )
     else:
         error_message = f"Unknown target_type: {target_type}"
         raise ValueError(error_message)
