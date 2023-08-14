@@ -25,5 +25,5 @@ class TurboDCATestCase(StrategyDefaultTestCase):
         }
 
 
-class DCABINANCETestCase(TurboDCATestCase, ModelTestCase):
+class TurboDCABINANCETestCase(TurboDCATestCase, ModelTestCase):
     exchange = "BINANCE"

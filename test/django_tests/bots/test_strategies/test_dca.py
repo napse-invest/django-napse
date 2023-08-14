@@ -20,7 +20,7 @@ class DCATestCase(StrategyDefaultTestCase):
                 exchange_account=self.exchange_account,
                 base="BTC",
                 quote="USDT",
-                interval="1m",
+                interval="1d",
             ),
         }
 
