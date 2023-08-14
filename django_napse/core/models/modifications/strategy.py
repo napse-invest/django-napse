@@ -14,7 +14,7 @@ class StrategyModification(Modification):
     def _apply(self, **kwargs):
         strategy = kwargs.get("strategy")
         if not hasattr(strategy, f"variable_{self.key}"):
-            error_msg: str = f"Strategy {strategy} must have attribute {self.key}"
+            error_msg: str = f"Strategy {strategy} must have attribute variable_{self.key}"
             raise ValueError(error_msg)
         setattr(strategy, f"variable_{self.key}", process_value_from_type(self.value, self.target_type))
         self.status = MODIFICATION_STATUS.APPLIED

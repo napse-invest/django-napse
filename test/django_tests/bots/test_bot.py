@@ -1,6 +1,5 @@
-from django.test import TestCase
-
-from django_napse.core.models import Strategy
+from django_napse.core.models import Bot, Controller, EmptyStrategy
+from django_napse.utils.model_test_case import ModelTestCase
 
 """
 python test/test_app/manage.py test test.django_tests.bots.test_bot -v2 --keepdb --parallel
@@ -8,6 +7,21 @@ python test/test_app/manage.py test test.django_tests.bots.test_bot -v2 --keepdb
 
 
 class BotDefaultTestCase:
+    model = Bot
+    strategy_class = EmptyStrategy
+    config_settings = {"empty": True}
+
+    @property
+    def architecture_constants(self):
+        return {
+            "controller": Controller.get(
+                exchange_account=self.exchange_account,
+                base="BTC",
+                quote="USDT",
+                interval="1m",
+            ),
+        }
+
     def simple_create(self):
         return self.model.objects.create(name="Test Bot", strategy=self.strategy)
 
@@ -24,13 +38,5 @@ class BotDefaultTestCase:
         return self.strategy_class.objects.create(config=self.config, architecture=self.architecture)
 
 
-class BotTypeCkeck(TestCase):
-    def test_bot_type(self):
-        subclasses = []
-        for subclass_level in BotDefaultTestCase.__subclasses__():
-            subclasses += subclass_level.__subclasses__()
-        tested_strategies = {*[subclass.strategy_class for subclass in subclasses]}
-        strategies = {*Strategy.__subclasses__()}
-        if tested_strategies != strategies:
-            error_msg = "You have untested Strategies. Check out the documentation to see how to test them (spoiler, it's really easy!)."
-            raise ValueError(error_msg)
+class BotBINANCETestCase(BotDefaultTestCase, ModelTestCase):
+    exchange = "BINANCE"

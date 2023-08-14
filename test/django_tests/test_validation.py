@@ -40,6 +40,7 @@ class ValidateModelTestCaseSubclassesTestCase(TestCase):
 
         for subclass_name, exchanges in all_tests.items():
             if exchanges != napse_settings.NAPSE_EXCHANGES_TO_TEST:
+                print(exchanges, napse_settings.NAPSE_EXCHANGES_TO_TEST)
                 diff = []
                 for exchange in napse_settings.NAPSE_EXCHANGES_TO_TEST:
                     if exchange not in exchanges:
