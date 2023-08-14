@@ -139,6 +139,7 @@ class Bot(models.Model):
         connection = Connection.objects.create(owner=wallet, bot=self)
         for plugin in self._strategy.plugins.all():
             plugin.connect(connection)
+        self._strategy.connect(connection)
         return connection
 
     def copy(self):

@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 
 from django_napse.core.models.bots.managers.bot_config import BotConfigManager
+from django_napse.core.models.bots.strategy import Strategy
 from django_napse.utils.findable_class import FindableClass
 
 
@@ -35,6 +36,10 @@ class BotConfig(models.Model, FindableClass):
             if setting.name.startswith("setting_"):
                 settings[setting.name[8:]] = getattr(self, setting.name)
         return settings
+
+    @property
+    def strategy(self):
+        return Strategy.objects.get(config=self).find()
 
     def duplicate_immutable(self):
         return self.__class__.objects.create(
