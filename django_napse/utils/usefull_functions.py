@@ -6,9 +6,9 @@ from pytz import UTC
 
 def calculate_mbp(value: str, current_value: float, order, currencies: dict) -> float:
     ticker, value = value.split("|")
-    value = value.replace("#", str(order.debited_amount - order.exit_amount_quote))
-    value = value.replace("_", str(current_value))
-    value = value.replace("$", str(currencies.get(ticker, {"amount": 0})["amount"]))
+    value = value.replace("c", str(order.debited_amount - order.exit_amount_quote))
+    value = value.replace("b", str(current_value))
+    value = value.replace("a", str(currencies.get(ticker, {"amount": 0})["amount"]))
     return eval(value)  # noqa S307
 
 

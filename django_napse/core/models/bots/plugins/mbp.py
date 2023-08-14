@@ -11,7 +11,7 @@ class MBPPlugin(Plugin):
     def _apply(self, data: dict) -> dict:
         order = data["order"]
         if order["side"] == SIDES.BUY:
-            new_mbp = f"{order['controller'].base}|($ * _ + #) / (# / {order['price']} + $)"
+            new_mbp = f"{order['controller'].base}|(a * b + c) / (c / {order['price']} + a)"
             order["ConnectionModifications"] += [
                 {
                     "key": "mbp",
