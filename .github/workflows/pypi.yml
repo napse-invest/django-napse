@@ -5,15 +5,19 @@ on:
     branches: ["feature/ci"]
 
 jobs:
-  test:
-    name: Pypi
-    runs-on: ubuntu-latest
+  pypi-release:
+    name: Pypi release
+    runs-on: ubuntu-18.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
+    - uses: actions/checkout@master
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.11'
 
-      - name: test
-        run: |
-          echo "test"
+    - name: Get latest commit
+      id: commit
+      run: |
+        echo "::set-output name=hash::$(git log -1 --pretty=format:"%H")"
+        echo "commit: "
+        echo ${{ steps.commit.outputs.hash }}
