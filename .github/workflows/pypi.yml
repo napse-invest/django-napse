@@ -28,8 +28,7 @@ jobs:
         echo "LATEST_TAG=$tag" >> $GITHUB_ENV
 
     - name: Update version in setup.py
-      run: |
-        sed -i "s/{{VERSION}}/${{ env.LATEST_TAG }}/g" setup.py
+      run: sed -i "s/{{VERSION}}/${{ env.LATEST_TAG }}/g" setup.py
 
     - name: Install pypa/build
       run: >-
