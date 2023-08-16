@@ -18,19 +18,20 @@ class SimulationTestCase:
     def simple_create(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
-            controller=Controller.get(
-                space=self.space,
-                base="BTC",
-                quote="USDT",
-                interval="1m",
-            ),
+            constants={
+                "controller": Controller.get(
+                    exchange_account=self.exchange_account,
+                    base="BTC",
+                    quote="USDT",
+                    interval="1m",
+                ),
+            },
         )
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)
         return Simulation.objects.create(
             space=self.space,
             bot=bot,
-            investment=1000,
             start_date=datetime(2021, 1, 1, tzinfo=UTC),
             end_date=datetime(2021, 1, 3, tzinfo=UTC),
             simulation_reference=uuid.uuid4(),
@@ -40,19 +41,20 @@ class SimulationTestCase:
     def test_with_data(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
-            controller=Controller.get(
-                space=self.space,
-                base="BTC",
-                quote="USDT",
-                interval="1m",
-            ),
+            constants={
+                "controller": Controller.get(
+                    exchange_account=self.exchange_account,
+                    base="BTC",
+                    quote="USDT",
+                    interval="1m",
+                ),
+            },
         )
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)
         simulation = Simulation.objects.create(
             space=self.space,
             bot=bot,
-            investment=1000,
             start_date=datetime(2021, 1, 1, tzinfo=UTC),
             end_date=datetime(2021, 1, 3, tzinfo=UTC),
             simulation_reference=uuid.uuid4(),
@@ -60,6 +62,8 @@ class SimulationTestCase:
                 "dates": [datetime.now(tz=UTC)],
                 "values": [1],
                 "actions": ["BUY"],
+                "amounts": [1],
+                "tickers": ["USDT"],
                 "mbp": [10],
             },
         )
@@ -68,19 +72,20 @@ class SimulationTestCase:
     def test_with_more_data(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         architecture = SinglePairArchitecture.objects.create(
-            controller=Controller.get(
-                space=self.space,
-                base="BTC",
-                quote="USDT",
-                interval="1m",
-            ),
+            constants={
+                "controller": Controller.get(
+                    exchange_account=self.exchange_account,
+                    base="BTC",
+                    quote="USDT",
+                    interval="1m",
+                ),
+            },
         )
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
         bot = Bot.objects.create(name="Test Bot", strategy=strategy)
         simulation = Simulation.objects.create(
             space=self.space,
             bot=bot,
-            investment=1000,
             start_date=datetime(2021, 1, 1, tzinfo=UTC),
             end_date=datetime(2021, 1, 3, tzinfo=UTC),
             simulation_reference=uuid.uuid4(),
@@ -99,6 +104,8 @@ class SimulationTestCase:
                 ],
                 "values": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                 "actions": ["BUY", "SELL", "SELL", "BUY", "KEEP", "KEEP", "BUY", "SELL", "BUY", "SELL"],
+                "amounts": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+                "tickers": ["USDT", "USDT", "USDT", "USDT", "USDT", "USDT", "USDT", "USDT", "USDT", "USDT"],
                 "mbp": [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
             },
         )

@@ -5,14 +5,13 @@ from django_napse.utils.errors import SimulationError
 
 
 class SimulationManager(models.Manager):
-    def create(self, space, bot, investment, start_date, end_date, simulation_reference, data):
+    def create(self, space, bot, start_date, end_date, simulation_reference, data):
         SimulationDataPoint = apps.get_model("django_napse_simulations", "SimulationDataPoint")
         SimulationDataPointExtraInfo = apps.get_model("django_napse_simulations", "SimulationDataPointExtraInfo")
 
         simulation = self.model(
             space=space,
             bot=bot,
-            investment=investment,
             start_date=start_date,
             end_date=end_date,
             simulation_reference=simulation_reference,
@@ -21,8 +20,7 @@ class SimulationManager(models.Manager):
 
         if data == {}:
             return simulation
-
-        must_have = ["dates", "values", "actions"]
+        must_have = ["dates", "values", "actions", "amounts", "tickers"]
         for key in must_have:
             if key not in data:
                 error_msg = f"Key {key} not in data"
@@ -43,19 +41,25 @@ class SimulationManager(models.Manager):
             data["dates"],
             data["values"],
             data["actions"],
+            data["amounts"],
+            data["tickers"],
             *[data[key] for key in extra_info_keys],
             strict=True,
         ):
             date = info[0]
             value = info[1]
             action = info[2]
-            extra_info = {key: info[i + 3] for i, key in enumerate(extra_info_keys)}
+            amount = info[3]
+            ticker = info[4]
+            extra_info = {key: info[i + 5] for i, key in enumerate(extra_info_keys)}
             bulk_list_data_point.append(
                 SimulationDataPoint(
                     simulation=simulation,
                     date=date,
                     value=value,
                     action=action,
+                    amount=amount,
+                    ticker=ticker,
                 ),
             )
             for key, value in extra_info.items():
@@ -63,7 +67,7 @@ class SimulationManager(models.Manager):
                     SimulationDataPointExtraInfo(
                         data_point=bulk_list_data_point[-1],
                         key=key,
-                        value=value,
+                        value=str(value),
                         target_type=type(value).__name__,
                     ),
                 )

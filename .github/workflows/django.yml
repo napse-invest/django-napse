@@ -19,7 +19,7 @@ jobs:
       ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -40,6 +40,7 @@ jobs:
     needs:
       - start-runner # required to start the main job when the runner is ready
     runs-on: ${{ needs.start-runner.outputs.label }} # run the job on the newly created runner
+    timeout-minutes: 10
     strategy:
       max-parallel: 4
 
@@ -84,12 +85,14 @@ jobs:
       - name: Coverage badge
         if: ${{ github.base_ref == 'main' }} 
         uses: Schneegans/dynamic-badges-action@v1.6.0
+        env:
+          COVERAGE: ${{ env.COVERAGE }}
         with:
           auth: ${{ secrets.NAPSE_SECRET_GIST }}
           gistID: 40fac957532fe3b731c99067467de842
           filename: django-napse-coverage.json
           label: Coverage
-          message: ${{ env.COVERAGE }}%
+          message: ${{ env.COVERAGE }} % 
           valColorRange: ${{ env.COVERAGE }}
           minColorRange: 50
           maxColorRange: 95
@@ -98,12 +101,12 @@ jobs:
     name: Stop self-hosted EC2 runner
     needs:
       - start-runner # required to get output from the start-runner job
-      - build # required to wait when the main job is done
+      - build # required to wait when the main job is done 
     runs-on: ubuntu-latest
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

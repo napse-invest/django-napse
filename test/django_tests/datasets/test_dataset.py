@@ -17,7 +17,7 @@ class DataSetTestCase:
 
     def simple_create(self):
         controller = Controller.get(
-            space=self.space,
+            exchange_account=self.exchange_account,
             base="BTC",
             quote="USDT",
             interval="1d",
@@ -38,7 +38,7 @@ class DataSetTestCase:
 
     def test_info_small(self):
         controller = Controller.get(
-            space=self.space,
+            exchange_account=self.exchange_account,
             base="BTC",
             quote="USDT",
             interval="1d",
@@ -48,7 +48,7 @@ class DataSetTestCase:
             start_date=datetime(2021, 1, 1, tzinfo=UTC),
             end_date=datetime(2021, 1, 3, tzinfo=UTC),
         )
-        dataset.info(verbose=True)
+        dataset.info(verbose=False)
 
     def test_error_save_completion_lt_0(self):
         dataset = self.simple_create()

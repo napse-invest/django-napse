@@ -1,5 +1,3 @@
-import uuid
-
 from django.db import models
 
 from django_napse.simulations.models.simulations.managers import SimulationDataPointManager, SimulationManager
@@ -7,10 +5,10 @@ from django_napse.utils.usefull_functions import process_value_from_type
 
 
 class Simulation(models.Model):
-    simulation_reference = models.UUIDField(unique=True, editable=False, default=uuid.uuid4, null=True)
+    simulation_reference = models.UUIDField(unique=True, editable=False, null=True)
     space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE, null=True)
     bot = models.OneToOneField("django_napse_core.Bot", on_delete=models.CASCADE, null=True, related_name="simulation")
-    investment = models.FloatField(default=1000)
+
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -25,7 +23,7 @@ class Simulation(models.Model):
         string += f"{beacon}Simulation {self.pk}:\n"
         string += f"{beacon}\t{self.bot=}\n"
         string += f"{beacon}\t{self.space=}\n"
-        string += f"{beacon}\t{self.investment=}\n"
+
         string += f"{beacon}\t{self.start_date=}\n"
         string += f"{beacon}\t{self.end_date=}\n"
         string += f"{beacon}\t{self.created_at=}\n"
@@ -57,6 +55,8 @@ class SimulationDataPoint(models.Model):
     date = models.DateTimeField()
     value = models.FloatField()
     action = models.CharField(max_length=10)
+    amount = models.FloatField()
+    ticker = models.CharField(max_length=10)
 
     objects = SimulationDataPointManager()
 
@@ -69,6 +69,8 @@ class SimulationDataPoint(models.Model):
             "date": self.date,
             "value": self.value,
             "action": self.action,
+            "amount": self.amount,
+            "ticker": self.ticker,
             **{info.key: info.get_value() for info in extra_info},
         }
 
@@ -90,23 +92,3 @@ class SimulationDataPointExtraInfo(models.Model):
 
     def get_value(self):
         return process_value_from_type(value=self.value, target_type=self.target_type)
-
-
-class SimulationQueue(models.Model):
-    simulation_reference = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
-    bot = models.OneToOneField("django_napse_core.Bot", on_delete=models.CASCADE, null=True)
-    investment = models.FloatField(default=1000)
-    start_date = models.DateTimeField(null=True)
-    end_date = models.DateTimeField(null=True)
-    canceled = models.BooleanField(default=False)
-
-    status = models.CharField(max_length=12, default="IDLE")
-    completion = models.FloatField(default=0.0)
-    eta = models.DurationField(blank=True, null=True)
-
-    error = models.BooleanField(default=False)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self) -> str:
-        return f"BOT SIM QUEUE {self.pk}"

@@ -3,6 +3,7 @@ import time
 from django.db import models
 
 from django_napse.core.models.bots.controller import Controller
+from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.wallets.currency import Currency
 from django_napse.core.models.wallets.managers import WalletManager
 from django_napse.utils.errors import WalletError
@@ -17,7 +18,7 @@ class Wallet(models.Model, FindableClass):
     objects = WalletManager()
 
     def __str__(self):
-        return f"WALLET: {self.pk=} - {self.title=} - {self.locked=}"
+        return f"WALLET: {self.pk=}"
 
     def info(self, verbose=True, beacon=""):
         self = self.find()
@@ -43,7 +44,7 @@ class Wallet(models.Model, FindableClass):
 
     @property
     def space(self):  # pragma: no cover
-        error_msg = "space() not implemented by default. Please implement in a subclass of Wallet."
+        error_msg = f"space() not implemented by default. Please implement it in {self.__class__}."
         raise NotImplementedError(error_msg)
 
     @property
@@ -98,7 +99,7 @@ class Wallet(models.Model, FindableClass):
             raise ValueError(error_msg)
 
         if mbp is None:
-            mbp = Controller.get_asset_price(space=self.space, base=ticker)
+            mbp = Controller.get_asset_price(exchange_account=self.exchange_account, base=ticker)
 
         start_time = time.time()
         while self.locked:
@@ -146,7 +147,7 @@ class Wallet(models.Model, FindableClass):
         for currency in self.currencies.all():
             if currency.amount == 0:
                 continue
-            value += currency.amount * Controller.get_asset_price(space=self.space, base=currency.ticker)
+            value += currency.amount * Controller.get_asset_price(exchange_account=self.exchange_account, base=currency.ticker)
         return value
 
     def to_dict(self):
@@ -157,11 +158,11 @@ class Wallet(models.Model, FindableClass):
             "locked": self.locked,
             "created_at": self.created_at,
             "currencies": {
-                curr.ticker: {
-                    "amount": curr.amount,
-                    "mbp": curr.mbp,
+                currency.ticker: {
+                    "amount": currency.amount,
+                    "mbp": currency.mbp,
                 }
-                for curr in currencies
+                for currency in currencies
             },
         }
 
@@ -176,6 +177,31 @@ class SpaceWallet(Wallet):
     @property
     def exchange_account(self):
         return self.space.exchange_account.find()
+
+    def connect_to(self, bot):
+        return Connection.objects.create(wallet=self, bot=bot)
+
+
+class SpaceSimulationWallet(Wallet):
+    owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="simulation_wallet")
+
+    @property
+    def testing(self):
+        return True
+
+    @property
+    def space(self):
+        return self.owner
+
+    @property
+    def exchange_account(self):
+        return self.space.exchange_account.find()
+
+    def reset(self):
+        self.currencies.all().delete()
+
+    def connect_to(self, bot):
+        return Connection.objects.create(wallet=self, bot=bot)
 
 
 class OrderWallet(Wallet):

@@ -4,4 +4,6 @@ from .bot import *
 from .config import *
 from .controller import *
 from .implementations import *
+from .plugin import *
+from .plugins import *
 from .strategy import *

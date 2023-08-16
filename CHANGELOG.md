@@ -1,3 +1,32 @@
+# [1.3.0](https://github.com/napse-invest/django-napse/compare/v1.2.0...v1.3.0) (2023-08-13)
+
+
+### Bug Fixes
+
+* **tests:** fixed simulation test breaking because of lacking keys "amounts" & "tickers" ([1b45b02](https://github.com/napse-invest/django-napse/commit/1b45b0229955360ef7280158892dcdba5e271563))
+
+
+### Features
+
+* **modifications:** first modification implemented and tested in quicksim ([bd0b157](https://github.com/napse-invest/django-napse/commit/bd0b1577cc229e4778ba57a1364fb411e4a7f21d))
+* **simulations:** First implementation of simutions and tests ([e0622eb](https://github.com/napse-invest/django-napse/commit/e0622eb9e12416dafa7be0fb37a76292f6bd2df4))
+* **simulations:** polished the feature, just lacks plugins ([6a052c3](https://github.com/napse-invest/django-napse/commit/6a052c3c8d93a19b603aee5d351a0f2d396e9c3d))
+
+# [1.2.0](https://github.com/napse-invest/django-napse/compare/v1.1.0...v1.2.0) (2023-08-10)
+
+
+### Bug Fixes
+
+* **ci:** removed BINANCE keys from pipelines ([aeeacc3](https://github.com/napse-invest/django-napse/commit/aeeacc3e184bb2747be53b3c5a09974eb5ecb7c7))
+* **ci:** test if changes to secrets worked ([b91d1c4](https://github.com/napse-invest/django-napse/commit/b91d1c4a39c6623351c989d3fa475e1182fd7fde))
+* **controller:** moved to exchange_account level ([ebff8f7](https://github.com/napse-invest/django-napse/commit/ebff8f7d4ed03ac6dd05369870717dfb6c7076e1))
+
+
+### Features
+
+* **simulations:** models added and tested ([d75da60](https://github.com/napse-invest/django-napse/commit/d75da60624a8bb09cf44c84e2220e4fe666fce12))
+* **tests:** Dataset ([89f83e7](https://github.com/napse-invest/django-napse/commit/89f83e777d94880dc906c0da734e67e0725686ed))
+
 # [1.1.0](https://github.com/napse-invest/django-napse/compare/v1.0.0...v1.1.0) (2023-08-08)
 
 

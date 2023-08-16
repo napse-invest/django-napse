@@ -11,7 +11,7 @@ class Currency(models.Model):
         unique_together = ("wallet", "ticker")
 
     def __str__(self):  # pragma: no cover
-        return f"{self.ticker} - {self.amount} - {self.wallet.pk}"
+        return f"CURRENCY {self.pk}"
 
     def info(self, verbose=True, beacon=""):
         string = ""

@@ -8,6 +8,7 @@ from django_napse.utils.errors import NapseError
 class NapseSpaceManager(models.Manager):
     def create(self, name: str, exchange_account, description: str = ""):
         SpaceWallet = apps.get_model("django_napse_core", "SpaceWallet")
+        SpaceSimulationWallet = apps.get_model("django_napse_core", "SpaceSimulationWallet")
         attempts = 0
         while attempts < 10:
             attempts += 1
@@ -25,6 +26,7 @@ class NapseSpaceManager(models.Manager):
         )
         space.save()
 
-        SpaceWallet.objects.create(owner=space, title=f"Main Wallet for space {space.name}")
+        SpaceWallet.objects.create(owner=space, title=f"Wallet for space {space.name}")
+        SpaceSimulationWallet.objects.create(owner=space, title=f"Simulation Wallet for space {space.name}")
 
         return space

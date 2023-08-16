@@ -1,0 +1,28 @@
+from test.django_tests.bots.test_strategy import StrategyDefaultTestCase
+
+from django_napse.core.models import Controller, EmptyStrategy
+from django_napse.utils.model_test_case import ModelTestCase
+
+"""
+python test/test_app/manage.py test test.django_tests.bots.test_strategies.test_empty_bot -v2 --keepdb --parallel
+"""
+
+
+class EmptyBotTestCase(StrategyDefaultTestCase):
+    model = EmptyStrategy
+    config_settings = {"empty": True}
+
+    @property
+    def architecture_constants(self):
+        return {
+            "controller": Controller.get(
+                exchange_account=self.exchange_account,
+                base="BTC",
+                quote="USDT",
+                interval="1m",
+            ),
+        }
+
+
+class EmptyBotBINANCETestCase(EmptyBotTestCase, ModelTestCase):
+    exchange = "BINANCE"

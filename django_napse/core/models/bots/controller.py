@@ -1,17 +1,19 @@
 import math
 from datetime import datetime, timedelta, timezone
+from typing import Optional
 
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
 
 from django_napse.core.models.bots.managers.controller import ControllerManager
-from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, STABLECOINS
+from django_napse.core.models.orders.order import Order, OrderBatch
+from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, ORDER_STATUS, SIDES, STABLECOINS
 from django_napse.utils.errors import ControllerError
 from django_napse.utils.trading.binance_controller import BinanceController
 
 
 class Controller(models.Model):
-    space = models.ForeignKey("NapseSpace", on_delete=models.CASCADE, related_name="controller")
+    exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="controller")
 
     pair = models.CharField(max_length=10)
     base = models.CharField(max_length=10)
@@ -28,10 +30,10 @@ class Controller(models.Model):
     objects = ControllerManager()
 
     class Meta:
-        unique_together = ("pair", "interval", "space")
+        unique_together = ("pair", "interval", "exchange_account")
 
     def __str__(self):
-        return f"Controller {self.pair} - {self.interval}"
+        return f"Controller {self.pk=}"
 
     def save(self, *args, **kwargs):
         if not self.pk:
@@ -67,18 +69,18 @@ class Controller(models.Model):
         return string
 
     @staticmethod
-    def get(space, base: str, quote: str, interval: str = "1m") -> "Controller":
+    def get(exchange_account, base: str, quote: str, interval: str = "1m") -> "Controller":
         """Return a controller object from the database."""
         try:
             controller = Controller.objects.get(
-                space=space,
+                exchange_account=exchange_account,
                 base=base,
                 quote=quote,
                 interval=interval,
             )
         except Controller.DoesNotExist:
             controller = Controller.objects.create(
-                space=space,
+                exchange_account=exchange_account,
                 base=base,
                 quote=quote,
                 interval=interval,
@@ -89,11 +91,11 @@ class Controller(models.Model):
 
     @property
     def exchange_controller(self):
-        return self.space.exchange_account.find().exchange_controller()
+        return self.exchange_account.find().exchange_controller()
 
     @property
     def exchange(self):
-        return self.space.exchange_account.exchange
+        return self.exchange_account.exchange
 
     def update_variables(self) -> None:
         """If the variables are older than 1 minute, update them."""
@@ -132,6 +134,94 @@ class Controller(models.Model):
         if self.pk:
             self.save()
 
+    def process_orders(self, testing: bool, no_db_data: Optional[dict] = None) -> list[Order]:
+        in_simulation = no_db_data is not None
+        no_db_data = no_db_data or {
+            "buy_orders": Order.objects.filter(
+                order__batch__status=ORDER_STATUS.READY,
+                order__side=SIDES.BUY,
+                order__batch__controller=self,
+                order__testing=testing,
+            ),
+            "sell_orders": Order.objects.filter(
+                order__batch__status=ORDER_STATUS.READY,
+                order__side=SIDES.SELL,
+                order__batch__controller=self,
+                order__testing=testing,
+            ),
+            "keep_orders": Order.objects.filter(
+                order__batch__status=ORDER_STATUS.READY,
+                order__side=SIDES.KEEP,
+                order__batch__controller=self,
+                order__testing=testing,
+            ),
+            "batches": OrderBatch.objects.filter(status=ORDER_STATUS.READY, batch__controller=self),
+            "exchange_controller": self.exchange_controller,
+            "min_trade": self.min_trade,
+            "price": self.get_price(),
+        }
+
+        aggregated_order = {
+            "buy_amount": 0,
+            "sell_amount": 0,
+            "min_trade": no_db_data["min_trade"],
+            "price": no_db_data["price"],
+            "min_notional": self.min_notional,
+            "pair": self.pair,
+        }
+
+        for order in no_db_data["buy_orders"]:
+            aggregated_order["buy_amount"] += order.asked_for_amount
+        for order in no_db_data["sell_orders"]:
+            aggregated_order["sell_amount"] += order.asked_for_amount
+
+        if aggregated_order["buy_amount"] > 0:
+            for order in no_db_data["buy_orders"]:
+                order._calculate_batch_share(total=aggregated_order["buy_amount"])
+        if aggregated_order["sell_amount"] > 0:
+            for order in no_db_data["sell_orders"]:
+                order._calculate_batch_share(total=aggregated_order["sell_amount"])
+        for order in no_db_data["keep_orders"]:
+            order.batch_share = 0
+
+        receipt, executed_amounts_buy, executed_amounts_sell, fees_buy, fees_sell = no_db_data["exchange_controller"].submit_order(
+            controller=self,
+            aggregated_order=aggregated_order,
+            testing=in_simulation or testing,
+        )
+        all_orders = []
+        for order in no_db_data["buy_orders"]:
+            order._calculate_exit_amounts(
+                controller=self,
+                executed_amounts=executed_amounts_buy,
+                fees=fees_buy,
+            )
+            all_orders.append(order)
+        for order in no_db_data["sell_orders"]:
+            order._calculate_exit_amounts(
+                controller=self,
+                executed_amounts=executed_amounts_sell,
+                fees=fees_sell,
+            )
+            all_orders.append(order)
+        for order in no_db_data["keep_orders"]:
+            order._calculate_exit_amounts(
+                controller=self,
+                executed_amounts={},
+                fees={},
+            )
+            all_orders.append(order)
+
+        for batch in no_db_data["batches"]:
+            batch._set_status_post_process(receipt=receipt)
+
+        return all_orders
+
+    def apply_orders(self, orders):
+        for order in orders:
+            order.save()
+            order.apply_swap()
+
     def send_candles_to_bots(self, closed_candle, current_candle) -> list:
         """Scan all bots (that are allowed to trade) and get their orders.
 
@@ -151,14 +241,14 @@ class Controller(models.Model):
         return orders
 
     @staticmethod
-    def get_asset_price(space, base: str, quote: str = "USDT") -> float:
+    def get_asset_price(exchange_account, base: str, quote: str = "USDT") -> float:
         """Get the price of an asset."""
-        if base in STABLECOINS[space.exchange_account.exchange.name]:
+        if base in STABLECOINS[exchange_account.exchange.name]:
             return 1
-        if base + quote not in EXCHANGE_PAIRS[space.exchange_account.exchange.name]:
-            error_msg = f"Invalid pair: {base+quote} on {space.exchange_account.exchange.name}"
+        if base + quote not in EXCHANGE_PAIRS[exchange_account.exchange.name]:
+            error_msg = f"Invalid pair: {base+quote} on {exchange_account.exchange.name}"
             raise ControllerError.InvalidPair(error_msg)
-        controller = Controller.get(space=space, base=base, quote=quote, interval="1m")
+        controller = Controller.get(exchange_account=exchange_account, base=base, quote=quote, interval="1m")
 
         return float(controller.get_price())
 
@@ -217,16 +307,4 @@ class Controller(models.Model):
             verbose=verbose,
         )
 
-
-class Candle(models.Model):
-    controller = models.ForeignKey("Controller", on_delete=models.CASCADE, related_name="candles")
-    latest = models.BooleanField(default=False)
-    last_update = models.DateTimeField(auto_now=True)
-    open = models.FloatField()
-    high = models.FloatField()
-    low = models.FloatField()
-    close = models.FloatField()
-    volume = models.FloatField()
-
-    def __str__(self):
         return f"CANDLE {self.pk}"

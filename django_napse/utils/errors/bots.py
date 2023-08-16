@@ -45,3 +45,10 @@ class ClusterError:
 
     class MultipleConfigs(Exception):
         """Raised when a cluster has multiple configs."""
+
+
+class PluginError:
+    """Base class for plugin errors."""
+
+    class InvalidPluginCategory(Exception):
+        """Raised when a plugin category is invalid."""

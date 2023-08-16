@@ -7,4 +7,4 @@ class EmptyBotConfig(BotConfig):
     setting_empty = models.BooleanField()
 
     def __str__(self) -> str:
-        return f"EMPTY BOT CONFIG: {self.pk} - {self.immutable}"
+        return f"DCA BOT CONFIG: {self.pk} - {self.immutable}"
