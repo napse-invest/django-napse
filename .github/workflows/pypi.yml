@@ -5,7 +5,7 @@ on:
     branches: ["feature/ci"]
 
 jobs:
-  release:
+  test:
     name: Pypi
     runs-on: ubuntu-latest
     steps:
