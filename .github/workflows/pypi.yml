@@ -2,13 +2,14 @@ name: Upload django-napse Package
 
 on:
   push:
-    branches: [ feature/ci ]
+    branches: [ "feature/ci" ]
 
 jobs:
   test:
+    name: test
+    runs-on: ubuntu-latest
     steps:
     - name: Get latest commit
       id: commit
       run: |
-        echo "::set-output name=hash::$(git log -1 --pretty=format:"%H")"
-        echo "${{ steps.commit.outputs.hash }}"
+        echo: "test"
