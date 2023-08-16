@@ -1,19 +1,40 @@
 name: Pypi
 
 on:
-  push:
-    branches: ["feature/ci"]
+  release:
+    types: [published]
 
 jobs:
-  test:
-    name: Pypi
+  pypi-release:
+    name: Pypi release
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          persist-credentials: false
+    environment:
+      name: pypi
+      url: https://pypi.org/p/djang-napse
+    permissions:
+      id-token: write
 
-      - name: test
-        run: |
-          echo "test"
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - name: Install pypa/build
+      run: >-
+        python3 -m
+        pip install
+        build
+        --user
+    - name: Build a binary wheel and a source tarball
+      run: >-
+        python3 -m
+        build
+        --sdist
+        --wheel
+        --outdir dist/
+
+    - name: Publish package distributions to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1

@@ -8,6 +8,7 @@ setup(
     version="1.4.0",  # Start with a small number and increase it with every change you make
     license="MIT",  # Chose a license from here: https://help.github.com/articles/licensing-a-repository
     description="The heart and brains of the Napse Invest platform.",  # Give a short description about your library
+    long_description="The heart and brains of the Napse Invest platform.",
     author="Napse Invest",  # Type in your name
     author_email="napse.invest@gmail.com",  # Type in your E-Mail
     url="https://github.com/napse-invest/django-napse",  # Provide either the link to your github or to your website
