@@ -1,15 +1,19 @@
-name: Upload django-napse Package
+name: Pypi
 
 on:
   push:
-    branches: [ "feature/ci" ]
+    branches: ["feature/ci"]
 
 jobs:
-  test:
-    name: test
+  release:
+    name: Pypi
     runs-on: ubuntu-latest
     steps:
-    - name: Get latest commit
-      id: commit
-      run: |
-        echo "test"
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+
+      - name: test
+        run: |
+          echo "test"
