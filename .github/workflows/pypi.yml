@@ -19,22 +19,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install wheel
 
-    - name: Get latest commit
-      id: commit
-      run: |
-        git_hash=$(git rev-parse --short "$GITHUB_SHA")
-        git_branch=${GITHUB_REF#refs/heads/}
-        echo "hash: $git_hash"
-        echo "branch: $git_branch"
-    - name: tag
-      run: |
-        LATEST_TAG=$(git describe --tags `git rev-list --tags --max-count=1`)
-        echo "$LATEST_TAG"
-        echo "action=$(pypa/gh-action-pypi-publish@release/${LATEST_TAG})" >> GITHUB_ENV
-    - name: print env
-      run: |
-        echo ${{ env.LATEST_TAG }}
-
     - name: Build a binary wheel
       run: |
         python setup.py sdist bdist_wheel
