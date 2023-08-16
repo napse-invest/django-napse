@@ -12,4 +12,4 @@ jobs:
     - name: Get latest commit
       id: commit
       run: |
-        echo: "test"
+        echo "test"
