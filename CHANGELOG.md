@@ -1,3 +1,10 @@
+## [1.5.2](https://github.com/napse-invest/django-napse/compare/v1.5.1...v1.5.2) (2023-08-16)
+
+
+### Bug Fixes
+
+* **workflow:** trigger new release ([25a74ad](https://github.com/napse-invest/django-napse/commit/25a74adf19c109e941fb31d6486d9a87df9bb36c))
+
 ## [1.5.1](https://github.com/napse-invest/django-napse/compare/v1.5.0...v1.5.1) (2023-08-16)
 
 
