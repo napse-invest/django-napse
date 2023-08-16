@@ -1,8 +1,8 @@
 name: Pypi
 
 on:
-  push:
-    branches: ["feature/ci"]
+  release:
+    types: [published]
 
 jobs:
   pypi-release:
