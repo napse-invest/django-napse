@@ -21,7 +21,7 @@
 <br/>
 
 ## django-napse
-...
+....
 
 ## Useful commands
 Unless otherwise specified, all commands are to be run at the root folder of the project.
