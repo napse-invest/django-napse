@@ -9,7 +9,6 @@ jobs:
     name: Pypi release
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
