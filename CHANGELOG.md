@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/napse-invest/django-napse/compare/v1.5.0...v1.5.1) (2023-08-16)
+
+
+### Bug Fixes
+
+* **workflow:** tag version in setup.py for pypi ([ee4e74e](https://github.com/napse-invest/django-napse/commit/ee4e74e894a2fbf7c347e60e302e50db3e0c70fa))
+
 # [1.5.0](https://github.com/napse-invest/django-napse/compare/v1.4.0...v1.5.0) (2023-08-16)
 
 
