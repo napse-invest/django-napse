@@ -7,7 +7,7 @@ on:
 jobs:
   pypi-release:
     name: Pypi release
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@master
     - name: Set up Python 3.11
