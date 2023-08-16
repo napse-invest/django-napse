@@ -3,33 +3,33 @@ from distutils.core import setup
 # from setuptools import setup
 
 setup(
-    name="django-napse",  # How you named your package folder (MyLib)
-    packages=["django_napse"],  # Chose the same as "name"
-    version="1.4.0",  # Start with a small number and increase it with every change you make
-    license="MIT",  # Chose a license from here: https://help.github.com/articles/licensing-a-repository
-    description="The heart and brains of the Napse Invest platform.",  # Give a short description about your library
+    name="django-napse",
+    packages=["django_napse"],
+    version="{{VERSION}}",
+    license="MIT",
+    description="The heart and brains of the Napse Invest platform.",
     long_description="The heart and brains of the Napse Invest platform.",
-    author="Napse Invest",  # Type in your name
-    author_email="napse.invest@gmail.com",  # Type in your E-Mail
-    url="https://github.com/napse-invest/django-napse",  # Provide either the link to your github or to your website
+    author="Napse Invest",
+    author_email="napse.invest@gmail.com",
+    url="https://github.com/napse-invest/django-napse",
     download_url="https://github.com/napse-invest/django-napse/archive/refs/tags/v1.4.0.tar.gz",
-    keywords=["Investing", "Django", "Trading"],  # Keywords that define your package best
+    keywords=["Investing", "Django", "Trading"],
     install_requires=[
-        "django",
-        "django-environ",
-        "django-celery-beat",
-        "psycopg2-binary",
-        "celery",
-        "redis",
-        "python-binance",
-        "shortuuid",
-        "anybadge",
+        "django>=4.2",
+        "django-environ>=0.10",
+        "django-celery-beat>=2.5",
+        "psycopg2-binary>=2.9",
+        "celery>=5.3",
+        "redis>=4.6",
+        "python-binance>=1",
+        "shortuuid>=1",
+        "pandas>=2",
     ],
     classifiers=[
-        "Development Status :: 4 - Beta",  # Chose either "3 - Alpha", "4 - Beta" or "5 - Production/Stable" as the current state of your package
-        "Intended Audience :: Developers",  # Define that your audience are developers
+        "Development Status :: 4 - Beta",  # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
+        "Intended Audience :: Developers",
         "Topic :: Software Development :: Build Tools",
-        "License :: OSI Approved :: MIT License",  # Again, pick a license
-        "Programming Language :: Python :: 3.11",  # Specify which pyhton versions that you want to support
+        "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.11",
     ],
 )
