@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/napse-invest/django-napse/compare/v1.4.0...v1.5.0) (2023-08-16)
+
+
+### Features
+
+* **workflow:** pypi workflow ([340dbbe](https://github.com/napse-invest/django-napse/commit/340dbbe64ab35901c5b5800f2331850b5b7289e5))
+
 # [1.4.0](https://github.com/napse-invest/django-napse/compare/v1.3.0...v1.4.0) (2023-08-14)
 
 
