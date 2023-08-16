@@ -7,11 +7,11 @@ on:
 jobs:
   pypi-release:
     name: Pypi release
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-lastest
     steps:
     - uses: actions/checkout@master
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v4
       with:
         python-version: '3.11'
 
