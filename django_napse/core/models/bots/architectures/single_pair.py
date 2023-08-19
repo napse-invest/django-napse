@@ -46,3 +46,9 @@ class SinglePairArchitecture(Architecture):
                 "ignore_failed_order": True,
             },
         ]
+
+    def accepted_tickers(self):
+        return [self.controller.base, self.controller.quote]
+
+    def accepted_investment_tickers(self):
+        return [self.controller.quote]

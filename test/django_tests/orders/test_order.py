@@ -3,7 +3,7 @@ from django_napse.utils.constants import SIDES
 from django_napse.utils.model_test_case import ModelTestCase
 
 """
-python test/test_app/manage.py test test.django_tests.orders.test_orders -v2 --keepdb --parallel
+python test/test_app/manage.py test test.django_tests.orders.test_order -v2 --keepdb --parallel
 """
 
 

@@ -58,6 +58,6 @@ class Strategy(models.Model, FindableClass):
 
     def copy(self):
         return self.find().__class__.objects.create(
-            config=self.config.duplicate_immutable(),
-            architecture=self.architecture.copy(),
+            config=self.config.find().duplicate_immutable(),
+            architecture=self.architecture.find().copy(),
         )

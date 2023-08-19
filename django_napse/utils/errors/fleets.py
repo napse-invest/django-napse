@@ -6,3 +6,9 @@ class FleetError:
 
     class InvalidOperator(Exception):
         """Raised when the operator is invalid."""
+
+    class InvalidShares(Exception):
+        """Raised when the sum of all shares is not 1."""
+
+    class InvalidClusters(Exception):
+        """Raised when the fleet has no clusters."""
