@@ -1,5 +1,6 @@
 from django_napse.core.models.bots.plugin import Plugin
-from django_napse.core.models.connections.connection import ConnectionSpecificArgs
+from django_napse.core.models.connections.connection import \
+    ConnectionSpecificArgs
 from django_napse.utils.constants import PLUGIN_CATEGORIES, SIDES
 
 
@@ -24,5 +25,4 @@ class MBPPlugin(Plugin):
         return data
 
     def _connect(self, connection):
-        ConnectionSpecificArgs.objects.create(connection=connection, key="mbp", value="None", target_type="float")
         ConnectionSpecificArgs.objects.create(connection=connection, key="mbp", value="None", target_type="float")
