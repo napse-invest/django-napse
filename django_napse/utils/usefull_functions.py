@@ -5,11 +5,14 @@ from pytz import UTC
 
 
 def calculate_mbp(value: str, current_value: float, order, currencies: dict) -> float:
-    ticker, value = value.split("|")
-    value = value.replace("c", str(order.debited_amount - order.exit_amount_quote))
-    value = value.replace("b", str(current_value if current_value is not None else 0))
-    value = value.replace("a", str(currencies.get(ticker, {"amount": 0})["amount"]))
-    return eval(value)  # noqa S307
+    ticker, price = value.split("|")
+    price = float(price)
+
+    current_amount = currencies.get(ticker, {"amount": 0})["amount"]
+    current_value = current_value if current_value is not None else 0
+    received_quote = order.debited_amount - order.exit_amount_quote
+
+    return (current_amount * current_value + received_quote) / (current_amount / price + current_amount)
 
 
 def process_value_from_type(value, target_type, **kwargs):

@@ -11,7 +11,7 @@ class MBPPlugin(Plugin):
     def _apply(self, data: dict) -> dict:
         order = data["order"]
         if order["side"] == SIDES.BUY:
-            new_mbp = f"{order['controller'].base}|(a * b + c) / (c / {order['price']} + a)"
+            new_mbp = f"{order['controller'].base}|{order['price']}"
             order["ConnectionModifications"] += [
                 {
                     "key": "mbp",
@@ -24,4 +24,5 @@ class MBPPlugin(Plugin):
         return data
 
     def _connect(self, connection):
+        ConnectionSpecificArgs.objects.create(connection=connection, key="mbp", value="None", target_type="float")
         ConnectionSpecificArgs.objects.create(connection=connection, key="mbp", value="None", target_type="float")
