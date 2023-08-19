@@ -49,6 +49,22 @@ class Architecture(models.Model, FindableClass):
             error_msg = f"controllers_dict not implemented for the Architecture base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
 
+    def accepted_tickers(self):  # pragma: no cover
+        if self.__class__ == Architecture:
+            error_msg = "accepted_tickers not implemented for the Architecture base class, please implement it in a subclass."
+        else:
+            error_msg = f"accepted_tickers not implemented for the Architecture base class, please implement it in the {self.__class__} class."
+        raise NotImplementedError(error_msg)
+
+    def accepted_investment_tickers(self):  # pragma: no cover
+        if self.__class__ == Architecture:
+            error_msg = "accepted_investment_tickers not implemented for the Architecture base class, please implement it in a subclass."
+        else:
+            error_msg = (
+                f"accepted_investment_tickers not implemented for the Architecture base class, please implement it in the {self.__class__} class."
+            )
+        raise NotImplementedError(error_msg)
+
     def get_extras(self):
         return {}
 

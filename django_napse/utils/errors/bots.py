@@ -10,6 +10,9 @@ class BotError:
     class BuildNotPossible(Exception):
         """Raised when a bot cannot be built due to bad parameters."""
 
+    class InvalidTicker(Exception):
+        """Raised when a ticker is invalid."""
+
 
 class BotConfigError:
     """Base class for bot config errors."""

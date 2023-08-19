@@ -19,13 +19,6 @@ class CustomEnumMeta(EnumMeta):
         return f"{[cls._member_map_[name].value for name in cls._member_names_]}"
 
 
-class OPERATORS(StrEnum, metaclass=CustomEnumMeta):
-    """The operator for a fleet."""
-
-    EQUILIBRIUM = "EQUILIBRIUM"
-    SPECIFIC_SHARES = "SPECIFIC_SHARES"
-
-
 class EXCHANGES(StrEnum, metaclass=CustomEnumMeta):
     """The exchange for a fleet or a bot."""
 
