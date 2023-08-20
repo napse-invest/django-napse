@@ -1,4 +1,4 @@
-from django_napse.core.models import Order
+# from django_napse.core.models import Order
 from django_napse.core.tasks.base_tasks import BaseTask
 
 
