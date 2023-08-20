@@ -1,3 +1,10 @@
+## [1.6.4](https://github.com/napse-invest/django-napse/compare/v1.6.3...v1.6.4) (2023-08-20)
+
+
+### Bug Fixes
+
+* **pypi:** requirements ([580a918](https://github.com/napse-invest/django-napse/commit/580a918f32a092c1c7847c144fa1e47dab95afae))
+
 ## [1.6.3](https://github.com/napse-invest/django-napse/compare/v1.6.2...v1.6.3) (2023-08-20)
 
 
