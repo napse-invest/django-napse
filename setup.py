@@ -12,7 +12,7 @@ setup(
     author="Napse Invest",
     author_email="napse.invest@gmail.com",
     url="https://github.com/napse-invest/django-napse",
-    download_url="https://github.com/napse-invest/django-napse/archive/refs/tags/v1.4.0.tar.gz",
+    download_url="https://github.com/napse-invest/django-napse/archive/refs/tags/v{{VERSION}}.tar.gz",
     keywords=["Investing", "Django", "Trading"],
     install_requires=[
         "django>=4.2",
