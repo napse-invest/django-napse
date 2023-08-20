@@ -1,3 +1,10 @@
+## [1.6.2](https://github.com/napse-invest/django-napse/compare/v1.6.1...v1.6.2) (2023-08-20)
+
+
+### Bug Fixes
+
+* **ci:** added space ([ca3cb5d](https://github.com/napse-invest/django-napse/commit/ca3cb5d901cc15395e341059caa9f7372a6466be))
+
 ## [1.6.1](https://github.com/napse-invest/django-napse/compare/v1.6.0...v1.6.1) (2023-08-20)
 
 
