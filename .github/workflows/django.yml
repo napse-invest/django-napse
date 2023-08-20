@@ -75,7 +75,7 @@ jobs:
           cd test/test_app
           bash setup_secrets.sh
           cd ../..
-          python3 test/test_app/manage.py makemigrations && python3 test/test_app/manage.py migrate
+          python3 test/test_app/manage.py makemigrations && python3 test/test_app/manage.py migrate 
           coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
 
       - name: Coverage value 
