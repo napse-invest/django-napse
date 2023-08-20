@@ -15,7 +15,17 @@ setup(
     url="https://github.com/napse-invest/django-napse",
     download_url="https://github.com/napse-invest/django-napse/archive/refs/tags/v{{VERSION}}.tar.gz",
     keywords=["Investing", "Django", "Trading"],
-    requires=[],
+    install_requires=[
+        "django>=4.2",
+        "django-environ>=0.10",
+        "django-celery-beat>=2.5",
+        "psycopg2-binary>=2.9",
+        "celery>=5.3",
+        "redis>=4.6",
+        "python-binance>=1",
+        "shortuuid>=1",
+        "pandas>=2",
+    ],
     classifiers=[
         "Development Status :: 4 - Beta",  # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
         "Intended Audience :: Developers",
