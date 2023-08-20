@@ -1,6 +1,5 @@
-from django_napse.core.models import Order
+# from django_napse.core.models import Order
 from django_napse.core.tasks.base_tasks import BaseTask
-from django_napse.utils.trading import OrderProcessor
 
 
 class OrderProcessExecutorTask(BaseTask):
@@ -16,9 +15,8 @@ class OrderProcessExecutorTask(BaseTask):
         if not self.avoid_overlap(verbose=True):
             print("skipped")
             return
-        processor = OrderProcessor()
-        for order in Order.objects.filter(status="pending", completed=True):
-            order = processor.process_order(order)
+        # for order in Order.objects.filter(status="pending", completed=True):
+        #     order = processor.process_order(order)
 
 
 OrderProcessExecutorTask().delete_task()
