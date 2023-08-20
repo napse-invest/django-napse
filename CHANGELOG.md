@@ -1,3 +1,10 @@
+## [1.6.5](https://github.com/napse-invest/django-napse/compare/v1.6.4...v1.6.5) (2023-08-20)
+
+
+### Bug Fixes
+
+* **pypi:** added utils ([161c5ed](https://github.com/napse-invest/django-napse/commit/161c5edfb4e827eafba3ba3ca6da12af3aafef9e))
+
 ## [1.6.4](https://github.com/napse-invest/django-napse/compare/v1.6.3...v1.6.4) (2023-08-20)
 
 
