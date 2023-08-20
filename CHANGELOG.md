@@ -1,3 +1,10 @@
+## [1.6.3](https://github.com/napse-invest/django-napse/compare/v1.6.2...v1.6.3) (2023-08-20)
+
+
+### Bug Fixes
+
+* **pypi:** adding modules ([91d36e6](https://github.com/napse-invest/django-napse/commit/91d36e69ff23eba7525fc0d49ac9574e24b749a6))
+
 ## [1.6.2](https://github.com/napse-invest/django-napse/compare/v1.6.1...v1.6.2) (2023-08-20)
 
 
