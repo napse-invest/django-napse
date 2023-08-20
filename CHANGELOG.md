@@ -1,3 +1,19 @@
+# [1.6.0](https://github.com/napse-invest/django-napse/compare/v1.5.2...v1.6.0) (2023-08-20)
+
+
+### Bug Fixes
+
+* **mbp-and-ruff:** fixed to remove eval ([341c5cc](https://github.com/napse-invest/django-napse/commit/341c5ccb32f8524da17febf78d59813d96134663))
+* **mbp:** duplicate line because of isort ([6348c4b](https://github.com/napse-invest/django-napse/commit/6348c4b2e8983a593738826d0bd542ba2c7b64ff))
+* **mbp:** removed eval ([7b4aa76](https://github.com/napse-invest/django-napse/commit/7b4aa765e038a93c66c3d46e648d0f5a9593680f))
+* **ruff:** added RUF012 back ([b3ea928](https://github.com/napse-invest/django-napse/commit/b3ea928514f5dc4a602b38f892a534f1cd8a343c))
+* **ruff:** isort ([fbac244](https://github.com/napse-invest/django-napse/commit/fbac244f30cd75fdfd5d32778020e6a81e6a3d94))
+
+
+### Features
+
+* **fleet:** implemented and tested ([7f8873e](https://github.com/napse-invest/django-napse/commit/7f8873ece6be015094b47771ed7ed06a06f47960))
+
 ## [1.5.2](https://github.com/napse-invest/django-napse/compare/v1.5.1...v1.5.2) (2023-08-16)
 
 
