@@ -43,9 +43,9 @@ class SimulationQueueTestCase:
         simulation_queue = self.simple_create()
         simulation_queue.run_quick_simulation().info()
 
-    # def test_irl_simulation(self):
-    #     simulation_queue = self.simple_create()
-    #     simulation_queue.run_irl_simulation().info()
+    def test_irl_simulation(self):
+        simulation_queue = self.simple_create()
+        simulation_queue.run_irl_simulation().info()
 
 
 class SimulationQueueBINANCETestCase(SimulationQueueTestCase, ModelTestCase):

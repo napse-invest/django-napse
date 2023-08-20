@@ -1,3 +1,7 @@
+[tool.isort]
+py_version=311
+
+
 [tool.ruff]
 
 # Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.

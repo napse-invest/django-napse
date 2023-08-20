@@ -19,6 +19,24 @@ class Fleet(models.Model):
     def __str__(self):
         return f"FLEET: {self.pk=}, name={self.name}"
 
+    def info(self, verbose=True, beacon=""):
+        string = ""
+        string += f"{beacon}Fleet {self.pk}:\n"
+        string += f"{beacon}Args:\n"
+        string += f"{beacon}\t{self.name=}\n"
+        string += f"{beacon}\t{self.exchange_account=}\n"
+        string += f"{beacon}\t{self.running=}\n"
+        string += f"{beacon}\t{self.setup_finished=}\n"
+
+        string += f"{beacon}Clusters:\n"
+        new_beacon = beacon + "\t"
+        for cluster in self.clusters.all():
+            string += f"{beacon}{cluster.info(verbose=False, beacon=new_beacon)}\n"
+
+        if verbose:  # pragma: no cover
+            print(string)
+        return string
+
     @property
     def testing(self):
         return self.exchange_account.testing
@@ -33,53 +51,8 @@ class Fleet(models.Model):
             bot_clusters.append(Bot.objects.filter(link__cluster=cluster))
         return bot_clusters
 
-
-class DefaultFleetOperator(models.Model):
-    fleet = models.OneToOneField("Fleet", on_delete=models.CASCADE, related_name="operator")
-
-    def __str__(self) -> str:
-        return f"DEFAULT_FLEET_OPERATOR: {self.pk=}, fleet__name={self.fleet.name}"
-
-
-class EquilibriumFleetOperator(DefaultFleetOperator):
-    pass
-
-
-class SpecificSharesFleetOperator(DefaultFleetOperator):
-    pass
-
-
-class SpecificShare(models.Model):
-    cluster = models.OneToOneField("Cluster", on_delete=models.CASCADE, related_name="specific_shares")
-    operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_shares")
-    share = models.FloatField()
-
-    class Meta:
-        unique_together = ("cluster", "operator")
-
-    def __str__(self) -> str:
-        return f"SPECIFIC_SHARE: {self.pk=}, operator={self.operator}, share={self.share}"
-
-
-class SpecificBreakPoint(models.Model):
-    cluster = models.OneToOneField("Cluster", on_delete=models.CASCADE, related_name="specific_breakpoints")
-    operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_breakpoints")
-    scale_up_breakpoint = models.FloatField()
-
-    class Meta:
-        unique_together = ("cluster", "operator")
-
-    def __str__(self) -> str:
-        return f"SPECIFIC_BREAKPOINT: {self.pk=}, operator={self.operator}, scale_up_breakpoint={self.scale_up_breakpoint}"
-
-
-class SpecificAutoscale(models.Model):
-    cluster = models.OneToOneField("Cluster", on_delete=models.CASCADE, related_name="specific_autoscales")
-    operator = models.ForeignKey(DefaultFleetOperator, on_delete=models.CASCADE, related_name="specific_autoscales")
-    autoscale = models.BooleanField(default=True)
-
-    class Meta:
-        unique_together = ("cluster", "operator")
-
-    def __str__(self) -> str:
-        return f"SPECIFIC_AUTOSCALE: {self.pk=}, operator={self.operator}, autoscale={self.autoscale}"
+    def invest(self, space, amount, ticker):
+        connections = []
+        for cluster in self.clusters.all():
+            connections += cluster.invest(space, amount * cluster.share, ticker)
+        return connections

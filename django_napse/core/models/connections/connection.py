@@ -30,7 +30,7 @@ class Connection(models.Model):
 
         string += f"{beacon}Wallet:\n"
         new_beacon = beacon + "\t"
-        string += f"{beacon}\t{self.wallet.info(verbose=False, beacon=new_beacon)}\n"
+        string += f"{self.wallet.info(verbose=False, beacon=new_beacon)}\n"
 
         string += f"{beacon}ConnectionSpecificArgs:\n"
         query = self.specific_args.all()
@@ -38,7 +38,7 @@ class Connection(models.Model):
             string += f"{beacon}\tNone\n"
         else:
             for connection_specific_arg in query:
-                string += f"{beacon}\t{connection_specific_arg.info(verbose=False, beacon=new_beacon)}\n"
+                string += f"{connection_specific_arg.info(verbose=False, beacon=new_beacon)}\n"
 
         if verbose:  # pragma: no cover
             print(string)
