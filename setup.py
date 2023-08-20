@@ -1,10 +1,11 @@
 from distutils.core import setup
 
-# from setuptools import setup
+from setuptools import find_packages
 
+print(find_packages(exclude=["test", "test.*"]))
 setup(
     name="django-napse",
-    packages=["django_napse"],
+    packages=find_packages(exclude=["test", "test.*"]),
     version="{{VERSION}}",
     license="MIT",
     description="The heart and brains of the Napse Invest platform.",
@@ -14,17 +15,7 @@ setup(
     url="https://github.com/napse-invest/django-napse",
     download_url="https://github.com/napse-invest/django-napse/archive/refs/tags/v{{VERSION}}.tar.gz",
     keywords=["Investing", "Django", "Trading"],
-    install_requires=[
-        "django>=4.2",
-        "django-environ>=0.10",
-        "django-celery-beat>=2.5",
-        "psycopg2-binary>=2.9",
-        "celery>=5.3",
-        "redis>=4.6",
-        "python-binance>=1",
-        "shortuuid>=1",
-        "pandas>=2",
-    ],
+    requires=[],
     classifiers=[
         "Development Status :: 4 - Beta",  # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"
         "Intended Audience :: Developers",
