@@ -1,3 +1,13 @@
+## [1.6.1](https://github.com/napse-invest/django-napse/compare/v1.6.0...v1.6.1) (2023-08-20)
+
+
+### Bug Fixes
+
+* **ci:** pypi ([4ccc241](https://github.com/napse-invest/django-napse/commit/4ccc2410457e5337fb15517b3d824f4a031146cd))
+* **ci:** tables missing ([aa98201](https://github.com/napse-invest/django-napse/commit/aa9820111dc8062a573beefe032f5e452d953753))
+* **ruff:** unused import ([759d5a9](https://github.com/napse-invest/django-napse/commit/759d5a9e1223ca21f6a87b74ecf228e435811b41))
+* **test:** failing test ([c30f705](https://github.com/napse-invest/django-napse/commit/c30f705683d5caee8157d6902b586c5ce88aec65))
+
 # [1.6.0](https://github.com/napse-invest/django-napse/compare/v1.5.2...v1.6.0) (2023-08-20)
 
 
