@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="./branding/napse_white.svg" width=500/>
+<img src="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/napse_white.svg" width=500/>
 </h1><br>
 
 <p align="center">
