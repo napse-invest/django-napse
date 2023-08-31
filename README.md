@@ -14,8 +14,7 @@
     <img src="https://img.shields.io/twitter/follow/NapseInvest?style=flat&label=%40NapseInvest&logo=twitter&color=0bf&logoColor=fff" alt="Twitter" />
   </a>
   <a>  
-    <img src="https://img.shields.io/discord/996867961157591081?style=flat&logo=discord&label=Napse%20Invest&link=https%3A%2F%2Fdiscord.gg%2FZkzc2V5KXB
-" alt="Discord" />
+    <img src="https://img.shields.io/discord/996867961157591081?style=flat&logo=discord&label=Napse%20Invest&link=https%3A%2F%2Fdiscord.gg%2FZkzc2V5KXB" alt="Discord" />
   </a>
 </p>
 
