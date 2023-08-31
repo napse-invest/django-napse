@@ -21,6 +21,7 @@
 <p align="center">
   <a href="#django-napse"><strong>Django Napse</strong></a> ·
   <a href="#usefull-commands"><strong>Usefull commands</strong></a>
+  <a href="#how-to-contribute"><strong>How to contribute</strong></a>
 </p>
 <br/>
 
@@ -56,3 +57,7 @@ Unless otherwise specified, all commands are to be run at the root folder of the
 ### Run coverage tests
 
 ```coverage run test/test_app/manage.py test -v2 --keepdb && coverage html && open ~/<path_to_project>/django-napse/htmlcov/index.html```
+
+## How to contribute
+
+...
