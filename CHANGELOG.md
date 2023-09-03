@@ -1,3 +1,14 @@
+## [1.6.6](https://github.com/napse-invest/django-napse/compare/v1.6.5...v1.6.6) (2023-09-03)
+
+
+### Bug Fixes
+
+* celery to 5.3.1 ([7c997da](https://github.com/napse-invest/django-napse/commit/7c997dada6e138134a029057abba2bf572b6d072))
+* **celery:** fix task name ([72becf3](https://github.com/napse-invest/django-napse/commit/72becf34b7b5e86d91de22a54bef65c5770a7367))
+* **celery:** import tasks ([c80fb7a](https://github.com/napse-invest/django-napse/commit/c80fb7ae6d3ae4dc02e94fa79103446834f33f4e))
+* **celery:** reverted imports ([514ef02](https://github.com/napse-invest/django-napse/commit/514ef027d33ea985eee4c0d1f22f6346ed54cd2b))
+* **celery:** version bumped down to 5.3.1 ([1c7b66d](https://github.com/napse-invest/django-napse/commit/1c7b66d39d4697649b309b9d178a9a9daa1b87cb))
+
 ## [1.6.5](https://github.com/napse-invest/django-napse/compare/v1.6.4...v1.6.5) (2023-08-20)
 
 
