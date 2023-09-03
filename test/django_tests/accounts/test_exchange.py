@@ -1,8 +1,6 @@
 import json
 from unittest import skipIf
 
-from django.conf import settings
-
 from django_napse.core.models import BinanceAccount, Exchange, ExchangeAccount
 from django_napse.core.settings import napse_settings
 from django_napse.utils.errors import ExchangeAccountError
@@ -24,13 +22,13 @@ class ExchangeTestCase(ModelTestCase):
         )
 
     def test_default_exchanges(self):
-        base_configs = settings.NAPSE_EXCHANGE_CONFIGS
+        base_configs = napse_settings.NAPSE_EXCHANGE_CONFIGS
         all_exchanges = Exchange.objects.all()
 
         self.assertEqual([exchange.name for exchange in all_exchanges], list(base_configs.keys()))
 
     def test_default_exchange_accounts(self):
-        with open(settings.NAPSE_SECRETS_FILE_PATH, "r") as json_file:
+        with open(napse_settings.NAPSE_SECRETS_FILE_PATH, "r") as json_file:
             secrets = json.load(json_file)
         for exchange_id, exchange_secrets in secrets["Exchange Accounts"].items():
             exchange_name = exchange_secrets.pop("exchange")
