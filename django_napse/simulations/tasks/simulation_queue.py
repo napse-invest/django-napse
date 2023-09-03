@@ -3,8 +3,8 @@ from django_napse.simulations.models import BotSimQueue
 from django_napse.utils.errors import SimulationError
 
 
-class BotSimQueueTask(BaseTask):
-    name = "sim_queue"
+class SimulationQueueTask(BaseTask):
+    name = "simulation_queue"
     interval_time = 5
     time_limit = 60 * 60
     soft_time_limit = 60 * 60
@@ -44,5 +44,5 @@ class BotSimQueueTask(BaseTask):
             raise SimulationError.BotSimQueueError(error_msg)
 
 
-BotSimQueueTask().delete_task()
-BotSimQueueTask().register_task()
+SimulationQueueTask().delete_task()
+SimulationQueueTask().register_task()
