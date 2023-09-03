@@ -1,5 +1,5 @@
 from django_napse.core.tasks import BaseTask
-from django_napse.simulations.models import BotSimQueue
+from django_napse.simulations.models import SimulationQueue
 from django_napse.utils.errors import SimulationError
 
 
@@ -16,7 +16,7 @@ class SimulationQueueTask(BaseTask):
         """
         if not self.avoid_overlap(verbose=True):
             return
-        queue = BotSimQueue.objects.filter(error=False).order_by("created_at").first()
+        queue = SimulationQueue.objects.filter(error=False).order_by("created_at").first()
 
         if queue is None:
             return
@@ -24,7 +24,7 @@ class SimulationQueueTask(BaseTask):
             return
         try:
             queue.run_quicksim()
-            queue = BotSimQueue.objects.get(simulation_reference=queue.simulation_reference)
+            queue = SimulationQueue.objects.get(simulation_reference=queue.simulation_reference)
         except SimulationError.CancelledSimulationError:
             print("BotSimQueueTask: cancelled")
             queue.delete()
