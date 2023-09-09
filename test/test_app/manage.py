@@ -2,8 +2,9 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+from pathlib import Path
 
-sys.path.append("../../")
+sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent))
 
 
 def main():
