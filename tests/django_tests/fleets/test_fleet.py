@@ -59,11 +59,3 @@ class FleetTestCase:
 
 class FleetBINANCETestCase(FleetTestCase, ModelTestCase):
     exchange = "BINANCE"
-
-
-class FleetBINANCETestCase(FleetTestCase, ModelTestCase):
-    exchange = "BINANCE"
-
-
-class FleetBINANCETestCase(FleetTestCase, ModelTestCase):
-    exchange = "BINANCE"

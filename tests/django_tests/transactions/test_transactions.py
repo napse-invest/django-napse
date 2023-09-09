@@ -76,5 +76,3 @@ class TransactionTestCase:
 
 class TransactionBINANCETestCase(TransactionTestCase, ModelTestCase):
     exchange = "BINANCE"
-    exchange = "BINANCE"
-    exchange = "BINANCE"

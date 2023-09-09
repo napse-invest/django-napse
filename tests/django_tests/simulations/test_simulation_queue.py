@@ -50,11 +50,3 @@ class SimulationQueueTestCase:
 
 class SimulationQueueBINANCETestCase(SimulationQueueTestCase, ModelTestCase):
     exchange = "BINANCE"
-
-
-class SimulationQueueBINANCETestCase(SimulationQueueTestCase, ModelTestCase):
-    exchange = "BINANCE"
-
-
-class SimulationQueueBINANCETestCase(SimulationQueueTestCase, ModelTestCase):
-    exchange = "BINANCE"

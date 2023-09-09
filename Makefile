@@ -1,5 +1,11 @@
 SHELL := /bin/bash
 
+makemigrations:
+	source .venv/bin/activate && python tests/test_app/manage.py makemigrations
+
+migrate:
+	source .venv/bin/activate && python tests/test_app/manage.py migrate
+
 runserver:
 	source .venv/bin/activate && python tests/test_app/manage.py runserver
 

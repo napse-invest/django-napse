@@ -114,5 +114,3 @@ class SimulationTestCase:
 
 class SimulationBINANCETestCase(SimulationTestCase, ModelTestCase):
     exchange = "BINANCE"
-    exchange = "BINANCE"
-    exchange = "BINANCE"

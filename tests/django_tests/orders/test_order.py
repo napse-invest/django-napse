@@ -37,11 +37,3 @@ class OrderTestCase:
 
 class OrderBINANCETestCase(OrderTestCase, ModelTestCase):
     exchange = "BINANCE"
-
-
-class OrderBINANCETestCase(OrderTestCase, ModelTestCase):
-    exchange = "BINANCE"
-
-
-class OrderBINANCETestCase(OrderTestCase, ModelTestCase):
-    exchange = "BINANCE"
