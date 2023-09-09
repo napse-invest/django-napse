@@ -1,3 +1,20 @@
+# [1.7.0](https://github.com/napse-invest/django-napse/compare/v1.6.6...v1.7.0) (2023-09-09)
+
+
+### Bug Fixes
+
+* **doublon:** doublon on save ([6e2c7f1](https://github.com/napse-invest/django-napse/commit/6e2c7f1b9b9184667d44216eb6cffbe28ed30d3b))
+* makefile ([c150640](https://github.com/napse-invest/django-napse/commit/c15064013ca49ed82fb9c586aef20fdefc25fea7))
+* **manage.py:** python path ([ba0ea46](https://github.com/napse-invest/django-napse/commit/ba0ea46c5921e1570b6357186cd11d1295a6b1eb))
+* **names:** fix test folder name (tests) and fix space' fleet property ([c599420](https://github.com/napse-invest/django-napse/commit/c599420fa805761ddd80e30641379604109d619f))
+* **readme:** update readme with make command ([88edcd6](https://github.com/napse-invest/django-napse/commit/88edcd6012a0536fae606052ad38949b5789aa14))
+
+
+### Features
+
+* **bridge:** add fleets property ([e72f7e0](https://github.com/napse-invest/django-napse/commit/e72f7e06b42dec4f19926d3ce6ba5284ae122c53))
+* **space:** add value property ([89fda45](https://github.com/napse-invest/django-napse/commit/89fda453841cf24bcc73ad72bed9978e34dcf71f))
+
 ## [1.6.6](https://github.com/napse-invest/django-napse/compare/v1.6.5...v1.6.6) (2023-09-03)
 
 
