@@ -35,10 +35,18 @@ Unless otherwise specified, all commands are to be run at the root folder of the
 
 ### Run a test version of the project
 
-```python test/test_app/manage.py makemigrations``` \
-```python test/test_app/manage.py migrate``` \
-```python test/test_app/manage.py runserver```
+- Build migrations \
+```make makemigrations```
+- Apply migrations \
+```make migrate``` 
+- Run server \
+```make runserver```
 
 ### Run coverage tests
 
-```coverage run test/test_app/manage.py test -v2 --keepdb && coverage html && open ~/<path_to_project>/django-napse/htmlcov/index.html```
+- Run tests \
+```test-napse```
+- Run tests with coverage \
+```coverage```
+- Run tests with coverage and open coverage report \
+```coverage-open```
