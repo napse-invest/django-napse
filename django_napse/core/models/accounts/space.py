@@ -1,6 +1,7 @@
 from django.db import models
 
 from django_napse.core.models.accounts.managers import NapseSpaceManager
+from django_napse.core.models.fleets.fleet import Fleet
 
 
 class NapseSpace(models.Model):
@@ -45,6 +46,4 @@ class NapseSpace(models.Model):
     @property
     def fleets(self) -> models.QuerySet:
         connections = self.wallet.connections.all()
-        for elt in connections.select_related("bot"):
-            print(elt)
-        return connections.select_related("bot").select_related("link").select_related("cluster").select_related("fleet")
+        return Fleet.objects.filter(clusters__links__bot__connections__in=connections).distinct()

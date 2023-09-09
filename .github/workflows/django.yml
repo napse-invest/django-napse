@@ -72,11 +72,11 @@ jobs:
         run: |
           export PYTHONPATH="$PYTHONPATH:./django-napse/"
           export NAPSE_IS_IN_PIPELINE=True
-          cd test/test_app
+          cd tests/test_app
           bash setup_secrets.sh
           cd ../..
-          python3 test/test_app/manage.py makemigrations && python3 test/test_app/manage.py migrate 
-          coverage run ./test/test_app/manage.py test -v2 --keepdb && coverage html
+          python3 tests/test_app/manage.py makemigrations && python3 tests/test_app/manage.py migrate 
+          coverage run ./tests/test_app/manage.py test -v2 --keepdb && coverage html
 
       - name: Coverage value 
         run: |
