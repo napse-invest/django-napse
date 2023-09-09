@@ -45,4 +45,6 @@ class NapseSpace(models.Model):
     @property
     def fleets(self) -> models.QuerySet:
         connections = self.wallet.connections.all()
+        for elt in connections.select_related("bot"):
+            print(elt)
         return connections.select_related("bot").select_related("link").select_related("cluster").select_related("fleet")
