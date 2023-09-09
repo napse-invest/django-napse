@@ -41,3 +41,8 @@ class NapseSpace(models.Model):
     def value(self) -> float:
         connections = self.wallet.connections.all()
         return sum([connection.wallet.value_market() for connection in connections])
+
+    @property
+    def fleets(self) -> models.QuerySet:
+        connections = self.wallet.connections.all()
+        return connections.select_related("bot").select_related("link").select_related("cluster").select_related("fleet")
