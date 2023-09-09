@@ -64,5 +64,3 @@ class PluginDefaultTestCase:
         )
 
         simulation_queue.run_quick_simulation()
-        simulation_queue.run_quick_simulation()
-        simulation_queue.run_quick_simulation()
