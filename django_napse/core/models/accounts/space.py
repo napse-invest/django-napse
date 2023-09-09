@@ -1,6 +1,7 @@
 from django.db import models
 
 from django_napse.core.models.accounts.managers import NapseSpaceManager
+from django_napse.core.models.fleets.fleet import Fleet
 
 
 class NapseSpace(models.Model):
@@ -36,3 +37,13 @@ class NapseSpace(models.Model):
     @property
     def testing(self):
         return self.exchange_account.testing
+
+    @property
+    def value(self) -> float:
+        connections = self.wallet.connections.all()
+        return sum([connection.wallet.value_market() for connection in connections])
+
+    @property
+    def fleets(self) -> models.QuerySet:
+        connections = self.wallet.connections.all()
+        return Fleet.objects.filter(clusters__links__bot__connections__in=connections).distinct()
