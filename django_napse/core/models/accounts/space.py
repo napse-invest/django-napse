@@ -36,3 +36,8 @@ class NapseSpace(models.Model):
     @property
     def testing(self):
         return self.exchange_account.testing
+
+    @property
+    def value(self) -> float:
+        connections = self.wallet.connections.all()
+        return sum([connection.wallet.value_market() for connection in connections])
