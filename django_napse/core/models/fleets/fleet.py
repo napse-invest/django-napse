@@ -59,12 +59,6 @@ class Fleet(models.Model):
         commun_connections = space_connections.intersection(fleet_connections)
         return sum([connection.wallet.value_market() for connection in commun_connections])
 
-    def bot_clusters(self):
-        bot_clusters = []
-        for cluster in self.clusters.all():
-            bot_clusters.append(Bot.objects.filter(link__cluster=cluster))
-        return bot_clusters
-
     def invest(self, space, amount, ticker):
         connections = []
         for cluster in self.clusters.all():
