@@ -1,4 +1,4 @@
-from django_napse.core.models import Bot, Controller, Credit, EmptyBotConfig, EmptyStrategy, Fleet, SinglePairArchitecture
+from django_napse.core.models import Bot, Controller, Credit, EmptyBotConfig, EmptyStrategy, Fleet, NapseSpace, SinglePairArchitecture
 from django_napse.utils.model_test_case import ModelTestCase
 
 """
@@ -55,6 +55,38 @@ class FleetTestCase:
         self.assertEqual(self.space.wallet.get_amount("USDT"), 0)
         self.assertEqual(connections[0].wallet.get_amount("USDT"), 1400)
         self.assertEqual(connections[1].wallet.get_amount("USDT"), 600)
+
+    def _two_spaces_on_same_fleet(self):
+        fleet = self.simple_create()
+
+        space = NapseSpace.objects.create(name="Random Space", exchange_account=self.exchange_account, description="This is a test space")
+        Credit.objects.create(wallet=space.wallet, amount=2000, ticker="USDT")
+        fleet.invest(space, 1000, "USDT")
+
+        Credit.objects.create(wallet=self.space.wallet, amount=2000, ticker="USDT")
+        fleet.invest(self.space, 1000, "USDT")
+
+        return fleet
+
+    def test_value(self):
+        Credit.objects.create(wallet=self.space.wallet, amount=1000, ticker="USDT")
+        fleet = self.simple_create()
+        fleet.invest(self.space, 1000, "USDT")
+        self.assertEqual(fleet.value, 1000)
+
+    def test_value_with_two_spaces(self):
+        fleet = self._two_spaces_on_same_fleet()
+        self.assertEqual(fleet.value, 2000)
+
+    def test_space_frame_value(self):
+        Credit.objects.create(wallet=self.space.wallet, amount=1000, ticker="USDT")
+        fleet = self.simple_create()
+        fleet.invest(self.space, 1000, "USDT")
+        self.assertEqual(fleet.space_frame_value(self.space), 1000)
+
+    def test_space_frame_value_with_two_spaces(self):
+        fleet = self._two_spaces_on_same_fleet()
+        self.assertEqual(fleet.space_frame_value(self.space), 1000)
 
 
 class FleetBINANCETestCase(FleetTestCase, ModelTestCase):
