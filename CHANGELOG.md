@@ -1,3 +1,10 @@
+## [1.7.1](https://github.com/napse-invest/django-napse/compare/v1.7.0...v1.7.1) (2023-09-10)
+
+
+### Bug Fixes
+
+* **fleet:** add values bridges ([28ebc4e](https://github.com/napse-invest/django-napse/commit/28ebc4e27a2cdeb500fcf402b45ba3604a395d30))
+
 # [1.7.0](https://github.com/napse-invest/django-napse/compare/v1.6.6...v1.7.0) (2023-09-09)
 
 
