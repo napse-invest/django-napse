@@ -59,7 +59,8 @@ class Cluster(models.Model):
         if len(bots) == 0:
             new_bot = self.bot.copy()
             Link.objects.create(bot=new_bot, cluster=self, importance=1)
-            connection = Connection.objects.create(bot=new_bot, owner=space.wallet)
+            # connection = Connection.objects.create(bot=new_bot, owner=space.wallet)
+            connection = space.wallet.connect_to(new_bot)
             Transaction.objects.create(
                 from_wallet=space.wallet,
                 to_wallet=connection.wallet,
@@ -76,7 +77,8 @@ class Cluster(models.Model):
             try:
                 connection = Connection.objects.get(bot=bot, owner=space.wallet)
             except Connection.DoesNotExist:
-                connection = Connection.objects.create(bot=bot, owner=space.wallet)
+                # connection = Connection.objects.create(bot=bot, owner=sace.wallet)
+                connection = space.wallet.connect_to(bot)
             Transaction.objects.create(
                 from_wallet=space.wallet,
                 to_wallet=connection.wallet,

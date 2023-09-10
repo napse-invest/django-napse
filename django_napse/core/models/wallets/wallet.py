@@ -179,7 +179,7 @@ class SpaceWallet(Wallet):
         return self.space.exchange_account.find()
 
     def connect_to(self, bot):
-        return Connection.objects.create(wallet=self, bot=bot)
+        return Connection.objects.create(owner=self, bot=bot)
 
 
 class SpaceSimulationWallet(Wallet):
@@ -201,7 +201,7 @@ class SpaceSimulationWallet(Wallet):
         self.currencies.all().delete()
 
     def connect_to(self, bot):
-        return Connection.objects.create(wallet=self, bot=bot)
+        return Connection.objects.create(owner=self, bot=bot)
 
 
 class OrderWallet(Wallet):
