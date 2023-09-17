@@ -7,7 +7,6 @@ class Credit(models.Model):
     wallet = models.ForeignKey("Wallet", on_delete=models.CASCADE, related_name="credits")
     amount = models.FloatField()
     ticker = models.CharField(max_length=10)
-
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = CreditManager()
