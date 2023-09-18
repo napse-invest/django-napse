@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/napse-invest/django-napse/compare/v1.7.1...v1.8.0) (2023-09-18)
+
+
+### Features
+
+* **api:** migrated api from dtk to djn ([01a9e1c](https://github.com/napse-invest/django-napse/commit/01a9e1c3731f5a233b79e8a8d4d3ac5a321650aa))
+
 ## [1.7.1](https://github.com/napse-invest/django-napse/compare/v1.7.0...v1.7.1) (2023-09-10)
 
 
