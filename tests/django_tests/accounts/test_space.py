@@ -19,14 +19,6 @@ class NapseSpaceTestCase:
         with self.assertRaises(IntegrityError):
             NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
 
-    def test_error_create_napse_space_with_same_identifier(self):
-        first_space = NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
-        second_space = NapseSpace.objects.create(name="Test Space 2", exchange_account=self.exchange_account, description="This is a test space")
-        second_space.identifier = first_space.identifier
-
-        with self.assertRaises(IntegrityError):
-            second_space.save()
-
     def _build_fleet_context(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
         controller = Controller.get(

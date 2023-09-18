@@ -29,11 +29,19 @@ class DjangoNapseSettings:
 
     @property
     def NAPSE_SECRETS_FILE_PATH(self):
-        return getattr(settings, "NAPSE_SECRETS_FILE_PATH", "secrets.json")
+        return settings.NAPSE_SECRETS_FILE_PATH
+
+    @property
+    def NAPSE_ENV_FILE_PATH(self):
+        return settings.NAPSE_ENV_FILE_PATH
 
     @property
     def NAPSE_EXCHANGES_TO_TEST(self):
         return getattr(settings, "NAPSE_EXCHANGES_TO_TEST", ["BINANCE"])
+
+    @property
+    def NAPSE_MASTER_KEY(self):
+        return getattr(settings, "NAPSE_MASTER_KEY", "insecure_master_key")
 
 
 napse_settings = DjangoNapseSettings()
@@ -43,17 +51,28 @@ if settings.configured:
         settings.INSTALLED_APPS += ("django_celery_beat",)
 
     if "NAPSE_SECRETS_FILE_PATH" not in settings.__dir__():
-        error_msg = "NAPSE_SECRETS_FILE_PATH not found in settings. Please add it to your settings file."
-        raise NapseError.SettingsError(error_msg)
-    else:
-        try:
-            with open(settings.NAPSE_SECRETS_FILE_PATH) as secrets_file:
-                secrets = json.load(secrets_file)
-        except FileNotFoundError:
-            warning = f"WARNING: No secrets file found at {settings.NAPSE_SECRETS_FILE_PATH}. Creating one now."
-            logger.warning(warning)
-            with open(settings.NAPSE_SECRETS_FILE_PATH, "w") as secrets_file:
-                json.dump({"Exchange Accounts": {}}, secrets_file)
+        warning = "NAPSE_SECRETS_FILE_PATH not found in settings. Please add it to your settings file."
+        logger.warning(warning)
+    try:
+        with open(napse_settings.NAPSE_SECRETS_FILE_PATH) as secrets_file:
+            secrets = json.load(secrets_file)
+    except FileNotFoundError:
+        warning = f"WARNING: No secrets file found at {napse_settings.NAPSE_SECRETS_FILE_PATH}. Creating one now."
+        logger.warning(warning)
+        with open(napse_settings.NAPSE_SECRETS_FILE_PATH, "w") as secrets_file:
+            json.dump({"Exchange Accounts": {}}, secrets_file)
+
+    if "NAPSE_ENV_FILE_PATH" not in settings.__dir__():
+        warning = "NAPSE_ENV_FILE_PATH not found in settings. Please add it to your settings file."
+        logger.warning(warning)
+    try:
+        with open(napse_settings.NAPSE_ENV_FILE_PATH) as env_file:
+            pass
+    except FileNotFoundError:
+        warning = f"WARNING: No env file found at {napse_settings.NAPSE_ENV_FILE_PATH}. Creating one now."
+        logger.warning(warning)
+        with open(napse_settings.NAPSE_ENV_FILE_PATH, "w") as env_file:
+            env_file.write("")
 
     if {*list(napse_settings.NAPSE_EXCHANGE_CONFIGS.keys())} != set(EXCHANGES):
         error_msg = "NAPSE_EXCHANGE_CONFIGS does not match the list of exchanges. Can't start the server."

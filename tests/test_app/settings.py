@@ -38,9 +38,12 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Utils
+    "django_extensions",
     # Napse
     "django_napse.core",
     "django_napse.simulations",
+    "django_napse.auth",
     # Required
     "django_celery_beat",
 ]
@@ -132,13 +135,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Napse settings
 
-# NAPSE_EXCHANGE_CONFIGS = {
-#     "BINANCE": {
-#         "description": "Binance exchange. More info: https://www.binance.com/en",
-#     },
-# }
-
 NAPSE_SECRETS_FILE_PATH = BASE_DIR / "secrets.json"
+NAPSE_ENV_FILE_PATH = BASE_DIR / ".env"
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 DEBUG = True

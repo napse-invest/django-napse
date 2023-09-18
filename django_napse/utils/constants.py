@@ -73,6 +73,13 @@ class PLUGIN_CATEGORIES(StrEnum, metaclass=CustomEnumMeta):
     POST_ORDER = "POST_ORDER"
 
 
+class PERMISSION_TYPES(StrEnum, metaclass=CustomEnumMeta):
+    """The permission type for a key."""
+
+    FULL_ACCESS = "FULL_ACCESS"
+    NO_ACCESS = "NO_ACCESS"
+
+
 ORDER_LEEWAY_PERCENTAGE = 10
 
 DEFAULT_TAX = {

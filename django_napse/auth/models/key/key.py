@@ -1,10 +1,10 @@
 from django.db import models
 
-from django_napse.core.models.authorizations.managers import NapseAPIKeyManager
+from django_napse.auth.models.key.managers import NapseAPIKeyManager
 
 
 class NapseAPIKey(models.Model):
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
     description = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
