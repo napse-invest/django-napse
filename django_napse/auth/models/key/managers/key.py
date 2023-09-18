@@ -15,5 +15,5 @@ class NapseAPIKeyManager(models.Manager):
                 break
         else:
             error_msg = f"Unable to generate a unique API key for the space {name}"
-            raise NapseError.NapseRandomGenrationError(error_msg)
+            raise NapseError.RandomGenrationError(error_msg)
         return super().create(name=name, description=description, napse_API_key=napse_API_key)
