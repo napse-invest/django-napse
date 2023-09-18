@@ -17,9 +17,13 @@ Including another URLconf
 
 """
 
+from django.conf.urls import include
 from django.contrib import admin
 from django.urls import path
 
+from django_napse.api.api_urls import main_api_router
+
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/", include(main_api_router.urls), name="api"),
 ]
