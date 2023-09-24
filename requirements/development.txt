@@ -6,3 +6,5 @@ coverage==7.3.1  # https://github.com/nedbat/coveragepy
 watchfiles==0.20.0  # https://github.com/samuelcolvin/watchfiles
 Werkzeug==2.3.7 # https://github.com/pallets/werkzeug
 django-extensions==3.2.3  # https://github.com/django-extensions/django-extensions
+
+mkdocs-material==9.4.1 # https://github.com/squidfunk/mkdocs-material
