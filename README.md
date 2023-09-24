@@ -16,7 +16,8 @@
 
 <p align="center">
   <a href="#django-napse"><strong>Django Napse</strong></a> ·
-  <a href="#usefull-commands"><strong>Usefull commands</strong></a>
+  <a href="#usefull-commands"><strong>Usefull commands</strong></a> .
+  <a href="#how-to-contribute"><strong>How to contribute</strong></a>
 </p>
 <br/>
 
