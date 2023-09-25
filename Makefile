@@ -31,4 +31,4 @@ coverage-open:
 	source .venv/bin/activate && coverage run tests/test_app/manage.py test -v2 --keepdb && coverage html && coverage report && open htmlcov/index.html
 
 mkdocs:
-	source .venv/bin/activate && mkdocs serve
+	source .venv/bin/activate && mkdocs serve --dev-addr=0.0.0.0:8005

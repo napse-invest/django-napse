@@ -1,5 +1,11 @@
 <h1 align="center">
-<img src="./branding/napse_white.svg" width=500/>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/NapseInvestLogoSVGWhite.svg">
+  <source media="(prefers-color-scheme: light)" srcset="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/NapseInvestLogoSVG.svg">
+  <img alt="Napse's logo" src="" width=500>
+</picture>
+
+<!-- <img src="./branding/napse_white.svg" width=500/> -->
 </h1><br>
 
 <p align="center">
