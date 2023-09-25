@@ -57,3 +57,12 @@ Unless otherwise specified, all commands are to be run at the root folder of the
 ```coverage```
 - Run tests with coverage and open coverage report \
 ```coverage-open```
+
+## Documentation
+
+[Docs](https://napse-invest.github.io/django-napse/)
+
+Run mkdocs server:
+```
+make mkdocs
+```
