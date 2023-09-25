@@ -17,8 +17,8 @@ curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 printf "Compiling requirements... This may take a few minutes.\n"
 pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
 pip install -r ./full-requirements.txt
-deactivate
-pip uninstall pip-tools -y
-source .venv/bin/activate
+# deactivate
+# pip uninstall pip-tools -y
+# source .venv/bin/activate
 
 printf "Done installing requirements for local .venv!\nHave fun coding!\n"
