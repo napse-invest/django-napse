@@ -1,2 +1,44 @@
-site_name: My Docs
-theme: readthedocs
+site_name: Django Napse Documentation
+
+repo_name: napse-invest/django-napse
+repo_url: https://github.com/napse-invest/django-napse
+
+
+docs_dir: "docs/"
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      use_pygments: true
+      noclasses: true
+      pygments_style: tango
+
+plugins:
+  - search
+
+theme:
+  name: 'material'
+  logo: 'assets/images/NapseInvestLogoSVG.svg'
+  favicon: 'theme/assets/images/logo.ico'
+  language: 'en'
+  palette:
+   primary: 'white'
+  custom_dir: 'docs/theme'
+  features:
+    - navigation.tabs
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - content.code.annotate
+    - toc.integrate
+    - toc.follow
+    - navigation.path
+    - navigation.top
+    - content.code.copy
+
+nav:
+  - Home: 
+    - Overview: "index.md"
+  #   - Installation:
+  #   - Tutorial:
+  # - API:
