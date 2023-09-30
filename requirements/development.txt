@@ -10,3 +10,4 @@ django-extensions==3.2.3  # https://github.com/django-extensions/django-extensio
 # Documentation
 mkdocs-material==9.4.1 # https://github.com/squidfunk/mkdocs-material
 pygments==2.16.1 # https://github.com/pygments/pygments
+

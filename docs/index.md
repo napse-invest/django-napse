@@ -22,7 +22,6 @@
 <br/>
 
 # Welcome to django-napse's documentation!
-[diataxis](https://diataxis.fr/)
 
 ## Useful commands
 Unless otherwise specified, all commands are to be run at the root folder of the project.
