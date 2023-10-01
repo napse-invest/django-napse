@@ -27,7 +27,8 @@ SECRET_KEY = "django-insecure-secret"  # noqa: S105
 DEBUG = False
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django"]
-
+CORS_ALLOWED_ORIGINS = [f"http://{host}:8888" for host in ALLOWED_HOSTS]
+CSRF_TRUSTED_ORIGINS = [f"http://{host}:8888" for host in ALLOWED_HOSTS]
 
 # Application definition
 
@@ -46,11 +47,13 @@ INSTALLED_APPS = [
     "django_napse.auth",
     # Required
     "django_celery_beat",
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",

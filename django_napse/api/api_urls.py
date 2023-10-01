@@ -47,3 +47,4 @@ def build_main_router() -> DefaultRouter:
 
 
 main_api_router = build_main_router()
+print(main_api_router.urls)
