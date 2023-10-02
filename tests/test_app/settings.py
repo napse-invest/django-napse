@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     # Required
     "django_celery_beat",
     "corsheaders",
+    "rest_framework",
+    "rest_framework_api_key",
 ]
 
 MIDDLEWARE = [
@@ -143,3 +145,7 @@ NAPSE_ENV_FILE_PATH = BASE_DIR / ".env"
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 DEBUG = True
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ["rest_framework_api_key.permissions.HasAPIKey", "django_napse.api.custom_permissions.HasAdminPermission"],
+}

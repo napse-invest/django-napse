@@ -6,4 +6,4 @@ from django_napse.auth.models import KeyPermission
 class PermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = KeyPermission
-        fields = "__all__"
+        fields = ["uuid", "permission_type", "approved"]

@@ -39,7 +39,6 @@ def build_main_router() -> DefaultRouter:
                 if url_name in url_name_list:
                     error_msg: str = f"Url name {url_name} already exists"
                     raise ConflictingUrlNames(error_msg)
-
                 main_router.register(url_name, obj, basename=url_name)
                 url_name_list.append(url_name)
 
@@ -47,4 +46,3 @@ def build_main_router() -> DefaultRouter:
 
 
 main_api_router = build_main_router()
-print(main_api_router.urls)

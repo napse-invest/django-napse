@@ -1,16 +1,24 @@
+import uuid
+
 from django.db import models
+from rest_framework_api_key.models import APIKey
 
 from django_napse.utils.constants import PERMISSION_TYPES
 
 
 class KeyPermission(models.Model):
-    key = models.ForeignKey("NapseAPIKey", on_delete=models.CASCADE, related_name="permissions")
+    uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
+
+    key = models.ForeignKey(APIKey, on_delete=models.CASCADE, related_name="permissions")
     space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE)
-    valid = models.BooleanField(default=True)
+    approved = models.BooleanField(default=False)
     permission_type = models.CharField(max_length=200)
 
+    class Meta:
+        unique_together = ["key", "space", "permission_type"]
+
     def __str__(self):
-        return f"NAPSE KEY PERMISSION: {self.permission_type.name} - {self.key.name} - {self.exchange_account.exchange.name}"
+        return f"NAPSE KEY PERMISSION: {self.permission_type}"
 
     def save(self, *args, **kwargs):
         if self.permission_type not in PERMISSION_TYPES:
