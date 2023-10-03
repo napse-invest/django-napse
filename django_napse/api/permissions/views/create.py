@@ -1,16 +1,15 @@
 from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework_api_key.permissions import HasAPIKey
 
-from django_napse.api.custom_permissions import HasSpace
+from django_napse.api.custom_permissions import HasAPIKey, HasSpace
 from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.auth.models import KeyPermission
 from django_napse.utils.constants import PERMISSION_TYPES
 
 
 class Permission(CustomViewSet):
-    permission_classes = [HasAPIKey, HasSpace]
+    permission_classes = [HasSpace, HasAPIKey]
 
     def create(self, request):
         space = self.space(request)
