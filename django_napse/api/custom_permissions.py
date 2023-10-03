@@ -12,9 +12,9 @@ def check_for_space(request):
     try:
         return NapseSpace.objects.get(uuid=request.query_params["space"])
     except NapseSpace.DoesNotExist as e:
-        raise APIError.MissingSpace() from e
+        raise APIError.InvalidSpace() from e
     except ValidationError as e:
-        raise APIError.MissingSpace() from e
+        raise APIError.InvalidSpace() from e
 
 
 class HasAdminPermission(BasePermission):

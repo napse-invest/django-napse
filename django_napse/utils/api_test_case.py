@@ -1,35 +1,70 @@
-from django.test import TestCase
-from rest_framework.reverse import reverse
+from django.urls import reverse
 from rest_framework.test import APIClient
+from rest_framework_api_key.models import APIKey
+from rest_framework_api_key.permissions import HasAPIKey
+
+from django_napse.api.custom_permissions import HasAdminPermission, HasFullAccessPermission, HasReadPermission, HasSpace
+from django_napse.auth.models import KeyPermission
+from django_napse.utils.constants import PERMISSION_TYPES
+from django_napse.utils.custom_test_case import CustomTestCase
 
 
-class CustomTestCase(TestCase):
+class APITestCase(CustomTestCase):
     def setUp(self):
         self.client = APIClient()
-        self.custom_params(modes=None)
+        self.modes = self.setup()
+        if self.modes == {} or not isinstance(self.modes, dict):
+            error_msg = "Modes not defined"
+            raise ValueError(error_msg)
 
-    def custom_params(self, modes):
-        self.modes = modes
-        self.additional_params()
+    def setup(self):
+        error_msg = "Setup function not implemented"
+        raise NotImplementedError(error_msg)
 
-    def additional_params(self):
-        pass
+    def build_url(self, kwargs=None):
+        self.url = reverse(viewname=self.url_name)
+        if kwargs:
+            self.url += "?" + "&".join([f"{key}={value}" for key, value in kwargs.items()])
+
+    def build_key(self, permissions):
+        key_obj, self.key = APIKey.objects.create_key(name="test")
+        if HasReadPermission in permissions:
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.READ_ONLY)
+        if HasFullAccessPermission in permissions:
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.FULL_ACCESS)
+        if HasAdminPermission in permissions:
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.ADMIN)
+
+    def authenticate(self):
+        self.headers["Authorization"] = f"Api-Key {self.key}"
+
+    def logout(self):
+        self.headers.pop("Authorization")
 
     def request(self, method):
         match method:
             case "GET":
-                return self.client.get(self.url)
+                return self.client.get(path=self.url, data=self.data, headers=self.headers)
             case "POST":
-                return self.client.post(self.url)
+                return self.client.post(path=self.url, data=self.data, headers=self.headers)
             case "PUT":
-                return self.client.put(self.url)
+                return self.client.put(path=self.url, data=self.data, headers=self.headers)
             case "PATCH":
-                return self.client.patch(self.url)
+                return self.client.patch(path=self.url, data=self.data, headers=self.headers)
             case "DELETE":
-                return self.client.delete(self.url)
+                return self.client.delete(path=self.url, data=self.data, headers=self.headers)
             case _:
                 error_msg = f"Unknown method: {method}"
                 raise ValueError(error_msg)
+
+    def check_auth(self, name: str, mode: str, error_list: list, divider: int = 1, expected: int = 403) -> None:
+        response = self.request(self.modes[mode]["method"])
+        try:
+            self.assertEqual(response.status_code // divider, expected)
+        except AssertionError as e:
+            e.add_note(f"{name} test failed (no permissions didn't return 403)")
+            e.add_note(str(response.data))
+            error_list.append(e)
 
     def run_tests(self, mode):
         if mode not in self.modes:
@@ -37,53 +72,81 @@ class CustomTestCase(TestCase):
             raise ValueError(error_msg)
 
         error_list = []
-
-        self.url = reverse(self.modes[mode]["url_name"], kwargs={"pk": 1} if self.modes[mode]["method"] in ["PATCH", "PUT", "DELETE"] else {})
+        self.kwargs = self.modes[mode].get("kwargs", {})
+        self.data = self.modes[mode].get("data", {})
+        self.headers = self.modes[mode].get("headers", {})
         self.url_name = self.modes[mode]["url_name"]
+        self.build_url(kwargs={"pk": 1, **self.kwargs} if self.modes[mode]["method"] in ["PATCH", "PUT", "DELETE"] else self.kwargs)
 
-        if self.modes[mode]["permissions"] == []:
-            response = self.request(self.modes[mode]["method"])
-            try:
-                self.assertEqual(response.status_code, 200)
-            except Exception as e:
-                e.add_note("No permissions test failed (no permissions didn't return 200)")
-                error_list.append(e)
+        permissions = self.modes[mode]["view"].permission_classes
+        permission_importance = {
+            HasSpace: 0,
+            HasAPIKey: 1,
+            HasReadPermission: 2,
+            HasFullAccessPermission: 3,
+            HasAdminPermission: 4,
+        }
+        permissions.sort(key=lambda x: permission_importance[x])
+
+        if permissions == []:
+            self.check_auth(name="No permissions", mode=mode, error_list=error_list, divider=100, expected=2)
         else:
-            if "IsActive" in self.modes[mode]["permissions"]:
-                response = self.request(self.modes[mode]["method"])
-                try:
-                    self.assertEqual(response.status_code, 401)
-                except Exception as e:
-                    e.add_note("IsAuthenticated test failed (no permissions didn't return 401)")
-                    error_list.append(e)
-            if "IsAuthenticated" in self.modes[mode]["permissions"]:
-                response = self.request(self.modes[mode]["method"])
-                try:
-                    self.assertEqual(response.status_code, 401)
-                except Exception as e:
-                    e.add_note("IsAuthenticated test failed (no permissions didn't return 401)")
-                    error_list.append(e)
+            if HasSpace in permissions:
+                self.check_auth(name="HasSpace \w no key", mode=mode, error_list=error_list, expected=400)
+                self.build_url(kwargs={"space": str("random uuid"), **self.kwargs})
+                self.check_auth(name="HasSpace \w no key", mode=mode, error_list=error_list, expected=400)
+                self.build_url(kwargs={"space": str("7aafc68d-f619-4874-aaf5-c123a176e303"), **self.kwargs})
+                self.check_auth(name="HasSpace \w no key", mode=mode, error_list=error_list, expected=400)
+                self.build_url(kwargs={"space": str(self.space.uuid), **self.kwargs})
 
-            if "IsActive" in self.modes[mode]["permissions"]:
-                self.user.is_active = True
-                self.user.save()
+            if HasAPIKey in permissions:
+                self.check_auth(name="HasAPIKey \w no key", mode=mode, error_list=error_list)
 
-            if "IsAuthenticated" in self.modes[mode]["permissions"]:
-                self.client.force_authenticate(user=self.user)
+            if HasReadPermission in permissions:
+                self.check_auth(name="HasReadPermission \w no key", mode=mode, error_list=error_list)
+                self.build_key([])
+                self.authenticate()
+                self.check_auth(name="HasReadPermission \w no permissions", mode=mode, error_list=error_list)
+
+            if HasFullAccessPermission in permissions:
+                self.check_auth(name="HasFullAccessPermission \w no key", mode=mode, error_list=error_list)
+                self.build_key([])
+                self.authenticate()
+                self.check_auth(name="HasFullAccessPermission \w no permissions", mode=mode, error_list=error_list)
+                self.build_key([HasReadPermission])
+                self.authenticate()
+                self.check_auth(name="HasFullAccessPermission \w read permissions", mode=mode, error_list=error_list)
+
+            if HasAdminPermission in permissions:
+                self.check_auth(name="HasAdminPermission \w no key", mode=mode, error_list=error_list)
+                self.build_key([])
+                self.authenticate()
+                self.check_auth(name="HasAdminPermission \w no permissions", mode=mode, error_list=error_list)
+                self.build_key([HasReadPermission])
+                self.authenticate()
+                self.check_auth(name="HasAdminPermission \w read permissions", mode=mode, error_list=error_list)
+                self.build_key([HasReadPermission, HasFullAccessPermission])
+                self.authenticate()
+                self.check_auth(name="HasAdminPermission \w read and full access permissions", mode=mode, error_list=error_list)
+
+        self.build_key(permissions)
+        self.authenticate()
 
         for test in self.modes[mode]["tests"]:
-            response = test["setup_function"]()
+            response = test["setup"]()
             try:
-                self.assertEqual(test["awaited_status_code"], response.status_code)
-            except Exception as e:
-                e.add_note(f"Test: {test['setup_function'].__name__} | status code")
+                self.assertEqual(test["status_code"], response.status_code)
+            except AssertionError as e:
+                e.add_note(f"Test: {test['name']} | {test['setup'].__name__} | status code")
+                e.add_note(str(response.data))
                 error_list.append(e)
 
             for check in test["checks"]:
                 try:
                     self.assertTrue(check(response))
                 except Exception as e:
-                    e.add_note(f"Test: {test['setup_function'].__name__} | check {check.__name__}")
+                    e.add_note(f"Test: {test['name']} | {test['setup'].__name__} | check {check.__name__}")
+                    e.add_note(str(response.data))
                     error_list.append(e)
 
         if len(error_list) > 0:

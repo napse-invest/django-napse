@@ -57,9 +57,9 @@ if settings.configured:
         warning = "REST_FRAMEWORK not found in settings. Please add it to your settings file."
         logger.warning(warning)
         settings.REST_FRAMEWORK = {
-            "DEFAULT_PERMISSION_CLASSES": ["rest_framework_api_key.permissions.HasAPIKey", "django_napse.api.custom_permissions.HasAdminPermission"],
+            "DEFAULT_PERMISSION_CLASSES": ["django_napse.api.custom_permissions.HasAdminPermission"],
         }
-    for permission in ["django_napse.api.custom_permissions.HasAdminPermission", "rest_framework_api_key.permissions.HasAPIKey"]:
+    for permission in ["django_napse.api.custom_permissions.HasAdminPermission"]:
         if permission not in settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"]:
             warning = f"{permission} not found in settings. Please add it to your settings file."
             logger.warning(warning)

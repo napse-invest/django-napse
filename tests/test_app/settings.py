@@ -147,5 +147,7 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
 DEBUG = True
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ["rest_framework_api_key.permissions.HasAPIKey", "django_napse.api.custom_permissions.HasAdminPermission"],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "django_napse.api.custom_permissions.HasAdminPermission",
+    ],
 }

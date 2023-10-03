@@ -11,7 +11,7 @@ class APIError:
 
     class InvalidSpace(APIException):
         status_code = 400
-        default_detail = "Invalid space uuid in request data"
+        default_detail = "Space uuid is invalid"
         default_code = "invalid_space"
 
     class InvalidPermissions(APIException):
