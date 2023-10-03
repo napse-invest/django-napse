@@ -76,7 +76,9 @@ class PLUGIN_CATEGORIES(StrEnum, metaclass=CustomEnumMeta):
 class PERMISSION_TYPES(StrEnum, metaclass=CustomEnumMeta):
     """The permission type for a key."""
 
+    ADMIN = "ADMIN"
     FULL_ACCESS = "FULL_ACCESS"
+    READ_ONLY = "READ_ONLY"
     NO_ACCESS = "NO_ACCESS"
 
 

@@ -47,8 +47,22 @@ class DjangoNapseSettings:
 napse_settings = DjangoNapseSettings()
 
 if settings.configured:
-    if "django_celery_beat" not in settings.INSTALLED_APPS:
-        settings.INSTALLED_APPS += ("django_celery_beat",)
+    for app in ["rest_framework", "rest_framework_api_key", "django_celery_beat"]:
+        if app not in settings.INSTALLED_APPS:
+            warning = f"{app} not found in settings.INSTALLED_APPS. Please add it to your settings file."
+            logger.warning(warning)
+            settings.INSTALLED_APPS += (app,)
+
+    if "REST_FRAMEWORK" not in settings.__dir__():
+        warning = "REST_FRAMEWORK not found in settings. Please add it to your settings file."
+        logger.warning(warning)
+        settings.REST_FRAMEWORK = {
+            "DEFAULT_PERMISSION_CLASSES": ["django_napse.api.custom_permissions.HasAdminPermission"],
+        }
+    for permission in ["django_napse.api.custom_permissions.HasAdminPermission"]:
+        if permission not in settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"]:
+            warning = f"{permission} not found in settings. Please add it to your settings file."
+            logger.warning(warning)
 
     if "NAPSE_SECRETS_FILE_PATH" not in settings.__dir__():
         warning = "NAPSE_SECRETS_FILE_PATH not found in settings. Please add it to your settings file."

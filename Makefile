@@ -1,5 +1,8 @@
 SHELL := /bin/bash
 
+setup:
+	source setup-unix.sh
+
 makemigrations:
 	source .venv/bin/activate && python tests/test_app/manage.py makemigrations
 
@@ -11,6 +14,9 @@ runserver:
 
 up:
 	make makemigrations && make migrate && make runserver
+
+clean:
+	source .venv/bin/activate && python tests/test_app/manage.py flush
 
 celery:
 	source .venv/bin/activate && watchfiles --filter python celery.__main__.main --args "-A tests.test_app worker --beat -l INFO"

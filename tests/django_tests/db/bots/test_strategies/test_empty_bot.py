@@ -1,6 +1,6 @@
 from django_napse.core.models import Controller, EmptyStrategy
 from django_napse.utils.model_test_case import ModelTestCase
-from tests.django_tests.bots.test_strategy import StrategyDefaultTestCase
+from tests.django_tests.db.bots.test_strategy import StrategyDefaultTestCase
 
 """
 python tests/test_app/manage.py test tests.django_tests.bots.test_strategies.test_empty_bot -v2 --keepdb --parallel

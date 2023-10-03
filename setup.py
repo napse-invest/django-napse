@@ -2,7 +2,6 @@ from distutils.core import setup
 
 from setuptools import find_packages
 
-print(find_packages(exclude=["test", "test.*"]))
 setup(
     name="django-napse",
     packages=find_packages(exclude=["test", "test.*"]),

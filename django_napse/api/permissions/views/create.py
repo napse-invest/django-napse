@@ -1,26 +1,31 @@
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
+from rest_framework_api_key.permissions import HasAPIKey
 
-from django_napse.auth.models import KeyPermission, NapseAPIKey
-from django_napse.core.models import NapseSpace
+from django_napse.api.custom_permissions import HasSpace
+from django_napse.api.custom_viewset import CustomViewSet
+from django_napse.auth.models import KeyPermission
 from django_napse.utils.constants import PERMISSION_TYPES
 
 
-class Permission(GenericViewSet):
+class Permission(CustomViewSet):
+    permission_classes = [HasAPIKey, HasSpace]
+
     def create(self, request):
-        if "space_uuid" not in request.data:
-            return Response({"error": "Missing space_uuid"}, status=status.HTTP_400_BAD_REQUEST)
-        if "api_key" not in request.data:
-            return Response({"error": "Missing api_key"}, status=status.HTTP_400_BAD_REQUEST)
+        space = self.space(request)
+
+        if "permission_type" not in request.data:
+            return Response({"error": "Missing permission_type"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.data["permission_type"] not in PERMISSION_TYPES:
+            return Response({"error": f"Permission type ({request.data['permission_type']}) does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            key = NapseAPIKey.objects.get(napse_API_key=request.data["api_key"])
-        except NapseAPIKey.DoesNotExist:
-            return Response({"error": f"Napse API Key (name={request.data['api_key']}) does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-        try:
-            space = NapseSpace.objects.get(uuid=request.data["space_uuid"])
-        except NapseSpace.DoesNotExist:
-            return Response({"error": f"Napse Space (uuid={request.data['space_uuid']}) does not exist."}, status=status.HTTP_400_BAD_REQUEST)
-        permission_type = PERMISSION_TYPES.FULL_ACCESS
-        KeyPermission.objects.create(key=key, space=space, permission_type=permission_type)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            KeyPermission.objects.create(key=self.get_api_key(request), space=space, permission_type=request.data["permission_type"])
+        except IntegrityError:
+            return Response(
+                {"error": f"Permission {request.data['permission_type']} already exists for this key and space."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(status=status.HTTP_201_CREATED)
