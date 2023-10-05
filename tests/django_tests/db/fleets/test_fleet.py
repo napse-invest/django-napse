@@ -25,13 +25,13 @@ class FleetTestCase:
             exchange_account=self.exchange_account,
             clusters=[
                 {
-                    "bot": bot,
+                    "template_bot": bot,
                     "share": 0.7,
                     "breakpoint": 1000,
                     "autoscale": False,
                 },
                 {
-                    "bot": bot,
+                    "template_bot": bot,
                     "share": 0.3,
                     "breakpoint": 1000,
                     "autoscale": True,
