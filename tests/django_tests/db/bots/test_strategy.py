@@ -33,7 +33,7 @@ class StrategyDefaultTestCase:
             investments={"USDT": 10000},
         )
 
-        simulation_queue.run_quick_simulation().info()
+        simulation_queue.run_quick_simulation(verbose=False)
 
 
 class BotTypeCkeck(TestCase):

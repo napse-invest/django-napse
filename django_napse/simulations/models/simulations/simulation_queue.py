@@ -413,24 +413,24 @@ class SimulationQueue(models.Model):
             },
         )
 
-    def run_quick_simulation(self):
+    def run_quick_simulation(self, verbose=True):
         self.status = SIMULATION_STATUS.RUNNING
         self.save()
         bot, no_db_data = self.setup_simulation()
 
-        simulation = self.quick_simulation(bot=bot, no_db_data=no_db_data)
+        simulation = self.quick_simulation(bot=bot, no_db_data=no_db_data, verbose=verbose)
 
         self.cleanup_simulation(bot)
         self.status = SIMULATION_STATUS.IDLE
         self.save()
         return simulation
 
-    def run_irl_simulation(self):
+    def run_irl_simulation(self, verbose=True):
         self.status = SIMULATION_STATUS.RUNNING
         self.save()
         bot, no_db_data = self.setup_simulation()
 
-        simulation = self.irl_simulation(bot=bot, no_db_data=no_db_data)
+        simulation = self.irl_simulation(bot=bot, no_db_data=no_db_data, verbose=verbose)
 
         self.cleanup_simulation(bot)
         self.status = SIMULATION_STATUS.IDLE
