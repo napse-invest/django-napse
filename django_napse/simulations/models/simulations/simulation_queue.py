@@ -202,7 +202,7 @@ class SimulationQueue(models.Model):
             for plugin in extras:
                 extras[plugin] = [*extras[plugin], connection_specific_args[plugin].get_value()]
 
-    def quick_simulation(self, bot, no_db_data):
+    def quick_simulation(self, bot, no_db_data, verbose=True):
         data, currencies, exchange_controllers, min_interval = self.preparation(bot, no_db_data)
         _time = time.time()
         tpi = []
@@ -302,7 +302,10 @@ class SimulationQueue(models.Model):
             )
             tpi.append(time.time() - _time)
             _time = time.time()
-        print(sum(tpi) / len(tpi))
+
+        if verbose:
+            print(f"Simulation ended.\nAverage TPI: {sum(tpi) / len(tpi)}")
+
         return Simulation.objects.create(
             space=self.space,
             bot=bot,
@@ -322,7 +325,7 @@ class SimulationQueue(models.Model):
             },
         )
 
-    def irl_simulation(self, bot, no_db_data):
+    def irl_simulation(self, bot, no_db_data, verbose=True):
         data, _, exchange_controllers, min_interval = self.preparation(bot, no_db_data)
         _time = time.time()
         tpi = []
@@ -387,7 +390,10 @@ class SimulationQueue(models.Model):
             )
             tpi.append(time.time() - _time)
             _time = time.time()
-        print(sum(tpi) / len(tpi))
+
+        if verbose:
+            print(f"Simulation ended.\nAverage TPI: {sum(tpi) / len(tpi)}")
+
         return Simulation.objects.create(
             space=self.space,
             bot=bot,

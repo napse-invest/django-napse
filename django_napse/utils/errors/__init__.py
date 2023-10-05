@@ -2,6 +2,7 @@ from .api import *
 from .bots import *
 from .exchange import *
 from .fleets import *
+from .histories import *
 from .napse import *
 from .orders import *
 from .sims import *

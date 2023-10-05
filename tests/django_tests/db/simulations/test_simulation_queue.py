@@ -41,11 +41,11 @@ class SimulationQueueTestCase:
 
     def test_quick_simulation(self):
         simulation_queue = self.simple_create()
-        simulation_queue.run_quick_simulation().info()
+        simulation_queue.run_quick_simulation()
 
     def test_irl_simulation(self):
         simulation_queue = self.simple_create()
-        simulation_queue.run_irl_simulation().info()
+        simulation_queue.run_irl_simulation()
 
 
 class SimulationQueueBINANCETestCase(SimulationQueueTestCase, ModelTestCase):
