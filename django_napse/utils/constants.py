@@ -82,6 +82,17 @@ class PERMISSION_TYPES(StrEnum, metaclass=CustomEnumMeta):
     NO_ACCESS = "NO_ACCESS"
 
 
+class HISTORY_DATAPOINT_FIELDS(StrEnum, metaclass=CustomEnumMeta):
+    """The different fields for a history data point."""
+
+    AMOUNT = "AMOUNT"
+    ASSET = "ASSET"
+    PRICE = "PRICE"
+    MBP = "MBP"
+    LBO = "LBO"
+    VALUE = "VALUE"
+
+
 ORDER_LEEWAY_PERCENTAGE = 10
 
 DEFAULT_TAX = {
