@@ -63,4 +63,4 @@ class PluginDefaultTestCase:
             investments={"USDT": 10000},
         )
 
-        simulation_queue.run_quick_simulation()
+        simulation_queue.run_quick_simulation(verbose=False)
