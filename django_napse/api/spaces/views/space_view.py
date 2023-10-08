@@ -1,13 +1,14 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
+from rest_framework_api_key.permissions import HasAPIKey
 
+from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceSerializer
 from django_napse.core.models import NapseSpace
 
 
-class SpaceView(GenericViewSet):
-    permission_classes = []
+class SpaceView(CustomViewSet):
+    permission_classes = [HasAPIKey]
     serializer_class = SpaceSerializer
 
     def get_queryset(self):
