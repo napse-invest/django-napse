@@ -1,11 +1,15 @@
+
+
 <h1 align="center">
+<!-- ![test](theme/assets/images/NapseInvestLogoSVGWhite.png#only-light)
+![test](theme/assets/images/NapseInvestLogoSVG.png#only-dark) -->
+
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/NapseInvestLogoSVGWhite.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/NapseInvestLogoSVG.svg">
-  <img alt="Napse's logo" src="" width=500>
+  <source media="(prefers-color-scheme: light)" srcset="theme/assets/images/NapseInvestLogoSVGWhite.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="theme/assets/images/NapseInvestLogoSVG.svg">
+  <img alt="Test" src="theme/assets/images/NapseInvestLogoSVGWhite.svg">
 </picture>
 
-<!-- <img src="./branding/napse_white.svg" width=500/> -->
 </h1><br>
 
 <p align="center">
@@ -19,16 +23,11 @@
     <img src="https://img.shields.io/github/v/release/napse-invest/django-napse" alt="Release" />
   </a>
 </p>
-
-<p align="center">
-  <a href="#django-napse"><strong>Django Napse</strong></a> ·
-  <a href="#usefull-commands"><strong>Usefull commands</strong></a> .
-  <a href="#how-to-contribute"><strong>How to contribute</strong></a>
-</p>
 <br/>
 
-## django-napse
-....
+
+
+# Welcome to django-napse's documentation!
 
 ## Useful commands
 Unless otherwise specified, all commands are to be run at the root folder of the project.
@@ -63,6 +62,6 @@ Unless otherwise specified, all commands are to be run at the root folder of the
 [Docs](https://napse-invest.github.io/django-napse/)
 
 Run mkdocs server:
-```
+```shell
 make mkdocs
 ```

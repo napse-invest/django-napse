@@ -3,11 +3,17 @@ SHELL := /bin/bash
 setup:
 	source setup-unix.sh
 
+activate:
+	source .venv/bin/activate
+
 makemigrations:
 	source .venv/bin/activate && python tests/test_app/manage.py makemigrations
 
 migrate:
 	source .venv/bin/activate && python tests/test_app/manage.py migrate
+
+reset-makemigrations:
+	cd django_napse && find . -path "*/migrations/*.py" -not -name "__init__.py" -delete && find . -path "*/migrations/*.pyc"  -delete && cd .. && rm tests/test_app/db.sqlite3
 
 runserver:
 	source .venv/bin/activate && python tests/test_app/manage.py runserver_plus
@@ -30,5 +36,5 @@ coverage:
 coverage-open:
 	source .venv/bin/activate && coverage run tests/test_app/manage.py test -v2 --keepdb && coverage html && coverage report && open htmlcov/index.html
 
-reset-makemigrations:
-	cd django_napse && find . -path "*/migrations/*.py" -not -name "__init__.py" -delete && find . -path "*/migrations/*.pyc"  -delete && cd .. && rm tests/test_app/db.sqlite3
+mkdocs:
+	source .venv/bin/activate && mkdocs serve --dev-addr=0.0.0.0:8005
