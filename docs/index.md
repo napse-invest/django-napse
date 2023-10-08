@@ -1,11 +1,15 @@
 
 
 <h1 align="center">
+<!-- ![test](theme/assets/images/NapseInvestLogoSVGWhite.png#only-light)
+![test](theme/assets/images/NapseInvestLogoSVG.png#only-dark) -->
 
-<img alt="Napse's logo" src="theme/assets/images/NapseInvestLogoSVG.svg" width=600>
+<picture>
+  <source media="(prefers-color-scheme: light)" srcset="theme/assets/images/NapseInvestLogoSVGWhite.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="theme/assets/images/NapseInvestLogoSVG.svg">
+  <img alt="Test" src="theme/assets/images/NapseInvestLogoSVGWhite.svg">
+</picture>
 
-
-<!-- <img src="./branding/napse_white.svg" width=500/> -->
 </h1><br>
 
 <p align="center">
@@ -20,6 +24,8 @@
   </a>
 </p>
 <br/>
+
+
 
 # Welcome to django-napse's documentation!
 

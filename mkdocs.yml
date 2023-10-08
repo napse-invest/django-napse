@@ -1,7 +1,8 @@
 site_name: Django Napse Documentation
-
+# site_url: https://go.napse-invest.com/visit/
 repo_name: napse-invest/django-napse
 repo_url: https://github.com/napse-invest/django-napse
+copyright: MIT Licence
 
 
 docs_dir: "docs/"
@@ -29,10 +30,17 @@ markdown_extensions:
       use_pygments: true
       noclasses: true
       pygments_style: tango
+  - pymdownx.details:
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list:
+  - md_in_html:
 
 
 plugins:
   - search
+  - inline-svg
+
 
 theme:
   name: 'material'
@@ -40,20 +48,53 @@ theme:
   favicon: 'theme/assets/images/logo.ico'
   language: 'en'
   palette:
-   primary: 'white'
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: 'white'
+      toggle:
+        # icon: material/toggle-switch
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      toggle:
+        # icon: material/toggle-switch-off-outline
+        icon: material/toggle-switch
+        name: Switch to light mode
   custom_dir: 'docs/theme'
   features:
     - navigation.tabs
+    - navigation.tabs.stickyx
     - navigation.instant
     - navigation.instant.prefetch
     - navigation.tracking
+    # - navigation.section
     - content.code.annotate
     - toc.integrate
     - toc.follow
     - navigation.path
     - navigation.top
     - content.code.copy
+    - search.suggest
 
+extra:
+  social:
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/NapseInvest
+      name: X
+    - icon: fontawesome/brands/linkedin
+      link: https://fr.linkedin.com/company/napse-investment
+      name: Linkedin
+    - icon: fontawesome/brands/discord
+      link: https://discord.com/invite/47gKBreSXa
+      name: Discord
+    - icon: fontawesome/brands/github
+      link: https://github.com/napse-invest/Napse
+      name: Github
 
 nav:
   - Home: 

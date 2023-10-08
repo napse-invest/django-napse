@@ -16,16 +16,19 @@ For larger changes (e.g., new feature), please open an issue first to discuss th
 
 The first step is to set up the development environment
 
-- For **Linux**:
+=== "Linux"
+
     ```bash
     source setup-unix.sh
     ```
-- For **Windows**:
+
+=== "Windows"
+
     ```powershell
     .\setup-windows.ps1
     ```
 
-!!! advice
+???+ advice "Make for Windows users"
     If you're using **Windows**, for the rest of this guide (and for your own convenience), please install [make](https://linuxhint.com/install-use-make-windows/).
 
 Then, you can run a test version of the project to work with:
