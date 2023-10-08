@@ -15,7 +15,7 @@ source .venv/bin/activate
 printf "Virtual python environment has been activated.\n"
 curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
 printf "Compiling requirements... This may take a few minutes.\n"
-pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
+pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking --strip-extras
 pip install -r ./full-requirements.txt
 # deactivate
 # pip uninstall pip-tools -y

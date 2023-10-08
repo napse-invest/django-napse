@@ -1,7 +1,7 @@
 from django_napse.core.models import MBPPlugin
 from django_napse.utils.constants import PLUGIN_CATEGORIES
 from django_napse.utils.model_test_case import ModelTestCase
-from tests.django_tests.bots.test_plugin import PluginDefaultTestCase
+from tests.django_tests.db.bots.test_plugin import PluginDefaultTestCase
 
 """
 python tests/test_app/manage.py test tests.django_tests.bots.test_plugin_mbp -v2 --keepdb --parallel

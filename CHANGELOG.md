@@ -1,3 +1,45 @@
+# [1.8.0](https://github.com/napse-invest/django-napse/compare/v1.7.1...v1.8.0) (2023-09-18)
+
+
+### Features
+
+* **api:** migrated api from dtk to djn ([01a9e1c](https://github.com/napse-invest/django-napse/commit/01a9e1c3731f5a233b79e8a8d4d3ac5a321650aa))
+
+## [1.7.1](https://github.com/napse-invest/django-napse/compare/v1.7.0...v1.7.1) (2023-09-10)
+
+
+### Bug Fixes
+
+* **fleet:** add values bridges ([28ebc4e](https://github.com/napse-invest/django-napse/commit/28ebc4e27a2cdeb500fcf402b45ba3604a395d30))
+
+# [1.7.0](https://github.com/napse-invest/django-napse/compare/v1.6.6...v1.7.0) (2023-09-09)
+
+
+### Bug Fixes
+
+* **doublon:** doublon on save ([6e2c7f1](https://github.com/napse-invest/django-napse/commit/6e2c7f1b9b9184667d44216eb6cffbe28ed30d3b))
+* makefile ([c150640](https://github.com/napse-invest/django-napse/commit/c15064013ca49ed82fb9c586aef20fdefc25fea7))
+* **manage.py:** python path ([ba0ea46](https://github.com/napse-invest/django-napse/commit/ba0ea46c5921e1570b6357186cd11d1295a6b1eb))
+* **names:** fix test folder name (tests) and fix space' fleet property ([c599420](https://github.com/napse-invest/django-napse/commit/c599420fa805761ddd80e30641379604109d619f))
+* **readme:** update readme with make command ([88edcd6](https://github.com/napse-invest/django-napse/commit/88edcd6012a0536fae606052ad38949b5789aa14))
+
+
+### Features
+
+* **bridge:** add fleets property ([e72f7e0](https://github.com/napse-invest/django-napse/commit/e72f7e06b42dec4f19926d3ce6ba5284ae122c53))
+* **space:** add value property ([89fda45](https://github.com/napse-invest/django-napse/commit/89fda453841cf24bcc73ad72bed9978e34dcf71f))
+
+## [1.6.6](https://github.com/napse-invest/django-napse/compare/v1.6.5...v1.6.6) (2023-09-03)
+
+
+### Bug Fixes
+
+* celery to 5.3.1 ([7c997da](https://github.com/napse-invest/django-napse/commit/7c997dada6e138134a029057abba2bf572b6d072))
+* **celery:** fix task name ([72becf3](https://github.com/napse-invest/django-napse/commit/72becf34b7b5e86d91de22a54bef65c5770a7367))
+* **celery:** import tasks ([c80fb7a](https://github.com/napse-invest/django-napse/commit/c80fb7ae6d3ae4dc02e94fa79103446834f33f4e))
+* **celery:** reverted imports ([514ef02](https://github.com/napse-invest/django-napse/commit/514ef027d33ea985eee4c0d1f22f6346ed54cd2b))
+* **celery:** version bumped down to 5.3.1 ([1c7b66d](https://github.com/napse-invest/django-napse/commit/1c7b66d39d4697649b309b9d178a9a9daa1b87cb))
+
 ## [1.6.5](https://github.com/napse-invest/django-napse/compare/v1.6.4...v1.6.5) (2023-08-20)
 
 
