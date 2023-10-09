@@ -6,6 +6,7 @@ from .histories import *
 from .napse import *
 from .orders import *
 from .sims import *
+from .spaces import *
 from .tasks import *
 from .transactions import *
 from .wallets import *

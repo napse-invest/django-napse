@@ -29,3 +29,11 @@ class Currency(models.Model):
     @property
     def testing(self):
         return self.wallet.testing
+
+    def copy(self, owner):
+        return Currency.objects.create(
+            wallet=owner,
+            mbp=self.mbp,
+            ticker=self.ticker,
+            amount=self.amount,
+        )

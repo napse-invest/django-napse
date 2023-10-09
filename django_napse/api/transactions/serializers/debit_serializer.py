@@ -11,6 +11,7 @@ class DebitSerializer(serializers.ModelSerializer):
         fields = [
             "amount",
             "ticker",
+            "operation_type",
             "created_at",
         ]
         read_only_fields = fields

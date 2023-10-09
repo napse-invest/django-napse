@@ -16,11 +16,16 @@ class SpaceSerializer(serializers.ModelSerializer):
             "id",
             "value",
             "fleet_count",
+            # write-only
+            "exchange_account",
         ]
         read_only_fields = [
             "id",
             "value",
             "fleet_count",
+        ]
+        write_only_fields = [
+            "exchange_account",
         ]
 
     def get_fleet_count(self, instance) -> int:
@@ -30,6 +35,7 @@ class SpaceSerializer(serializers.ModelSerializer):
 class SpaceDetailSerializer(serializers.ModelSerializer):
     fleets = FleetSerializer(many=True, read_only=True)
     wallet = WalletSerializer(many=False, read_only=True)
+    statistics = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = NapseSpace
@@ -38,15 +44,20 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
             "description",
             # read-only
             "id",
-            "value",
+            # "value",
             "created_at",
+            "statistics",
             "wallet",
             "fleets",
         ]
         read_only_fields = [
             "id",
-            "value",
+            # "value",
             "created_at",
+            "statistics",
             "wallet",
             "fleet",
         ]
+
+    def get_statistics(self, instance) -> dict:
+        return instance.get_stats()
