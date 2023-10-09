@@ -2,12 +2,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceSerializer
 from django_napse.core.models import NapseSpace
 
 
 class SpaceView(GenericViewSet):
     permission_classes = []
-    # serializer_class = SpaceSerializer
+    serializer_class = SpaceSerializer
 
     def get_object(self):
         return self.get_queryset().get(uuid=self.kwargs["pk"])
@@ -16,8 +17,6 @@ class SpaceView(GenericViewSet):
         return NapseSpace.objects.all()
 
     def get_serializer_class(self, *args, **kwargs):
-        from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceSerializer
-
         actions: dict = {
             "list": SpaceSerializer,
             "retrieve": SpaceDetailSerializer,
