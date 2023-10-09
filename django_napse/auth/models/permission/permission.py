@@ -12,6 +12,7 @@ class KeyPermission(models.Model):
     key = models.ForeignKey(APIKey, on_delete=models.CASCADE, related_name="permissions")
     space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE)
     approved = models.BooleanField(default=False)
+    revoked = models.BooleanField(default=False)
     permission_type = models.CharField(max_length=200)
 
     class Meta:

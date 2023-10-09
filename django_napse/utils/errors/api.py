@@ -18,3 +18,13 @@ class APIError:
         status_code = 403
         default_detail = "API key does not have the required permissions."
         default_code = "invalid_permissions"
+
+    class NoAPIKey(APIException):
+        status_code = 403
+        default_detail = "No API key was provided. Please provide an API key in the Authorization header. (Authorization: Api-Key <key>)"
+        default_code = "no_api_key"
+
+    class InvalidAPIKey(APIException):
+        status_code = 403
+        default_detail = "Invalid API key."
+        default_code = "invalid_api_key"

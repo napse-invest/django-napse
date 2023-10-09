@@ -29,19 +29,19 @@ class NapseSpaceTestCase:
         )
         architecture = SinglePairArchitecture.objects.create(constants={"controller": controller})
         strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
-        bot = Bot.objects.create(name="Test Bot", strategy=strategy)
+        template_bot = Bot.objects.create(name="Test Bot", strategy=strategy)
         fleet = Fleet.objects.create(
             name="Test Fleet",
             exchange_account=self.exchange_account,
             clusters=[
                 {
-                    "bot": bot,
+                    "template_bot": template_bot,
                     "share": 0.7,
                     "breakpoint": 1000,
                     "autoscale": False,
                 },
                 {
-                    "bot": bot,
+                    "template_bot": template_bot,
                     "share": 0.3,
                     "breakpoint": 1000,
                     "autoscale": True,

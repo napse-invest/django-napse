@@ -9,7 +9,7 @@ from django_napse.utils.errors import BotError, ClusterError
 
 class Cluster(models.Model):
     fleet = models.ForeignKey("Fleet", on_delete=models.CASCADE, related_name="clusters")
-    bot = models.OneToOneField("Bot", on_delete=models.CASCADE, related_name="cluster")
+    template_bot = models.OneToOneField("Bot", on_delete=models.CASCADE, related_name="cluster")
     share = models.FloatField()
     breakpoint = models.FloatField()
     autoscale = models.BooleanField()
@@ -28,7 +28,7 @@ class Cluster(models.Model):
         string += f"{beacon}Cluster {self.pk}:\n"
         string += f"{beacon}Args:\n"
         string += f"{beacon}\t{self.fleet=}\n"
-        string += f"{beacon}\t{self.bot=}\n"
+        string += f"{beacon}\t{self.template_bot=}\n"
         string += f"{beacon}\t{self.share=}\n"
         string += f"{beacon}\t{self.breakpoint=}\n"
         string += f"{beacon}\t{self.autoscale=}\n"
@@ -51,13 +51,13 @@ class Cluster(models.Model):
 
     @property
     def config(self):
-        return self.bot.strategy.config
+        return self.template_bot.strategy.config
 
     def invest(self, space, amount, ticker):
         all_connections = []
         bots = [link.bot for link in self.links.all().order_by("importance")]
         if len(bots) == 0:
-            new_bot = self.bot.copy()
+            new_bot = self.template_bot.copy()
             Link.objects.create(bot=new_bot, cluster=self, importance=1)
             # connection = Connection.objects.create(bot=new_bot, owner=space.wallet)
             connection = space.wallet.connect_to(new_bot)

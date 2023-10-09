@@ -78,13 +78,13 @@ jobs:
           python3 tests/test_app/manage.py makemigrations && python3 tests/test_app/manage.py migrate 
           coverage run ./tests/test_app/manage.py test -v2 --keepdb && coverage html
 
-      - name: Coverage value 
+      - name: Coverage value
         run: |
           cvg_result=$(coverage report --skip-covered | head -n -2 | tail -n 1 | awk '{print $NF}' | sed 's/%//')
           echo "COVERAGE=$cvg_result" >> $GITHUB_ENV
 
       - name: Coverage badge
-        if: ${{ github.base_ref == 'main' }} 
+        if: ${{ github.base_ref == 'main' }}
         uses: Schneegans/dynamic-badges-action@v1.6.0
         env:
           COVERAGE: ${{ env.COVERAGE }}
@@ -93,7 +93,7 @@ jobs:
           gistID: 40fac957532fe3b731c99067467de842
           filename: django-napse-coverage.json
           label: Coverage
-          message: ${{ env.COVERAGE }} % 
+          message: ${{ env.COVERAGE }} %
           valColorRange: ${{ env.COVERAGE }}
           minColorRange: 50
           maxColorRange: 95
@@ -102,7 +102,7 @@ jobs:
     name: Stop self-hosted EC2 runner
     needs:
       - start-runner # required to get output from the start-runner job
-      - build # required to wait when the main job is done 
+      - build # required to wait when the main job is done
     runs-on: ubuntu-latest
     if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
     steps:
