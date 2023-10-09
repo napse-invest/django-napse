@@ -5,8 +5,6 @@ from rest_framework.viewsets import GenericViewSet
 from django_napse.api.exchanges.serializers import ExchangeAccountDetailSerializer, ExchangeAccountSerializer
 from django_napse.core.models import ExchangeAccount
 
-# from rest_framework.decorators import action
-
 
 class ExchangeAccountView(GenericViewSet):
     permission_classes = []
