@@ -6,20 +6,23 @@ from django_napse.core.models import NapseSpace
 
 class SpaceSerializer(serializers.ModelSerializer):
     fleet_count = serializers.SerializerMethodField(read_only=True)
+    exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
 
     class Meta:
         model = NapseSpace
         fields = [
             "name",
             # read-only
-            "id",
+            "uuid",
             "value",
             "fleet_count",
+            "exchange_account",
         ]
         read_only_fields = [
-            "id",
+            "uuid",
             "value",
             "fleet_count",
+            "exchange_account",
         ]
 
     def get_fleet_count(self, instance) -> int:
@@ -28,6 +31,7 @@ class SpaceSerializer(serializers.ModelSerializer):
 
 class SpaceDetailSerializer(serializers.ModelSerializer):
     fleets = FleetSerializer(many=True, read_only=True)
+    exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
 
     class Meta:
         model = NapseSpace
@@ -35,14 +39,16 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
             "name",
             "description",
             # read-only
-            "id",
+            "uuid",
             "value",
             "created_at",
             "fleets",
+            "exchange_account",
         ]
         read_only_fields = [
-            "id",
+            "uuid",
             "value",
             "fleet",
             "created_at",
+            "exchange_account",
         ]
