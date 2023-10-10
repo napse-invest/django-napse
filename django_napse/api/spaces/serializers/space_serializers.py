@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from django_napse.api.fleets.serializers import FleetSerializer
-from django_napse.api.wallets.serializers import WalletSerializer
 from django_napse.core.models import NapseSpace
 
 
@@ -13,19 +12,16 @@ class SpaceSerializer(serializers.ModelSerializer):
         model = NapseSpace
         fields = [
             "name",
+            "exchange_account",
             # read-only
             "uuid",
             "value",
             "fleet_count",
-            "exchange_account",
         ]
         read_only_fields = [
             "uuid",
             "value",
             "fleet_count",
-        ]
-        write_only_fields = [
-            "exchange_account",
         ]
 
     def get_fleet_count(self, instance) -> int:
@@ -43,18 +39,16 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
             "description",
             # read-only
             "uuid",
-            # "value"
+            "exchange_account",
             "created_at",
             "statistics",
             "wallet",
             "fleets",
-            "exchange_account",
         ]
         read_only_fields = [
             "uuid",
-            # "value",
-            "created_at",
             "exchange_account",
+            "created_at",
             "statistics",
             "wallet",
             "fleet",

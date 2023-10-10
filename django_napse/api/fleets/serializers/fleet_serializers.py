@@ -74,7 +74,7 @@ class FleetDetailSerializer(serializers.Serializer):
 
     def get_wallet(self, instance):
         # PUT THIS INTO MODEL ???
-
+        # TODO Make a dict & return
         # instance.bots
         wallets = ConnectionWallet.objects.filter(connection__bot__in=instance.bots)
 
