@@ -5,7 +5,7 @@ from rest_framework_api_key.permissions import HasAPIKey
 from django_napse.api.custom_permissions import HasSpace
 from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.api.fleets.serializers import FleetDetailSerializer, FleetSerializer
-from django_napse.core.models import Fleet, NapseSpace
+from django_napse.core.models import NapseSpace
 
 
 class FleetView(CustomViewSet):
