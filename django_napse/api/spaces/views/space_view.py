@@ -14,6 +14,9 @@ class SpaceView(CustomViewSet):
     permission_classes = [HasAPIKey]
     serializer_class = SpaceSerializer
 
+    def get_object(self):
+        return self.get_queryset().get(uuid=self.kwargs["pk"])
+
     def get_queryset(self):
         return NapseSpace.objects.all()
 
@@ -27,13 +30,14 @@ class SpaceView(CustomViewSet):
         return result if result else super().get_serializer_class()
 
     def list(self, request):
-        serializer = self.serializer_class(self.get_queryset(), many=True)
+        serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @permission_decorator([HasSpace])
     def retrieve(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
+        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @permission_decorator([HasSpace])

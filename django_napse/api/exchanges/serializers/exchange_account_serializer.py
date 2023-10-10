@@ -10,13 +10,13 @@ class ExchangeAccountSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExchangeAccount
         fields = [
-            "id",
+            "uuid",
             "exchange_name",
             "name",
             "testing",
         ]
         read_only_fields = [
-            "id",
+            "uuid",
             "exchange_name",
             "testing",
         ]
@@ -29,7 +29,7 @@ class ExchangeAccountDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExchangeAccount
         fields = [
-            "id",
+            "uuid",
             "exchange_name",
             "name",
             "testing",
@@ -38,7 +38,7 @@ class ExchangeAccountDetailSerializer(serializers.ModelSerializer):
             "spaces",
         ]
         read_only_fields = [
-            "id",
+            "uuid",
             "exchange_name",
             "testing",
             "created_at",

@@ -29,11 +29,11 @@ class APITestCase(CustomTestCase):
     def build_key(self, permissions):
         key_obj, self.key = APIKey.objects.create_key(name="test")
         if HasReadPermission in permissions:
-            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.READ_ONLY)
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.READ_ONLY, approved=True)
         if HasFullAccessPermission in permissions:
-            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.FULL_ACCESS)
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.FULL_ACCESS, approved=True)
         if HasAdminPermission in permissions:
-            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.ADMIN)
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.ADMIN, approved=True)
 
     def authenticate(self):
         self.headers["Authorization"] = f"Api-Key {self.key}"

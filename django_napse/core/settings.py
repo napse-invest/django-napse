@@ -47,7 +47,12 @@ class DjangoNapseSettings:
 napse_settings = DjangoNapseSettings()
 
 if settings.configured:
-    for app in ["rest_framework", "rest_framework_api_key", "django_celery_beat"]:
+    for app in [
+        "rest_framework",
+        "rest_framework_api_key",
+        "django_celery_beat",
+        "corsheaders",
+    ]:
         if app not in settings.INSTALLED_APPS:
             warning = f"{app} not found in settings.INSTALLED_APPS. Please add it to your settings file."
             logger.warning(warning)

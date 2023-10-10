@@ -5,11 +5,12 @@ from rest_framework.viewsets import GenericViewSet
 from django_napse.api.exchanges.serializers import ExchangeAccountDetailSerializer, ExchangeAccountSerializer
 from django_napse.core.models import ExchangeAccount
 
-# from rest_framework.decorators import action
-
 
 class ExchangeAccountView(GenericViewSet):
     permission_classes = []
+
+    def get_object(self):
+        return self.get_queryset().get(uuid=self.kwargs["pk"])
 
     def get_queryset(self):
         return ExchangeAccount.objects.all()

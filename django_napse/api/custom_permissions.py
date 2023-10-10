@@ -1,5 +1,6 @@
 from django.forms import ValidationError
 from rest_framework.permissions import BasePermission
+from rest_framework_api_key.permissions import HasAPIKey  # noqa
 
 from django_napse.core.models import NapseSpace
 from django_napse.utils.constants import PERMISSION_TYPES
@@ -22,7 +23,14 @@ class HasAdminPermission(BasePermission):
         space = check_for_space(request)
 
         api_key = view.get_api_key(request)
-        if any(permission.permission_type == PERMISSION_TYPES.ADMIN for permission in api_key.permissions.filter(space=space)):
+        if any(
+            permission.permission_type == PERMISSION_TYPES.ADMIN
+            for permission in api_key.permissions.filter(
+                space=space,
+                approved=True,
+                revoked=False,
+            )
+        ):
             return True
         raise APIError.InvalidPermissions()
 
@@ -32,7 +40,11 @@ class HasFullAccessPermission(BasePermission):
         space = check_for_space(request)
 
         api_key = view.get_api_key(request)
-        for permission in api_key.permissions.filter(space=space):
+        for permission in api_key.permissions.filter(
+            space=space,
+            approved=True,
+            revoked=False,
+        ):
             if permission.permission_type in [PERMISSION_TYPES.ADMIN, PERMISSION_TYPES.FULL_ACCESS]:
                 return True
         raise APIError.InvalidPermissions()
@@ -43,7 +55,11 @@ class HasReadPermission(BasePermission):
         space = check_for_space(request)
 
         api_key = view.get_api_key(request)
-        for permission in api_key.permissions.filter(space=space):
+        for permission in api_key.permissions.filter(
+            space=space,
+            approved=True,
+            revoked=False,
+        ):
             if permission.permission_type in [PERMISSION_TYPES.ADMIN, PERMISSION_TYPES.FULL_ACCESS, PERMISSION_TYPES.READ_ONLY]:
                 return True
         raise APIError.InvalidPermissions()
