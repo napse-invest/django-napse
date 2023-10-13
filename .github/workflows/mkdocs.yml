@@ -3,8 +3,8 @@ name: mkdocs
 on:
   push:
     branches:
-      - feature/mkdocs
       - main
+      - feature/mkdocs
 
 permissions:
   contents: write
