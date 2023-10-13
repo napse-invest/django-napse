@@ -2,8 +2,7 @@ from rest_framework import serializers
 from rest_framework.fields import empty
 
 from django_napse.api.bots.serializers import BotSerializer
-from django_napse.api.wallets.serializers import WalletSerializer
-from django_napse.core.models import ConnectionWallet, Fleet, Wallet
+from django_napse.core.models import ConnectionWallet, Fleet
 
 
 class FleetSerializer(serializers.ModelSerializer):
@@ -73,26 +72,32 @@ class FleetDetailSerializer(serializers.Serializer):
         return instance.get_stats()
 
     def get_wallet(self, instance):
-        # PUT THIS INTO MODEL ???
-        # TODO Make a dict & return
-        # instance.bots
-        wallets = ConnectionWallet.objects.filter(connection__bot__in=instance.bots)
+        def _search_ticker(ticker: str, merged_wallet) -> int | None:
+            """Return the index of the currency in the list if found, None otherwise."""
+            for i, currency in enumerate(merged_wallet):
+                if currency.get("ticker").ticker == ticker:
+                    return i
+            return None
 
-        # Merge currencies
-        merged_wallet = Wallet(title="merged_wallet")
-        merged_wallet.save()
-        merged_wallet_tickers: list[str] = []
+        def _update_merged_wallet(index: int, currency: str, merged_wallet) -> None:
+            """Update the merged wallet with the new currency."""
+            if index is None:
+                merged_wallet.append(
+                    {
+                        "ticker": currency.ticker,
+                        "amount": currency.amount,
+                        "mbp": currency.mbp,
+                    },
+                )
+            else:
+                merged_wallet[index]["amount"] += currency.amount
+
+        wallets = ConnectionWallet.objects.filter(owner__owner=self.space.wallet, owner__bot__in=instance.bots)
+        merged_wallet: list[dict[str, str | float]] = []
 
         for wallet in wallets:
             for currency in wallet.currencies.all():
-                if currency.ticker not in merged_wallet_tickers:
-                    merged_wallet_tickers.append(currency.ticker)
-                    currency.copy(owner=wallet)
-                    continue
-                merged_currency = merged_wallet.currencies.get(ticker=currency.ticker)
-                merged_currency.amount += currency.amount
-                merged_currency.save()
+                index = _search_ticker(currency.ticker, merged_wallet)
+                _update_merged_wallet(index, currency, merged_wallet)
 
-        serialized_wallet = WalletSerializer(merged_wallet).data
-        merged_wallet.delete()
-        return serialized_wallet
+        return merged_wallet

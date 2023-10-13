@@ -4,8 +4,9 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.utils.timezone import get_default_timezone
 
-from django_napse.core.models import Fleet, Order
 from django_napse.core.models.accounts.managers import NapseSpaceManager
+from django_napse.core.models.fleets.fleet import Fleet
+from django_napse.core.models.orders.order import Order
 from django_napse.utils.errors import SpaceError
 
 
