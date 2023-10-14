@@ -24,7 +24,7 @@ env.read_env(str(BASE_DIR / ".env"))
 SECRET_KEY = "django-insecure-secret"  # noqa: S105
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "django"]
 CORS_ALLOWED_ORIGINS = [f"http://{host}:8888" for host in ALLOWED_HOSTS]
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
@@ -144,7 +145,6 @@ NAPSE_SECRETS_FILE_PATH = BASE_DIR / "secrets.json"
 NAPSE_ENV_FILE_PATH = BASE_DIR / ".env"
 CELERY_BROKER_URL = "redis://localhost:6379"
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers.DatabaseScheduler"
-DEBUG = True
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [

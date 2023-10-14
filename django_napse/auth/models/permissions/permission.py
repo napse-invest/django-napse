@@ -1,7 +1,6 @@
 import uuid
 
 from django.db import models
-from rest_framework_api_key.models import APIKey
 
 from django_napse.utils.constants import PERMISSION_TYPES
 
@@ -9,7 +8,7 @@ from django_napse.utils.constants import PERMISSION_TYPES
 class KeyPermission(models.Model):
     uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
 
-    key = models.ForeignKey(APIKey, on_delete=models.CASCADE, related_name="permissions")
+    key = models.ForeignKey("NapseAPIKey", on_delete=models.CASCADE, related_name="permissions")
     space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE)
     approved = models.BooleanField(default=False)
     revoked = models.BooleanField(default=False)

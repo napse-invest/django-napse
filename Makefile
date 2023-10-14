@@ -22,7 +22,7 @@ up:
 	make makemigrations && make migrate && make runserver
 
 clean:
-	source .venv/bin/activate && python tests/test_app/manage.py flush
+	rm tests/test_app/db.sqlite3
 
 celery:
 	source .venv/bin/activate && watchfiles --filter python celery.__main__.main --args "-A tests.test_app worker --beat -l INFO"
