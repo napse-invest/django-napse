@@ -24,18 +24,21 @@ class SpaceViewTestCase:
                 "url_name": "space-list",
                 "view": SpaceView,
                 "method": "GET",
+                "data": {"pk": self.space.id},
                 "tests": [],
             },
             "retrieve": {
                 "url_name": "space-detail",
                 "view": SpaceView,
                 "method": "GET",
+                "data": {"pk": self.space.id},
                 "tests": [],
             },
             "create": {
                 "url_name": "space-list",
                 "view": SpaceView,
                 "method": "POST",
+                "data": {"pk": self.space.id},
                 "tests": [],
             },
         }
