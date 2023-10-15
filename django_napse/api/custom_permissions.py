@@ -23,6 +23,8 @@ class HasAdminPermission(BasePermission):
         space = check_for_space(request)
 
         api_key = view.get_api_key(request)
+        if api_key.is_master_key:
+            return True
         if any(
             permission.permission_type == PERMISSION_TYPES.ADMIN
             for permission in api_key.permissions.filter(
@@ -40,6 +42,8 @@ class HasFullAccessPermission(BasePermission):
         space = check_for_space(request)
 
         api_key = view.get_api_key(request)
+        if api_key.is_master_key:
+            return True
         for permission in api_key.permissions.filter(
             space=space,
             approved=True,
@@ -55,6 +59,8 @@ class HasReadPermission(BasePermission):
         space = check_for_space(request)
 
         api_key = view.get_api_key(request)
+        if api_key.is_master_key:
+            return True
         for permission in api_key.permissions.filter(
             space=space,
             approved=True,
@@ -69,3 +75,11 @@ class HasSpace(BasePermission):
     def has_permission(self, request, view):
         check_for_space(request)
         return True
+
+
+class HasMasterKey(BasePermission):
+    def has_permission(self, request, view):
+        api_key = view.get_api_key(request)
+        if api_key.is_master_key:
+            return True
+        raise APIError.InvalidPermissions()

@@ -26,7 +26,7 @@ class SpaceView(CustomViewSet):
             "retrieve": SpaceDetailSerializer,
             "create": SpaceSerializer,
         }
-        result = actions.get(self.action)
+        result = actions.get(self.action, None)
         return result if result else super().get_serializer_class()
 
     def list(self, request):
@@ -37,7 +37,6 @@ class SpaceView(CustomViewSet):
     def retrieve(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @permission_decorator([HasSpace])
