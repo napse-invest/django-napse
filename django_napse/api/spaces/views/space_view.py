@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
-from django_napse.api.custom_permissions import HasAPIKey, HasReadPermission, HasSpace
+from django_napse.api.custom_permissions import HasAPIKey
 from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceSerializer
 from django_napse.core.models import NapseSpace
 
