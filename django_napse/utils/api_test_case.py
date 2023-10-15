@@ -22,7 +22,10 @@ class APITestCase(CustomTestCase):
         raise NotImplementedError(error_msg)
 
     def build_url(self, kwargs=None):
-        self.url = reverse(viewname=self.url_name)
+        if kwargs and kwargs.get("pk", None):
+            self.url = reverse(viewname=self.url_name, kwargs={"pk": kwargs.pop("pk")})
+        else:
+            self.url = reverse(viewname=self.url_name)
         if kwargs:
             self.url += "?" + "&".join([f"{key}={value}" for key, value in kwargs.items()])
 
@@ -76,7 +79,7 @@ class APITestCase(CustomTestCase):
         self.data = self.modes[mode].get("data", {})
         self.headers = self.modes[mode].get("headers", {})
         self.url_name = self.modes[mode]["url_name"]
-        self.build_url(kwargs={"pk": 1, **self.kwargs} if self.modes[mode]["method"] in ["PATCH", "PUT", "DELETE"] else self.kwargs)
+        self.build_url(kwargs={"pk": 1} if self.modes[mode]["method"] in ["PATCH", "PUT", "DELETE"] and not self.kwargs else self.kwargs)
 
         permissions = self.modes[mode]["view"].permission_classes
         permission_importance = {
