@@ -17,14 +17,6 @@ class NapseAPIKeySerializer(serializers.ModelSerializer):
             "revoked",
             "description",
         ]
-        read_only_fields = [
-            "name",
-            "prefix",
-            "permissions",
-            "is_master_key",
-            "revoked",
-            "description",
-        ]
 
 
 class NapseAPIKeySpaceSerializer(serializers.ModelSerializer):
@@ -33,10 +25,9 @@ class NapseAPIKeySpaceSerializer(serializers.ModelSerializer):
         fields = [
             "name",
             "prefix",
-        ]
-        read_only_fields = [
-            "name",
-            "prefix",
+            "is_master_key",
+            "revoked",
+            "description",
         ]
 
     def to_representation(self, instance):

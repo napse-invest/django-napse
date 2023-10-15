@@ -79,7 +79,6 @@ class PERMISSION_TYPES(StrEnum, metaclass=CustomEnumMeta):
     ADMIN = "ADMIN"
     FULL_ACCESS = "FULL_ACCESS"
     READ_ONLY = "READ_ONLY"
-    NO_ACCESS = "NO_ACCESS"
 
 
 class HISTORY_DATAPOINT_FIELDS(StrEnum, metaclass=CustomEnumMeta):

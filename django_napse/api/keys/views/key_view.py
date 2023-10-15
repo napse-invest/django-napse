@@ -1,12 +1,15 @@
 from django.db.transaction import atomic
 from rest_framework import status
+from rest_framework.decorators import action
+from rest_framework.decorators import permission_classes as pc
 from rest_framework.response import Response
 
-from django_napse.api.custom_permissions import HasMasterKey
+from django_napse.api.custom_permissions import HasAPIKey, HasMasterKey
 from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.api.keys.serializers import NapseAPIKeySerializer
 from django_napse.api.keys.serializers.key import NapseAPIKeySpaceSerializer
 from django_napse.auth.models import NapseAPIKey
+from django_napse.utils.constants import PERMISSION_TYPES
 
 
 class Key(CustomViewSet):
@@ -22,8 +25,7 @@ class Key(CustomViewSet):
         if "name" not in request.data:
             return Response({"error": "Missing name"}, status=status.HTTP_400_BAD_REQUEST)
 
-        with atomic():
-            _, key = NapseAPIKey.objects.create_key(name=request.data["name"], description=request.data.get("name", ""))
+        _, key = NapseAPIKey.objects.create_key(name=request.data["name"], description=request.data.get("name", ""))
 
         return Response({"key": key}, status=status.HTTP_201_CREATED)
 
@@ -45,7 +47,10 @@ class Key(CustomViewSet):
 
     def retrieve(self, request, pk):
         key = self.get_object()
-        serializer = NapseAPIKeySerializer(key)
+        if "space" not in request.query_params:
+            serializer = NapseAPIKeySerializer(key)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = NapseAPIKeySpaceSerializer(key, context={"space": request.query_params["space"]})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk):
@@ -55,12 +60,23 @@ class Key(CustomViewSet):
 
     def patch(self, request, pk):
         key = self.get_object()
-        if "name" in request.data:
-            key.name = request.data["name"]
-        if "permissions" in request.data:
-            key.permissions.all().delete()
-            for permission in request.data["permissions"]:
-                key.add_permission(self.space, permission)
-        key.save()
+        with atomic():
+            if "name" in request.data:
+                key.name = request.data["name"]
+            if "description" in request.data:
+                key.description = request.data["description"]
+            if "permissions" in request.data:
+                for permission in key.permissions.filter(space=self.space(request)):
+                    permission.delete()
+                for permission in request.data["permissions"]:
+                    key.add_permission(self.space(request), permission)
+            key.save()
+            if request.data.get("revoked", False):
+                key.revoke()
         serializer = NapseAPIKeySerializer(key)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["GET"])
+    @pc([HasAPIKey])
+    def possible_permissions(self, request):
+        return Response(list(PERMISSION_TYPES), status=status.HTTP_200_OK)
