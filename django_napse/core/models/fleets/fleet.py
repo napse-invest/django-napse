@@ -1,10 +1,13 @@
 import uuid
+from datetime import datetime, timedelta
 
 from django.db import models
+from django.utils.timezone import get_default_timezone
 
 from django_napse.core.models.bots.bot import Bot
+from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.fleets.managers import FleetManager
-from django_napse.core.models.wallets import Connection
+from django_napse.core.models.orders.order import Order
 
 
 class Fleet(models.Model):
@@ -70,3 +73,14 @@ class Fleet(models.Model):
         for cluster in self.clusters.all():
             connections += cluster.invest(space, amount * cluster.share, ticker)
         return connections
+
+    def get_stats(self):
+        order_count = Order.objects.filter(
+            connection__bot__in=self.bots,
+            created_at__gt=datetime.now(tz=get_default_timezone()) - timedelta(days=30),
+        ).count()
+        return {
+            "value": self.value,
+            "order_count_30": order_count,
+            "change_30": None,  # TODO: Need history
+        }
