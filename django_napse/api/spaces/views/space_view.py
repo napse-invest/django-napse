@@ -2,12 +2,13 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from django_napse.api.custom_permissions import HasAPIKey
 from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceSerializer
 from django_napse.core.models import NapseSpace
 
 
 class SpaceView(GenericViewSet):
-    permission_classes = []
+    permission_classes = [HasAPIKey]
     serializer_class = SpaceSerializer
 
     def get_object(self):
@@ -21,7 +22,7 @@ class SpaceView(GenericViewSet):
             "list": SpaceSerializer,
             "retrieve": SpaceDetailSerializer,
         }
-        result = actions.get(self.action)
+        result = actions.get(self.action, None)
         return result if result else super().get_serializer_class()
 
     def list(self, request):
@@ -31,7 +32,6 @@ class SpaceView(GenericViewSet):
     def retrieve(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
-        print(serializer.data)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
