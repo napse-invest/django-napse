@@ -156,3 +156,21 @@ class APITestCase(CustomTestCase):
         if len(error_list) > 0:
             error_msg = f"Errors in {mode} mode"
             raise ExceptionGroup(error_msg, error_list)
+
+
+class ViewTest:
+    def __init__(self, testcase_instance: APITestCase):
+        self.testcase_instance = testcase_instance
+
+    def setup(self, data: dict | None = None):
+        def _setup(data=data):
+            return self.testcase_instance.client.get(
+                path=self.testcase_instance.url,
+                data=data,
+                headers=self.testcase_instance.headers,
+            )
+
+        return _setup
+
+    def run(self) -> list[dict[str, any]]:
+        raise NotImplementedError

@@ -6,7 +6,7 @@ from django_napse.api.wallets.serializers.currency_serializer import CurrencySer
 from django_napse.core.models import Transaction, Wallet
 
 
-class WalletDetailSerializer(serializers.ModelSerializer):
+class WalletSerializer(serializers.ModelSerializer):
     currencies = CurrencySerializer(many=True, read_only=True)
     value = serializers.SerializerMethodField(read_only=True)
     operations = serializers.SerializerMethodField(read_only=True)
@@ -16,13 +16,15 @@ class WalletDetailSerializer(serializers.ModelSerializer):
         fields = [
             "title",
             "value",
-            "currencies",
             "created_at",
+            "currencies",
+            "operations",
         ]
         read_only_fields = [
             "value",
-            "currencies",
             "created_at",
+            "currencies",
+            "operations",
         ]
 
     def get_value(self, instance) -> float:

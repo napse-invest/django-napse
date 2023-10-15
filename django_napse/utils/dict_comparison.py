@@ -1,5 +1,5 @@
 """Module that contains a function to compare two dictionaries."""
-from rest_framework.utils.serializer_helpers import ReturnList
+from rest_framework.utils.serializer_helpers import ReturnDict, ReturnList
 
 
 def compare_responses(response1, response2):
@@ -25,9 +25,11 @@ def compare_responses(response1, response2):
 
 
 def convert_response(response: ReturnList):
-    if not isinstance(response, ReturnList):
-        return response
-    return dict(response[0])
+    if isinstance(response, ReturnList):
+        return dict(response[0])
+    if isinstance(response, ReturnDict):
+        return dict(response)
+    return response
 
 
 def compare_dicts(dict1, dict2):
@@ -35,8 +37,13 @@ def compare_dicts(dict1, dict2):
         error_message = "One of the arguments is not a dictionary."
         raise TypeError(error_message)
 
+    # Only dict type comparaison
+    if dict1 == {} or dict2 == {}:
+        return True
+
     if set(dict1.keys()) != set(dict2.keys()):
-        return False
+        error_msg: str = f"Dictionaries do not contain the same number of keys ({len(dict1.keys())} != {len(dict2.keys())})"
+        raise ValueError(error_msg)
 
     for key in dict1:
         val1 = dict1[key]
@@ -53,8 +60,14 @@ def compare_list(list1, list2):
     if not isinstance(list1, list) or not isinstance(list2, list):
         error_message = "One of the arguments is not a list."
         raise TypeError(error_message)
+
+    # Only list type comparaison
+    if list1 == [] or list2 == []:
+        return True
+
     if len(list1) != len(list2):
-        return False
+        error_msg: str = f"List haven't the same lenght ({len(list1)} != {len(list1)})"
+        raise ValueError(error_msg)
 
     for i in range(len(list1)):
         try:
