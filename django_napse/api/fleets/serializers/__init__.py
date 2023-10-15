@@ -1,1 +1,1 @@
-from .fleet_serializers import FleetSerializer
+from .fleet_serializers import FleetDetailSerializer, FleetSerializer
