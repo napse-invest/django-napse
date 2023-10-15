@@ -12,7 +12,7 @@ python tests/test_app/manage.py test tests.django_tests.api.spaces.test_space_vi
 class ListSpaceViewTest(ViewTest):
     def check_response(self, response) -> bool:
         return compare_responses(
-            response.data,
+            response.data[0],
             {
                 "name": str(),
                 "uuid": str(),
@@ -51,6 +51,7 @@ class RetrieveSpaceViewTest(ViewTest):
                 "wallet": {},
                 "fleets": [],
             },
+            authorize_abstract_comparison=True,
         )
 
     def run(self):
