@@ -49,6 +49,7 @@ class RetrieveSpaceViewTest(ViewTest):
                     "change_30": None,
                 },
                 "wallet": {},
+                # "history": {},
                 "fleets": [],
             },
             authorize_abstract_comparison=True,
