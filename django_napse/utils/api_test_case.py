@@ -159,7 +159,7 @@ class APITestCase(CustomTestCase):
 
 
 class ViewTest:
-    def __init__(self, testcase_instance: APITestCase):
+    def __init__(self, testcase_instance: APITestCase, *args, **kwargs):
         self.testcase_instance = testcase_instance
 
     def setup(self, data: dict | None = None):

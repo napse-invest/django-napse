@@ -14,12 +14,12 @@ class FleetSerializer(serializers.ModelSerializer):
         fields = [
             "name",
             # read-only
-            "id",
+            "uuid",
             "value",
             "bot_count",
         ]
         read_only_fields = [
-            "id",
+            "uuid",
             "value",
             "bot_count",
         ]
@@ -36,7 +36,6 @@ class FleetSerializer(serializers.ModelSerializer):
 
 
 class FleetDetailSerializer(serializers.Serializer):
-    value = serializers.SerializerMethodField(read_only=True)
     wallet = serializers.SerializerMethodField(read_only=True)
     statistics = serializers.SerializerMethodField(read_only=True)
     bots = BotSerializer(many=True, read_only=True)
@@ -44,29 +43,17 @@ class FleetDetailSerializer(serializers.Serializer):
     class Meta:
         model = Fleet
         fields = [
-            "id",
-            "value",
+            "uuid",
+            "name",
             "created_at",
             "statistics",
             "wallet",
             "bots",
         ]
-        read_only_fields = [
-            "id",
-            "value",
-            "created_at",
-            "statistics",
-            "wallet",
-            "bots",
-        ]
-        write_only_fields = []
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
         self.space = space
         super().__init__(instance=instance, data=data, **kwargs)
-
-    def get_value(self, instance):
-        return instance.value(space=self.space)
 
     def get_statistics(self, instance):
         return instance.get_stats()
@@ -101,3 +88,7 @@ class FleetDetailSerializer(serializers.Serializer):
                 _update_merged_wallet(index, currency, merged_wallet)
 
         return merged_wallet
+
+    def save(self, **kwargs):
+        error_msg: str = "Impossible to update a fleet through the detail serializer."
+        raise ValueError(error_msg)

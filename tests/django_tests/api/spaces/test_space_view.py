@@ -2,8 +2,6 @@ from django_napse.api.spaces import SpaceView
 from django_napse.utils.api_test_case import APITestCase, ViewTest
 from django_napse.utils.dict_comparison import compare_responses
 
-# from django_napse.utils.dict_comparison import compare_responses
-
 """
 python tests/test_app/manage.py test tests.django_tests.api.spaces.test_space_view -v2 --keepdb --parallel
 """
@@ -49,6 +47,7 @@ class RetrieveSpaceViewTest(ViewTest):
                     "change_30": None,
                 },
                 "wallet": {},
+                # "history": {},
                 "fleets": [],
             },
             authorize_abstract_comparison=True,
@@ -87,8 +86,8 @@ class SpaceViewTestCase:
                 "url_name": "space-detail",
                 "view": SpaceView,
                 "method": "GET",
-                "tests": retrieve_test.run(),
                 "kwargs": {"pk": self.space.uuid},
+                "tests": retrieve_test.run(),
             },
         }
 
