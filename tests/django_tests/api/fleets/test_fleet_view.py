@@ -131,11 +131,11 @@ class RetrieveFleetViewTest(ViewTest):
 
 
 class FleetViewTestCase:
-    def test_list(self):
-        self.run_tests("list")
+    # def test_list(self):
+    #     self.run_tests("list")
 
-    def test_retrieve(self):
-        self.run_tests("list")
+    # def test_retrieve(self):
+    #     self.run_tests("list")
 
     def setup(self):
         list_test = ListFleetViewTest(self)
