@@ -1,14 +1,16 @@
 """Module that contains a function to compare two dictionaries."""
+from rest_framework.utils.serializer_helpers import ReturnList
 
 
 def compare_responses(response1, response2):
+    response1 = convert_response(response1)
+    response2 = convert_response(response2)
+
     if response1 is None and response2 is None:
         return True
     if isinstance(response1, str) and isinstance(response2, str):
         return True
-    if isinstance(response1, int) and isinstance(response2, int):
-        return True
-    if isinstance(response1, float) and isinstance(response2, float):
+    if isinstance(response1, (int, float)) and isinstance(response2, (int, float)):
         return True
     if isinstance(response1, bool) and isinstance(response2, bool):
         return True
@@ -17,8 +19,15 @@ def compare_responses(response1, response2):
     if isinstance(response1, list) and isinstance(response2, list):
         return compare_list(response1, response2)
     if type(response1) != type(response2):
-        return False
+        error_msg: str = f"{type(response1)} != {type(response2)}"
+        raise TypeError(error_msg)
     return True
+
+
+def convert_response(response: ReturnList):
+    if not isinstance(response, ReturnList):
+        return response
+    return dict(response[0])
 
 
 def compare_dicts(dict1, dict2):
@@ -32,8 +41,11 @@ def compare_dicts(dict1, dict2):
     for key in dict1:
         val1 = dict1[key]
         val2 = dict2[key]
-        if not compare_responses(val1, val2):
-            return False
+        try:
+            compare_responses(val1, val2)
+        except TypeError as error:
+            error_msg = f"{error} on {key} key"
+            raise TypeError(error_msg) from error
     return True
 
 
@@ -43,4 +55,11 @@ def compare_list(list1, list2):
         raise TypeError(error_message)
     if len(list1) != len(list2):
         return False
-    return all(compare_responses(elem1, elem2) for elem1, elem2 in zip(list1, list2, strict=True))
+
+    for i in range(len(list1)):
+        try:
+            compare_responses(list1[i], list2[i])
+        except TypeError as error:
+            error_msg = f"{error} on {i} index"
+            raise TypeError(error_msg) from error
+    return True
