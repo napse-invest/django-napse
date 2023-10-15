@@ -1,10 +1,10 @@
 from django.urls import reverse
 from rest_framework.test import APIClient
-from rest_framework_api_key.models import APIKey
 from rest_framework_api_key.permissions import HasAPIKey
 
-from django_napse.api.custom_permissions import HasAdminPermission, HasFullAccessPermission, HasReadPermission, HasSpace
+from django_napse.api.custom_permissions import HasAdminPermission, HasFullAccessPermission, HasMasterKey, HasReadPermission, HasSpace
 from django_napse.auth.models import KeyPermission
+from django_napse.auth.models.keys.key import NapseAPIKey
 from django_napse.utils.constants import PERMISSION_TYPES
 from django_napse.utils.custom_test_case import CustomTestCase
 
@@ -27,7 +27,7 @@ class APITestCase(CustomTestCase):
             self.url += "?" + "&".join([f"{key}={value}" for key, value in kwargs.items()])
 
     def build_key(self, permissions):
-        key_obj, self.key = APIKey.objects.create_key(name="test")
+        key_obj, self.key = NapseAPIKey.objects.create_key(name="test")
         if HasReadPermission in permissions:
             KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.READ_ONLY, approved=True)
         if HasFullAccessPermission in permissions:
@@ -85,6 +85,7 @@ class APITestCase(CustomTestCase):
             HasReadPermission: 2,
             HasFullAccessPermission: 3,
             HasAdminPermission: 4,
+            HasMasterKey: 5,
         }
         permissions.sort(key=lambda x: permission_importance[x])
 

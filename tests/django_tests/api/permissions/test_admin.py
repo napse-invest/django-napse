@@ -3,7 +3,7 @@ from django_napse.utils.api_test_case import APITestCase
 from django_napse.utils.dict_comparison import compare_responses
 
 """
-python tests/test_app/manage.py test tests.django_tests.api.permissions.create -v2 --keepdb --parallel
+python tests/test_app/manage.py test tests.django_tests.api.permissions.test_admin -v2 --keepdb --parallel
 """
 
 
@@ -17,7 +17,6 @@ class PermissionAdminTestCase:
                 return self.client.get(path=self.url, headers=self.headers)
 
             def check__create(response):
-                print(response.data)
                 return compare_responses(response.data, [])
 
             return {
