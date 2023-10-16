@@ -1,14 +1,8 @@
 
+![Napse logo](theme/logo/napse_invest_logo_black.svg#only-light)
+![Napse logo](theme/logo/napse_invest_logo_white.svg#only-dark)
 
 <h1 align="center">
-<!-- ![test](theme/assets/images/NapseInvestLogoSVGWhite.png#only-light)
-![test](theme/assets/images/NapseInvestLogoSVG.png#only-dark) -->
-
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="theme/assets/images/NapseInvestLogoSVGWhite.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="theme/assets/images/NapseInvestLogoSVG.svg">
-  <img alt="Test" src="theme/assets/images/NapseInvestLogoSVGWhite.svg">
-</picture>
 
 </h1><br>
 

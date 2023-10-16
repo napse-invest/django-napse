@@ -28,17 +28,13 @@ The first step is to set up the development environment
     .\setup-windows.ps1
     ```
 
-???+ advice "Make for Windows users"
-    If you're using **Windows**, for the rest of this guide (and for your own convenience), please install [make](https://linuxhint.com/install-use-make-windows/).
+    !!! advice "Make for Windows users"
+        If you're using **Windows**, for the rest of this guide (and for your own convenience), please install [make](https://linuxhint.com/install-use-make-windows/).
 
 Then, you can run a test version of the project to work with:
 ```bash
 make makemigrations
-```
-```bash
 make migrate
-```
-```bash
 make runserver
 ```
 
