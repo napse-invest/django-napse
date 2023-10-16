@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from django_napse.api.fleets.serializers import FleetSerializer
+from django_napse.api.histories.serializers import HistorySerializer  # noqa: F401
+from django_napse.api.wallets.serializers.wallet_serializers import WalletSerializer
 from django_napse.core.models import NapseSpace
 
 
@@ -12,17 +14,16 @@ class SpaceSerializer(serializers.ModelSerializer):
         model = NapseSpace
         fields = [
             "name",
+            "exchange_account",
             # read-only
             "uuid",
             "value",
             "fleet_count",
-            "exchange_account",
         ]
         read_only_fields = [
             "uuid",
             "value",
             "fleet_count",
-            "exchange_account",
         ]
 
     def get_fleet_count(self, instance) -> int:
@@ -32,6 +33,9 @@ class SpaceSerializer(serializers.ModelSerializer):
 class SpaceDetailSerializer(serializers.ModelSerializer):
     fleets = FleetSerializer(many=True, read_only=True)
     exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
+    statistics = serializers.SerializerMethodField(read_only=True)
+    wallet = WalletSerializer(read_only=True)
+    # history = HistorySerializer(read_only=True)
 
     class Meta:
         model = NapseSpace
@@ -40,15 +44,22 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
             "description",
             # read-only
             "uuid",
-            "value",
-            "created_at",
-            "fleets",
             "exchange_account",
+            "created_at",
+            "statistics",
+            "wallet",
+            # "history",
+            "fleets",
         ]
         read_only_fields = [
             "uuid",
-            "value",
-            "fleet",
-            "created_at",
             "exchange_account",
+            "created_at",
+            "statistics",
+            "wallet",
+            # "history",
+            "fleet",
         ]
+
+    def get_statistics(self, instance) -> dict:
+        return instance.get_stats()

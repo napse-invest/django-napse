@@ -3,9 +3,6 @@ SHELL := /bin/bash
 setup:
 	source setup-unix.sh
 
-activate:
-	source .venv/bin/activate
-
 makemigrations:
 	source .venv/bin/activate && python tests/test_app/manage.py makemigrations
 
