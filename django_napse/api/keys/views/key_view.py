@@ -1,7 +1,6 @@
 from django.db.transaction import atomic
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.decorators import permission_classes as pc
 from rest_framework.response import Response
 
 from django_napse.api.custom_permissions import HasAPIKey, HasMasterKey
@@ -20,6 +19,15 @@ class Key(CustomViewSet):
 
     def get_object(self):
         return NapseAPIKey.objects.get(prefix=self.kwargs["pk"])
+
+    def get_permissions(self):
+        match self.action:
+            case "connect" | "possible_permissions":
+                return [HasAPIKey()]
+            case "retrieve":
+                return [HasAPIKey()]
+            case _:
+                return super().get_permissions()
 
     def create(self, request):
         if "name" not in request.data:
@@ -71,12 +79,15 @@ class Key(CustomViewSet):
                 for permission in request.data["permissions"]:
                     key.add_permission(self.space(request), permission)
             key.save()
-            if request.data.get("revoked", False):
+            if request.data.get("revoked", False) and not key.is_master_key:
                 key.revoke()
         serializer = NapseAPIKeySerializer(key)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["GET"])
-    @pc([HasAPIKey])
     def possible_permissions(self, request):
         return Response(list(PERMISSION_TYPES), status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["GET"])
+    def connect(self, request):
+        return Response(status=status.HTTP_204_NO_CONTENT)
