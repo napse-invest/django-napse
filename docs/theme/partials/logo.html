@@ -1,8 +1,38 @@
-<img id="logo_light_mode" src="{{ config.theme.logo_light_mode | url }}" alt="logo">
-<img id="logo_dark_mode" src="{{ config.theme.logo_dark_mode | url }}" alt="logo">
+<!-- <img id="logo_light_mode" src="{{ config.theme.logo_light_mode | url }}" alt="logo"> -->
+<!-- <img id="logo_dark_mode" src="{{ config.theme.logo_dark_mode | url }}" alt="logo"> -->
 
 <!-- <picture>
     <source media="(prefers-color-scheme: light)" srcset="{{ config.theme.logo_light_mode | url }}">
     <source media="(prefers-color-scheme: dark)" srcset="{{ config.theme.logo_dark_mode | url }}">
     <img alt="Test" src="theme/assets/napse_logo_black.svg">
   </picture> -->
+
+<!-- <picture>
+    <source media="(prefers-color-scheme: light)" srcset="theme/assets/napse_invest_logo_black.svg">
+    <source media="(prefers-color-scheme: dark)" srcset="theme/assets/napse_invest_logo_black.svg">
+    <img alt="Test" src="">
+</picture> -->
+
+  <!-- <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/NapseInvestLogoSVGWhite.svg">
+    <source media="(prefers-color-scheme: light)" srcset="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/NapseInvestLogoSVG.svg">
+    <img alt="Napse's logo" src="" width=500>
+  </picture> -->
+<!-- 
+{% if config.theme.palette.logo %}
+  <img src="{{ config.theme.palette.logo | url }}" alt="logo" />
+{% else %}
+  {% set icon = config.theme.icon.logo or "material/library" %}
+  {% include ".icons/" ~ icon ~ ".svg" %}
+{% endif %} -->
+
+
+<!-- {% if config.theme %}
+  {% for elt in config.theme.palette %}
+    <p>{{elt}}</p>
+    {% for key in elt %}
+      <p>{{ key }}</p>
+    {% endfor %}
+
+  {% endfor %}
+{% endif %} -->

@@ -1,6 +1,6 @@
 
-![Napse logo](theme/logo/napse_invest_logo_black.svg#only-light)
-![Napse logo](theme/logo/napse_invest_logo_white.svg#only-dark)
+![Napse logo](theme/assets/napse_invest_logo_black.svg#only-light)
+![Napse logo](theme/assets/napse_invest_logo_white.svg#only-dark)
 
 <h1 align="center">
 

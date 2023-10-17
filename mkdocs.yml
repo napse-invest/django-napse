@@ -16,9 +16,9 @@ extra_css:
 theme:
   name: 'material'
   custom_dir: theme
-  logo: 'assets/napse_logo_white.svg'
-  logo_dark_mode: 'theme/assets/napse_logo_white.svg'
-  logo_light_mode: 'theme/assets/napse_logo_black.svg'
+  # logo: 'assets/napse_logo_white.svg'
+  # logo_dark_mode: 'theme/assets/napse_logo_white.svg'
+  # logo_light_mode: 'theme/assets/napse_logo_black.svg'
   favicon: 'theme/assets/napse_logo_white.svg'
   language: 'en'
   palette:
@@ -26,6 +26,7 @@ theme:
     - media: "(prefers-color-scheme: light)"
       scheme: default
       primary: 'white'
+      logo: 'theme/assets/napse_invest_logo_black.svg'
       toggle:
         # icon: material/toggle-switch
         icon: material/toggle-switch-off-outline
@@ -35,6 +36,7 @@ theme:
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
       primary: black
+      logo: 'theme/assets/napse_invest_logo_white.svg'
       toggle:
         # icon: material/toggle-switch-off-outline
         icon: material/toggle-switch
