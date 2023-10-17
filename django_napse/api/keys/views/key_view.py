@@ -1,7 +1,6 @@
 from django.db.transaction import atomic
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.decorators import permission_classes as pc
 from rest_framework.response import Response
 
 from django_napse.api.custom_permissions import HasAPIKey, HasMasterKey
@@ -12,7 +11,7 @@ from django_napse.auth.models import NapseAPIKey
 from django_napse.utils.constants import PERMISSION_TYPES
 
 
-class Key(CustomViewSet):
+class KeyView(CustomViewSet):
     permission_classes = [HasMasterKey]
 
     def get_queryset(self):
@@ -21,11 +20,20 @@ class Key(CustomViewSet):
     def get_object(self):
         return NapseAPIKey.objects.get(prefix=self.kwargs["pk"])
 
+    def get_permissions(self):
+        match self.action:
+            case "connect" | "possible_permissions":
+                return [HasAPIKey()]
+            case "retrieve":
+                return [HasAPIKey()]
+            case _:
+                return super().get_permissions()
+
     def create(self, request):
         if "name" not in request.data:
             return Response({"error": "Missing name"}, status=status.HTTP_400_BAD_REQUEST)
 
-        _, key = NapseAPIKey.objects.create_key(name=request.data["name"], description=request.data.get("name", ""))
+        _, key = NapseAPIKey.objects.create_key(name=request.data["name"], description=request.data.get("description", ""))
 
         return Response({"key": key}, status=status.HTTP_201_CREATED)
 
@@ -71,12 +79,15 @@ class Key(CustomViewSet):
                 for permission in request.data["permissions"]:
                     key.add_permission(self.space(request), permission)
             key.save()
-            if request.data.get("revoked", False):
+            if request.data.get("revoked", False) and not key.is_master_key:
                 key.revoke()
         serializer = NapseAPIKeySerializer(key)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["GET"])
-    @pc([HasAPIKey])
     def possible_permissions(self, request):
         return Response(list(PERMISSION_TYPES), status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=["GET"])
+    def connect(self, request):
+        return Response(status=status.HTTP_204_NO_CONTENT)

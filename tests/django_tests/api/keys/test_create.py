@@ -1,4 +1,4 @@
-from django_napse.api.keys import Key
+from django_napse.api.keys import KeyView
 from django_napse.utils.api_test_case import APITestCase
 from django_napse.utils.dict_comparison import compare_responses
 
@@ -44,7 +44,7 @@ class KeyCreateAPITestCase:
         return {
             "create": {
                 "url_name": "key-list",
-                "view": Key,
+                "view": KeyView,
                 "method": "POST",
                 "data": {"username": "test_username"},
                 "tests": [

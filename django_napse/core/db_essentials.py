@@ -46,6 +46,7 @@ def create_accounts(sender, **kwargs):
                 EXCHANGE_ACCOUNT_DICT[exchange_name].objects.create(
                     name=exchange_id,
                     exchange=exchange,
+                    default=True,
                     **exchange_secrets,
                 )
                 created_exchange_accounts.append(exchange_id)

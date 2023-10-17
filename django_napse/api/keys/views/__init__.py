@@ -1,1 +1,1 @@
-from .key_view import Key
+from .key_view import KeyView
