@@ -11,7 +11,7 @@ from django_napse.auth.models import NapseAPIKey
 from django_napse.utils.constants import PERMISSION_TYPES
 
 
-class Key(CustomViewSet):
+class KeyView(CustomViewSet):
     permission_classes = [HasMasterKey]
 
     def get_queryset(self):
@@ -33,7 +33,7 @@ class Key(CustomViewSet):
         if "name" not in request.data:
             return Response({"error": "Missing name"}, status=status.HTTP_400_BAD_REQUEST)
 
-        _, key = NapseAPIKey.objects.create_key(name=request.data["name"], description=request.data.get("name", ""))
+        _, key = NapseAPIKey.objects.create_key(name=request.data["name"], description=request.data.get("description", ""))
 
         return Response({"key": key}, status=status.HTTP_201_CREATED)
 
