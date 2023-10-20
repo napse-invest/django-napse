@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 
 from django_napse.core.models.accounts.managers.exchange import ExchangeAccountManager
@@ -24,10 +26,13 @@ class Exchange(models.Model):
 
 
 class ExchangeAccount(models.Model, FindableClass):
+    uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
+
     exchange = models.ForeignKey("Exchange", on_delete=models.CASCADE, related_name="accounts")
-    name = models.CharField(max_length=200, unique=True)
+    name = models.CharField(max_length=200)
     testing = models.BooleanField(default=True)
     description = models.TextField()
+    default = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = ExchangeAccountManager()

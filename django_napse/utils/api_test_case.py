@@ -1,10 +1,10 @@
 from django.urls import reverse
 from rest_framework.test import APIClient
-from rest_framework_api_key.models import APIKey
 from rest_framework_api_key.permissions import HasAPIKey
 
-from django_napse.api.custom_permissions import HasAdminPermission, HasFullAccessPermission, HasReadPermission, HasSpace
+from django_napse.api.custom_permissions import HasAdminPermission, HasFullAccessPermission, HasMasterKey, HasReadPermission, HasSpace
 from django_napse.auth.models import KeyPermission
+from django_napse.auth.models.keys.key import NapseAPIKey
 from django_napse.utils.constants import PERMISSION_TYPES
 from django_napse.utils.custom_test_case import CustomTestCase
 
@@ -22,18 +22,21 @@ class APITestCase(CustomTestCase):
         raise NotImplementedError(error_msg)
 
     def build_url(self, kwargs=None):
-        self.url = reverse(viewname=self.url_name)
+        if kwargs and kwargs.get("pk", None):
+            self.url = reverse(viewname=self.url_name, kwargs={"pk": kwargs.pop("pk")})
+        else:
+            self.url = reverse(viewname=self.url_name)
         if kwargs:
             self.url += "?" + "&".join([f"{key}={value}" for key, value in kwargs.items()])
 
     def build_key(self, permissions):
-        key_obj, self.key = APIKey.objects.create_key(name="test")
+        key_obj, self.key = NapseAPIKey.objects.create_key(name="test")
         if HasReadPermission in permissions:
-            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.READ_ONLY)
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.READ_ONLY, approved=True)
         if HasFullAccessPermission in permissions:
-            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.FULL_ACCESS)
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.FULL_ACCESS, approved=True)
         if HasAdminPermission in permissions:
-            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.ADMIN)
+            KeyPermission.objects.create(key=key_obj, space=self.space, permission_type=PERMISSION_TYPES.ADMIN, approved=True)
 
     def authenticate(self):
         self.headers["Authorization"] = f"Api-Key {self.key}"
@@ -76,7 +79,7 @@ class APITestCase(CustomTestCase):
         self.data = self.modes[mode].get("data", {})
         self.headers = self.modes[mode].get("headers", {})
         self.url_name = self.modes[mode]["url_name"]
-        self.build_url(kwargs={"pk": 1, **self.kwargs} if self.modes[mode]["method"] in ["PATCH", "PUT", "DELETE"] else self.kwargs)
+        self.build_url(kwargs={"pk": 1} if self.modes[mode]["method"] in ["PATCH", "PUT", "DELETE"] and not self.kwargs else self.kwargs)
 
         permissions = self.modes[mode]["view"].permission_classes
         permission_importance = {
@@ -85,6 +88,7 @@ class APITestCase(CustomTestCase):
             HasReadPermission: 2,
             HasFullAccessPermission: 3,
             HasAdminPermission: 4,
+            HasMasterKey: 5,
         }
         permissions.sort(key=lambda x: permission_importance[x])
 
@@ -152,3 +156,21 @@ class APITestCase(CustomTestCase):
         if len(error_list) > 0:
             error_msg = f"Errors in {mode} mode"
             raise ExceptionGroup(error_msg, error_list)
+
+
+class ViewTest:
+    def __init__(self, testcase_instance: APITestCase, *args, **kwargs):
+        self.testcase_instance = testcase_instance
+
+    def setup(self, data: dict | None = None):
+        def _setup(data=data):
+            return self.testcase_instance.client.get(
+                path=self.testcase_instance.url,
+                data=data,
+                headers=self.testcase_instance.headers,
+            )
+
+        return _setup
+
+    def run(self) -> list[dict[str, any]]:
+        raise NotImplementedError

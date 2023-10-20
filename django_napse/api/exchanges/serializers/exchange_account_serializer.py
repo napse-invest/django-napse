@@ -5,32 +5,32 @@ from django_napse.core.models import ExchangeAccount
 
 
 class ExchangeAccountSerializer(serializers.ModelSerializer):
-    exchange_name = serializers.CharField(source="exchange.name")
+    exchange = serializers.CharField(source="exchange.name")
 
     class Meta:
         model = ExchangeAccount
         fields = [
-            "id",
-            "exchange_name",
+            "uuid",
+            "exchange",
             "name",
             "testing",
         ]
         read_only_fields = [
-            "id",
-            "exchange_name",
+            "uuid",
+            "exchange",
             "testing",
         ]
 
 
 class ExchangeAccountDetailSerializer(serializers.ModelSerializer):
-    exchange_name = serializers.CharField(source="exchange.name")
+    exchange = serializers.CharField(source="exchange.name")
     spaces = SpaceSerializer(many=True, read_only=True)
 
     class Meta:
         model = ExchangeAccount
         fields = [
-            "id",
-            "exchange_name",
+            "uuid",
+            "exchange",
             "name",
             "testing",
             "description",
@@ -38,8 +38,8 @@ class ExchangeAccountDetailSerializer(serializers.ModelSerializer):
             "spaces",
         ]
         read_only_fields = [
-            "id",
-            "exchange_name",
+            "uuid",
+            "exchange",
             "testing",
             "created_at",
             "spaces",

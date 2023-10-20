@@ -29,7 +29,7 @@ class FleetManager(models.Manager):
         fleet.save()
 
         for cluster in clusters:
-            cluster["bot"] = cluster["bot"].copy()
+            cluster["template_bot"] = cluster["template_bot"].copy()
             Cluster.objects.create(fleet=fleet, **cluster)
 
         fleet.setup_finished = True
