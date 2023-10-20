@@ -37,6 +37,14 @@ class KeyView(CustomViewSet):
 
         return Response({"key": key}, status=status.HTTP_201_CREATED)
 
+    def retrieve(self, request, pk):
+        key = self.get_object()
+        if "space" not in request.query_params:
+            serializer = NapseAPIKeySerializer(key)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = NapseAPIKeySpaceSerializer(key, context={"space": request.query_params["space"]})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def list(self, request):
         keys = self.get_queryset()
         if "space" not in request.query_params:
@@ -52,14 +60,6 @@ class KeyView(CustomViewSet):
         serializer = NapseAPIKeySerializer(master_key)
         data["master_key"] = serializer.data
         return Response(data, status=status.HTTP_200_OK)
-
-    def retrieve(self, request, pk):
-        key = self.get_object()
-        if "space" not in request.query_params:
-            serializer = NapseAPIKeySerializer(key)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = NapseAPIKeySpaceSerializer(key, context={"space": request.query_params["space"]})
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk):
         key = self.get_object()
