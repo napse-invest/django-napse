@@ -1,3 +1,18 @@
+# [1.9.0](https://github.com/napse-invest/django-napse/compare/v1.8.0...v1.9.0) (2023-10-07)
+
+
+### Bug Fixes
+
+* **tests:** cleaned up prints in tests ([5654ecf](https://github.com/napse-invest/django-napse/commit/5654ecfae85f0530ee393cfb76873863c39ec273))
+* **tests:** seperated db tests and api tests ([8a1ab68](https://github.com/napse-invest/django-napse/commit/8a1ab68a3a4def356c5545398ccd78e462f815cd))
+
+
+### Features
+
+* **api:** integrated restframework_api_keys ([cccd414](https://github.com/napse-invest/django-napse/commit/cccd414ae0bd16bcd8c35ce10554698f983e1214))
+* **api:** Tests implemented ([c1d5144](https://github.com/napse-invest/django-napse/commit/c1d5144819e50bfc54e0b3de8cde4a56a98a7707))
+* **histories:** Added support for histories. Supported classes are Wallet, NapseSpace, Bot, Fleet, ExchangeAccount ([4cb831b](https://github.com/napse-invest/django-napse/commit/4cb831bc23ad3191cba1ce0046928d94837f7872))
+
 # [1.8.0](https://github.com/napse-invest/django-napse/compare/v1.7.1...v1.8.0) (2023-09-18)
 
 
