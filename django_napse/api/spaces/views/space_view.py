@@ -1,9 +1,7 @@
 from rest_framework import status
-from rest_framework.decorators import permission_classes as permission_decorator
 from rest_framework.response import Response
-from rest_framework_api_key.permissions import HasAPIKey
 
-from django_napse.api.custom_permissions import HasSpace
+from django_napse.api.custom_permissions import HasFullAccessPermission, HasReadPermission
 from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceSerializer
 from django_napse.core.models import NapseSpace
@@ -11,7 +9,7 @@ from django_napse.utils.errors import SpaceError
 
 
 class SpaceView(CustomViewSet):
-    permission_classes = [HasAPIKey]
+    permission_classes = [HasFullAccessPermission]
     serializer_class = SpaceSerializer
 
     def get_object(self):
@@ -33,8 +31,8 @@ class SpaceView(CustomViewSet):
 
     def get_permissions(self):
         match self.action:
-            case "retrieve" | "update" | "partial_update" | "delete":
-                return [HasAPIKey(), HasSpace()]
+            case "retrieve" | "list":
+                return [HasReadPermission()]
             case _:
                 return super().get_permissions()
 

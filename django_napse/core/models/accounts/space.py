@@ -62,7 +62,7 @@ class NapseSpace(models.Model):
         return {
             "value": self.value,
             "order_count_30": order_count_30,
-            "change_30": None,  # need history on space's value
+            "delta_30": 0,  # need history on space's value
         }
 
     def delete(self) -> None:
