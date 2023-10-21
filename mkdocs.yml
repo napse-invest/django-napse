@@ -9,21 +9,18 @@ docs_dir: "docs/"
 
 
 extra_css:
-  -  asssets/stylesheets/extra.css
+  -  assets/stylesheets/extra.css
 
 
 
 theme:
   name: 'material'
   custom_dir: theme
-  # logo: 'assets/napse_logo_white.svg'
-  # logo_dark_mode: 'theme/assets/napse_logo_white.svg'
-  # logo_light_mode: 'theme/assets/napse_logo_black.svg'
   favicon: 'theme/assets/napse_logo_white.svg'
   language: 'en'
   palette:
     # Palette toggle for light mode
-    - media: "(prefers-color-scheme: light)"
+    - media: "prefers-color-scheme: light"
       scheme: default
       primary: 'white'
       logo: 'theme/assets/napse_invest_logo_black.svg'
@@ -33,7 +30,7 @@ theme:
         name: Switch to dark mode
 
     # Palette toggle for dark mode
-    - media: "(prefers-color-scheme: dark)"
+    - media: "prefers-color-scheme: dark"
       scheme: slate
       primary: black
       logo: 'theme/assets/napse_invest_logo_white.svg'
