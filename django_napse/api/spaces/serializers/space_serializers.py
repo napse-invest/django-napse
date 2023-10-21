@@ -1,9 +1,10 @@
+from json import loads
+
 from rest_framework import serializers
 
 from django_napse.api.fleets.serializers import FleetSerializer
-from django_napse.api.histories.serializers import HistorySerializer  # noqa: F401
 from django_napse.api.wallets.serializers.wallet_serializers import WalletSerializer
-from django_napse.core.models import NapseSpace
+from django_napse.core.models import NapseSpace, SpaceHistory
 
 
 class SpaceSerializer(serializers.ModelSerializer):
@@ -15,14 +16,13 @@ class SpaceSerializer(serializers.ModelSerializer):
         fields = [
             "name",
             "description",
+            "exchange_account",
             # read-only
             "uuid",
-            "exchange_account",
             "value",
             "fleet_count",
         ]
         read_only_fields = [
-            "exchange_account",
             "uuid",
             "value",
             "fleet_count",
@@ -37,7 +37,7 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
     exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
     statistics = serializers.SerializerMethodField(read_only=True)
     wallet = WalletSerializer(read_only=True)
-    # history = HistorySerializer(read_only=True)
+    history = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = NapseSpace
@@ -50,7 +50,7 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "statistics",
             "wallet",
-            # "history",
+            "history",
             "fleets",
         ]
         read_only_fields = [
@@ -59,9 +59,17 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "statistics",
             "wallet",
-            # "history",
+            "history",
             "fleet",
         ]
 
     def get_statistics(self, instance) -> dict:
         return instance.get_stats()
+
+    def get_history(self, instance) -> list:
+        try:
+            history = SpaceHistory.objects.get(owner=instance)
+        except SpaceHistory.DoesNotExist:
+            return []
+
+        return loads(history.to_dataframe().to_json(orient="records"))
