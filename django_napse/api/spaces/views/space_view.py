@@ -25,28 +25,47 @@ class SpaceView(CustomViewSet):
             "list": SpaceSerializer,
             "retrieve": SpaceDetailSerializer,
             "create": SpaceSerializer,
+            "update": SpaceSerializer,
+            "partial_update": SpaceSerializer,
         }
         result = actions.get(self.action, None)
         return result if result else super().get_serializer_class()
+
+    def get_permissions(self):
+        match self.action:
+            case "retrieve" | "update" | "partial_update" | "delete":
+                return [HasAPIKey(), HasSpace()]
+            case _:
+                return super().get_permissions()
 
     def list(self, request):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @permission_decorator([HasSpace])
     def retrieve(self, request, pk=None):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @permission_decorator([HasSpace])
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
 
-    @permission_decorator([HasSpace])
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop("partial", False)
+        instance = self.get_object()
+
+        serializer = self.get_serializer(instance=instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(status=status.HTTP_200_OK)
+
+    def partial_update(self, request, **kwargs):
+        """Partial update the connected user."""
+        return self.update(request, partial=True, **kwargs)
+
     def delete(self, request, *args, **kwargs):
         instance = self.get_object()
         try:

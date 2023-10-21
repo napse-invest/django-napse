@@ -14,13 +14,15 @@ class SpaceSerializer(serializers.ModelSerializer):
         model = NapseSpace
         fields = [
             "name",
-            "exchange_account",
+            "description",
             # read-only
             "uuid",
+            "exchange_account",
             "value",
             "fleet_count",
         ]
         read_only_fields = [
+            "exchange_account",
             "uuid",
             "value",
             "fleet_count",
