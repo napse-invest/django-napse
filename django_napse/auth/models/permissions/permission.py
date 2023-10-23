@@ -9,7 +9,7 @@ class KeyPermission(models.Model):
     uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
 
     key = models.ForeignKey("NapseAPIKey", on_delete=models.CASCADE, related_name="permissions")
-    space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE)
+    space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE, related_name="permissions")
     approved = models.BooleanField(default=False)
     revoked = models.BooleanField(default=False)
     permission_type = models.CharField(max_length=200)
