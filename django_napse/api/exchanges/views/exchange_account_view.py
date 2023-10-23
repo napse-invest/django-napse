@@ -4,7 +4,8 @@ from rest_framework.response import Response
 
 from django_napse.api.custom_permissions import HasMasterKey
 from django_napse.api.custom_viewset import CustomViewSet
-from django_napse.api.exchanges.serializers import ExchangeAccountDetailSerializer, ExchangeAccountSerializer
+from django_napse.api.exchanges.serializers.exchange_account_detail_serializer import ExchangeAccountDetailSerializer
+from django_napse.api.exchanges.serializers.exchange_account_serializer import ExchangeAccountSerializer
 from django_napse.core.models import Exchange, ExchangeAccount
 from django_napse.utils.constants import EXCHANGES
 
