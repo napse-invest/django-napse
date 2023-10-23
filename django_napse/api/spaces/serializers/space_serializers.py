@@ -1,3 +1,4 @@
+import uuid
 from json import loads
 
 from rest_framework import serializers
@@ -8,8 +9,8 @@ from django_napse.core.models import ExchangeAccount, NapseSpace, SpaceHistory
 
 
 class SpaceSerializer(serializers.ModelSerializer):
-    fleet_count = serializers.SerializerMethodField(read_only=True)
     exchange_account = serializers.CharField(source="exchange_account.uuid")
+    delta = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = NapseSpace
@@ -20,21 +21,29 @@ class SpaceSerializer(serializers.ModelSerializer):
             # read-only
             "uuid",
             "value",
-            # TODO: add delta value
-            "fleet_count",
+            "delta",
         ]
         read_only_fields = [
             "uuid",
             "value",
-            "fleet_count",
+            "delta",
         ]
 
-    def get_fleet_count(self, instance) -> int:
-        return instance.fleets.count()
+    def get_delta(self, instance) -> float:
+        """Delta on the last 30 days."""
+        try:
+            history = SpaceHistory.objects.get(owner=instance)
+        except SpaceHistory.DoesNotExist:
+            return 0
+        return history.get_delta()
 
     def create(self, validated_data):
         try:
-            print(validated_data)
+            uuid.UUID(str(validated_data["exchange_account"]["uuid"]))
+        except ValueError:
+            error_msg: str = "Invalid UUID"
+            raise serializers.ValidationError(error_msg) from None
+        try:
             exchange_account = ExchangeAccount.objects.get(uuid=validated_data["exchange_account"]["uuid"])
         except ExchangeAccount.DoesNotExist:
             error_msg: str = "Exchange Account does not exist"

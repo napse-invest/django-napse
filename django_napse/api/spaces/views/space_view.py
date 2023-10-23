@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework_api_key.permissions import HasAPIKey
 
 from django_napse.api.custom_permissions import HasFullAccessPermission, HasMasterKey, HasReadPermission
 from django_napse.api.custom_viewset import CustomViewSet
@@ -35,16 +36,18 @@ class SpaceView(CustomViewSet):
         match self.action:
             case "retrieve":
                 return [HasReadPermission()]
-            case "list" | "create":
-                return []
-            case "possible_exchange_accounts":
+            case "list":
+                return [HasAPIKey()]
+            case "possible_exchange_accounts" | "create":
                 return [HasMasterKey()]
 
             case _:
                 return super().get_permissions()
 
     def list(self, request):
-        serializer = self.get_serializer(self.get_queryset(), many=True)
+        api_key = self.get_api_key(request)
+        spaces = NapseSpace.objects.all() if api_key.is_master_key else NapseSpace.objects.filter(permissions__in=api_key.permissions.all())
+        serializer = self.get_serializer(spaces, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
@@ -55,8 +58,9 @@ class SpaceView(CustomViewSet):
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(status=status.HTTP_201_CREATED)
+        space = serializer.save()
+        serialized_space = self.get_serializer(space)
+        return Response(serialized_space.data, status=status.HTTP_201_CREATED)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop("partial", False)
@@ -81,8 +85,7 @@ class SpaceView(CustomViewSet):
 
     @action(detail=False, methods=["GET"])
     def possible_exchange_accounts(self, request):
-        serialized_exchange_account = ExchangeAccountSerializer(data=ExchangeAccount.objects.all(), many=True)
-        serialized_exchange_account.is_valid(raise_exception=True)
+        serialized_exchange_account = ExchangeAccountSerializer(ExchangeAccount.objects.all(), many=True)
         return Response(
             serialized_exchange_account.data,
             status=status.HTTP_200_OK,
