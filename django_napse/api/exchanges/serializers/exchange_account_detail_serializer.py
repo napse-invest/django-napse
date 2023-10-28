@@ -1,10 +1,12 @@
 from rest_framework import serializers
 
+from django_napse.api.spaces.serializers.space_serializers import SpaceSerializer
 from django_napse.core.models import ExchangeAccount
 
 
-class ExchangeAccountSerializer(serializers.ModelSerializer):
+class ExchangeAccountDetailSerializer(serializers.ModelSerializer):
     exchange = serializers.CharField(source="exchange.name")
+    spaces = SpaceSerializer(many=True, read_only=True)
 
     class Meta:
         model = ExchangeAccount
@@ -12,11 +14,15 @@ class ExchangeAccountSerializer(serializers.ModelSerializer):
             "uuid",
             "exchange",
             "name",
-            "description",
             "testing",
+            "description",
+            "created_at",
+            "spaces",
         ]
         read_only_fields = [
             "uuid",
             "exchange",
             "testing",
+            "created_at",
+            "spaces",
         ]

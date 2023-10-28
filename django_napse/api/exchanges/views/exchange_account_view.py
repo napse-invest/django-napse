@@ -4,7 +4,8 @@ from rest_framework.response import Response
 
 from django_napse.api.custom_permissions import HasMasterKey
 from django_napse.api.custom_viewset import CustomViewSet
-from django_napse.api.exchanges.serializers import ExchangeAccountDetailSerializer, ExchangeAccountSerializer
+from django_napse.api.exchanges.serializers.exchange_account_detail_serializer import ExchangeAccountDetailSerializer
+from django_napse.api.exchanges.serializers.exchange_account_serializer import ExchangeAccountSerializer
 from django_napse.core.models import Exchange, ExchangeAccount
 from django_napse.utils.constants import EXCHANGES
 
@@ -43,15 +44,31 @@ class ExchangeAccountView(CustomViewSet):
             return Response({"error": "Missing exchange"}, status=status.HTTP_400_BAD_REQUEST)
         if "testing" not in request.data:
             return Response({"error": "Missing testing"}, status=status.HTTP_400_BAD_REQUEST)
-        print(request.data)
+
         exchange = Exchange.objects.get(name=request.data["exchange"])
         exchange_account = ExchangeAccount.objects.create(
             exchange=exchange,
             name=request.data["name"],
             testing=request.data["testing"],
+            description=request.data.get("description", ""),
         )
         serializer = self.get_serializer(exchange_account)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    def destroy(self, request, pk=None):
+        instance = self.get_object()
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def patch(self, request, pk=None):
+        instance = self.get_object()
+        if "name" in request.data:
+            instance.name = request.data["name"]
+        if "description" in request.data:
+            instance.description = request.data["description"]
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["GET"])
     def possible_exchanges(self, request):
