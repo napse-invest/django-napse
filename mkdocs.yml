@@ -101,7 +101,9 @@ extra:
 nav:
   - Home: 
     - Overview: "index.md"
-  - Contributing: "contributing.md"
+  - Contributing: 
+    - Contributing: "CONTRIBUTING.md"
+    - Security: "SECURITY.md"
   #   - Installation:
   #   - Tutorial:
   # - API:
