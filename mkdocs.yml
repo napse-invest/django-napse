@@ -101,9 +101,11 @@ extra:
 nav:
   - Home: 
     - Overview: "index.md"
-  - Contributing: 
-    - Contributing: "CONTRIBUTING.md"
+  - How to guides:
+    - "sources/guides/exchange.md"
+    - "sources/guides/exchange_account.md"
+    - "sources/guides/space.md"
+    - "sources/guides/fleet.md"
+  - Contributing:
+    - Contributing: "contributing.md"
     - Security: "SECURITY.md"
-  #   - Installation:
-  #   - Tutorial:
-  # - API:

@@ -19,10 +19,9 @@ For larger changes (e.g., new feature), please open an issue first to discuss th
 ### Issues
 
 Have you identified a reproducible problem in django-napse? Do you have a feature request? You can help us to progress and to become the best open source investment platform.
-
 Before you create a new issue, please do a search in [open issues](https://github.com/napse-invest/django-napse/issues) to see if the issue or feature request has already been filed.
 
-If you open a new issue for a bug report or a feature request, please read the following guidelines to write a good issue:
+If you open a new issue for a bug report or a feature request, please read the following guidelines to write a good issue / feature request:
 === "Bug report"
 
     - A issue per bug report. Do not report several bugs in one issue.
@@ -74,6 +73,25 @@ You can commit the code from your fork through a pull request on the official re
     .\setup-windows.ps1
     ```
 
+#### Setup initial exchange accounts
+
+To make full use of the project, we recommend that you fill in the API keys of at least one exchange (among the django-napse [compabile exchanges](#compatible-exchanges)).
+
+At `tests/test_app/`, build a `secret.json` file (or run the `./setup_secrets.sh` script). Here is an exemple with Binance:
+```json
+{
+    "Exchange Accounts": {
+        "Binance EA_NAME": {
+            "exchange": "BINANCE",     # Name of your exchange (BINANCE, DYDX, ...)
+            "testing": true,
+            "public_key": "YOUR_PUBLIC_KEY",
+            "private_key": "YOUR_PRIVATE_KEY"
+        }
+    }
+}
+
+```
+
 #### Run 
 
 ```bash
@@ -82,10 +100,26 @@ make migrate
 make runserver
 ```
 
-### Development
-⚠️ Work in progress ⚠️
 ### Project structure
-⚠️ Work in progress ⚠️
+
+The project contains 5 parts:
+```
+.
+├─ django_napse/
+│  └─ api/
+│  └─ auth/
+│  └─ core/
+│  └─ simulations/
+│  └─ utils/
+```
+
+- `api`: Serialize data from database and allows interaction with models via endpoints.
+- `auth`: Contains stuff for authorizations keys
+- `core`: The heart of the project, contains all the logic within the django's models
+- `simulations`: The environment to allow backtest on bots
+- `utils`: Several usefull tools
+
+
 
 ## Documentation
 
@@ -94,6 +128,15 @@ In order to produce the best possible documentation, it is based on the [diataxi
 Feel free to request the addition of a **tutorial**, a **how-to guide** or an **explanation** by means of a pull request or a simple issue with the `documentation` tag.
 The **reference** section is generated automatically from docs strings in the code.
 If you find an error or something missing, don't hesitate to open an issue or a pull request.
+
+### Mkdocs
+
+This documentation is build with [Material for Mkdocs](https://squidfunk.github.io/mkdocs-material/). 
+To preview any changes to the documentation locally:
+```bash
+make mkdocs
+```
+The documentation should then be available locally at http://localhost:8005/.
 
 ## Code contribution
 
