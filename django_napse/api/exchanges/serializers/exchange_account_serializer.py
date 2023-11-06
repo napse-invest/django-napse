@@ -12,6 +12,7 @@ class ExchangeAccountSerializer(serializers.ModelSerializer):
             "uuid",
             "exchange",
             "name",
+            "description",
             "testing",
         ]
         read_only_fields = [

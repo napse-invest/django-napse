@@ -44,11 +44,13 @@ class ExchangeAccountView(CustomViewSet):
             return Response({"error": "Missing exchange"}, status=status.HTTP_400_BAD_REQUEST)
         if "testing" not in request.data:
             return Response({"error": "Missing testing"}, status=status.HTTP_400_BAD_REQUEST)
+
         exchange = Exchange.objects.get(name=request.data["exchange"])
         exchange_account = ExchangeAccount.objects.create(
             exchange=exchange,
             name=request.data["name"],
             testing=request.data["testing"],
+            description=request.data.get("description", ""),
         )
         serializer = self.get_serializer(exchange_account)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
