@@ -9,6 +9,6 @@ django-extensions==3.2.3  # https://github.com/django-extensions/django-extensio
 django-debug-toolbar==4.2.0  # https://github.com/jazzband/django-debug-toolbar
 
 # Documentation
-mkdocs-material==9.4.5 # https://github.com/squidfunk/mkdocs-material
+mkdocs-material==9.4.9 # https://github.com/squidfunk/mkdocs-material
 pygments==2.16.1 # https://github.com/pygments/pygments
 mkdocs-plugin-inline-svg==0.1.0 # https://pypi.org/project/mkdocs-plugin-inline-svg/
