@@ -25,6 +25,5 @@ jobs:
           restore-keys: |
             mkdocs-material-
       - run: |
-          pip install mkdocs-material
-          pip install mkdocs-plugin-inline-svg
+          pip install -r requirements/development.txt
       - run: mkdocs gh-deploy --force
