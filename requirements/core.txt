@@ -1,4 +1,4 @@
-django==4.2.6  # https://www.djangoproject.com/
+django==4.2.7  # https://www.djangoproject.com/
 django-environ==0.11.2  # https://github.com/joke2k/django-environ
 django-celery-beat==2.5.0  # https://github.com/celery/django-celery-beat
 drf-spectacular==0.26.5 # https://github.com/tfranzel/drf-spectacular
