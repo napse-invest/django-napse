@@ -32,8 +32,13 @@ class WalletSerializer(serializers.ModelSerializer):
 
     def get_operations(self, instance) -> dict:
         transactions = Transaction.objects.filter(Q(from_wallet=instance) | Q(to_wallet=instance)).order_by("created_at")
-        return {
-            "credits": CreditSerializer(instance.credits.all().order_by("created_at"), many=True).data,
-            "debits": DebitSerializer(instance.debits.all().order_by("created_at"), many=True).data,
-            "transactions": TransactionSerializer(transactions, many=True).data,
-        }
+        transactions_data = TransactionSerializer(transactions, many=True).data
+        credits_data = CreditSerializer(instance.credits.all().order_by("created_at"), many=True).data
+        debits_data = DebitSerializer(instance.debits.all().order_by("created_at"), many=True).data
+
+        # return {
+        #     "credits": CreditSerializer(instance.credits.all().order_by("created_at"), many=True).data,
+        #     "debits": DebitSerializer(instance.debits.all().order_by("created_at"), many=True).data,
+        #     "transactions": TransactionSerializer(transactions, many=True).data,
+        # }
+        return credits_data + debits_data + transactions_data

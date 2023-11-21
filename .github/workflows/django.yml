@@ -85,7 +85,7 @@ jobs:
 
       - name: Coverage badge
         if: ${{ github.base_ref == 'main' }}
-        uses: Schneegans/dynamic-badges-action@v1.6.0
+        uses: Schneegans/dynamic-badges-action@v1.7.0
         env:
           COVERAGE: ${{ env.COVERAGE }}
         with:
