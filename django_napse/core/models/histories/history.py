@@ -1,7 +1,9 @@
 import uuid
+from datetime import datetime, timedelta
 
 import pandas as pd
 from django.db import models
+from django.utils.timezone import get_default_timezone
 
 from django_napse.utils.constants import HISTORY_DATAPOINT_FIELDS
 from django_napse.utils.errors import HistoryError
@@ -40,9 +42,27 @@ class History(FindableClass, models.Model):
             return owner.history
         return cls.objects.create(owner=owner)
 
+    def delta(self, days: int = 30) -> float:
+        """Return the value delta between today and {days} days ago."""
+        # TODO: TEST IT
+        date = datetime.now(tz=get_default_timezone()) - timedelta(days=days)
+        data_points = self.data_points.filter(created_at__date=date.date())
+
+        while not data_points.exists():
+            days -= 1
+            date = date + timedelta(days=days)
+            data_points = self.data_points.filter(created_at__date=date.date())
+            if days == 0 and not data_points.exists():
+                return 0
+            if data_points.exists():
+                break
+
+        return data_points
+
 
 class HistoryDataPoint(models.Model):
     history = models.ForeignKey(History, on_delete=models.CASCADE, related_name="data_points")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:  # pragma: no cover
         return f"HISTORY DATA POINT {self.pk} {self.history.uuid}"

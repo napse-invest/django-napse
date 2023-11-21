@@ -48,7 +48,8 @@ def compare_dicts(dict1, dict2, **kwargs):
         return True
 
     if set(dict1.keys()) != set(dict2.keys()):
-        error_msg: str = f"Dictionaries do not contain the same number of keys ({len(dict1.keys())} != {len(dict2.keys())})"
+        error_msg: str = f"Dictionaries do not contain the same keys ({len(dict1.keys())} != {len(dict2.keys())})\n"
+        error_msg += f"{dict1.keys()} != {dict2.keys()}"
         raise ValueError(error_msg)
 
     for key in dict1:
