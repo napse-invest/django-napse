@@ -2,7 +2,7 @@ SHELL := /bin/bash
 
 OS := $(shell uname)
 
-all: makemigrations migrate runserver
+all: setup-testing-environment makemigrations migrate runserver
 
 setup:
 ifeq ($(OS),Darwin)        # Mac OS X
@@ -12,6 +12,9 @@ else ifeq ($(OS),Linux)
 else 
 	./setup-windows.sh
 endif
+
+setup-testing-environment:
+	cd tests/test_app && ./setup_secrets.sh
 
 makemigrations:
 	source .venv/bin/activate && python tests/test_app/manage.py makemigrations
