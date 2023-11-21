@@ -45,4 +45,5 @@ class BotTypeCkeck(TestCase):
         strategies = {*Strategy.__subclasses__()}
         if tested_strategies != strategies:
             error_msg = "You have untested Strategies. Check out the documentation to see how to test them (spoiler, it's really easy!)."
+            error_msg += str(tested_strategies) + str(strategies)
             raise ValueError(error_msg)
