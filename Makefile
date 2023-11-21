@@ -1,7 +1,17 @@
 SHELL := /bin/bash
 
+OS := $(shell uname)
+
+all: makemigrations migrate runserver
+
 setup:
-	source setup-unix.sh
+ifeq ($(OS),Darwin)        # Mac OS X
+	./setup-osx.sh
+else ifeq ($(OS),Linux)
+	./setup-unix.sh
+else 
+	./setup-windows.sh
+endif
 
 makemigrations:
 	source .venv/bin/activate && python tests/test_app/manage.py makemigrations
@@ -30,8 +40,8 @@ test:
 coverage:
 	source .venv/bin/activate && coverage run tests/test_app/manage.py test -v2 --keepdb && coverage html && coverage report
 
-coverage-open:
-	source .venv/bin/activate && coverage run tests/test_app/manage.py test -v2 --keepdb && coverage html && coverage report && open htmlcov/index.html
+coverage-open: coverage
+	open htmlcov/index.html
 
 mkdocs:
 	source .venv/bin/activate && mkdocs serve --dev-addr=0.0.0.0:8005
