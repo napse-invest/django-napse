@@ -1,3 +1,33 @@
+# [1.10.0](https://github.com/napse-invest/django-napse/compare/v1.9.0...v1.10.0) (2023-10-20)
+
+
+### Bug Fixes
+
+* **api-tests:** keys ([b063ad3](https://github.com/napse-invest/django-napse/commit/b063ad3379baaa00603b06b74cd9b12e1d964200))
+* **api:** exchangeAccounts endpoints ([62d24d5](https://github.com/napse-invest/django-napse/commit/62d24d54c6cd157ec0fbda60eb634a1e6a46a51e))
+* **api:** exchanges api create ([17ea8f1](https://github.com/napse-invest/django-napse/commit/17ea8f1a6effa69e932394500494aaad2c3bfcd2))
+* **api:** little changes ([1c99414](https://github.com/napse-invest/django-napse/commit/1c9941493d1720caefb07e50cb3b4d2b0b0dfa44))
+* **api:** little improvements ([a1fb18b](https://github.com/napse-invest/django-napse/commit/a1fb18beb20ee47936b3d84e4e0857ccfbb6d750))
+* **api:** minor changes to keys ([2eefac3](https://github.com/napse-invest/django-napse/commit/2eefac3e804526a7fbb2d66b1816f39568b9e62a))
+* **api:** tests for permission admin ([e68245b](https://github.com/napse-invest/django-napse/commit/e68245b966d936ec6860dfa796d1d66252418518))
+* **bot serializers:** add bot serializers ([0be9a58](https://github.com/napse-invest/django-napse/commit/0be9a587e25577ab1263615f0acf6d85c7111c5b))
+* **bot:** add view ([92b2184](https://github.com/napse-invest/django-napse/commit/92b2184fdde9f5911c354fe55ca42ff922a4ecb4))
+* **cluster:** renaming to template_bot ([bf71708](https://github.com/napse-invest/django-napse/commit/bf71708cfd778f4862be2d9ec68750cc76beea16))
+* **error stack:** improve stack error ([e5cfce3](https://github.com/napse-invest/django-napse/commit/e5cfce35c8f1da89062de689b987a79ab9e76402))
+* **history:** add history serializer ([11c3270](https://github.com/napse-invest/django-napse/commit/11c327099e93a7ea9fc88ad5d1eadaa4c8a846c1))
+* **history:** add history serializers ([d85bdc5](https://github.com/napse-invest/django-napse/commit/d85bdc51ee102951becc417f5dd66d3ccbe584ec))
+* **project:** remove useless folder & files in API folder ([2ea8704](https://github.com/napse-invest/django-napse/commit/2ea8704d54f79cf49382b09f95bc56dd2e27f2bb))
+* **python-module:** added correct dependencies ([3f388f3](https://github.com/napse-invest/django-napse/commit/3f388f3b22dc59e9281fcf1aac9f33f47b9b3eb3))
+* **ruff:** fixed extra iports ([221bbd6](https://github.com/napse-invest/django-napse/commit/221bbd635260da220c8751427884eca396a3d0e2))
+* **space:** finish setup of retrieve endpoint ([a763a00](https://github.com/napse-invest/django-napse/commit/a763a00ef6c0c1d63819e51776c02096cc151cb2))
+* **workflow:** missing mkdocs-plugin-inline-svg ([271f476](https://github.com/napse-invest/django-napse/commit/271f4762a31521f9a8d4daccd1fd35bc89492d31))
+* **workflow:** mkdocs workflow ([cd1d4dd](https://github.com/napse-invest/django-napse/commit/cd1d4ddf5e6588d4bc46395fa2a3ccb720b59911))
+
+
+### Features
+
+* **api:** keys reworked ([6a35dbd](https://github.com/napse-invest/django-napse/commit/6a35dbdf5ae197f83361075cc3eb3461a0667d6f))
+
 # [1.9.0](https://github.com/napse-invest/django-napse/compare/v1.8.0...v1.9.0) (2023-10-07)
 
 
