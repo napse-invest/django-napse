@@ -225,12 +225,12 @@ class Controller(models.Model):
     def send_candles_to_bots(self, closed_candle, current_candle) -> list:
         """Scan all bots (that are allowed to trade) and get their orders.
 
-        Parameters
-        ----------
-        closed_candle: The candle that just closed.
-        current_candle (dict): The candle that is currently open.
+        Args:
+        ----
+        closed_candle : The candle that just closed.
+        current_candle : The candle that is currently open.
 
-        Returns
+        Returns:
         -------
         list: A list of orders.
         """
