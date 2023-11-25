@@ -10,6 +10,7 @@ docs_dir: "docs/"
 
 extra_css:
   -  assets/stylesheets/extra.css
+  -  assets/stylesheets/api.css
 
 
 
@@ -62,7 +63,8 @@ plugins:
   - coverage:
       page_name: coverage  # default
       html_report_dir: htmlcov  # default
-  - neoteroi.mkdocsoad
+  - neoteroi.mkdocsoad:
+      use_pymdownx: true
 
 markdown_extensions:
   - toc:
@@ -111,7 +113,8 @@ nav:
     - "sources/guides/exchange_account.md"
     - "sources/guides/space.md"
     - "sources/guides/fleet.md"
+  - API: "api.md"
+  - Development: coverage.md
   - Contributing:
     - Contributing: "contributing.md"
     - Security: "SECURITY.md"
-  - Development: coverage.md

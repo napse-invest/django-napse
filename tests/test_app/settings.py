@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "rest_framework_api_key",
+    "drf_spectacular",
 ]
 
 MIDDLEWARE = [
@@ -150,4 +151,15 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "django_napse.api.custom_permissions.HasAdminPermission",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Django Napse API",
+    "DESCRIPTION": "List and description of all endpoints. This API documentation is essentially generated automatically. "
+    "It may therefore contain errors. If you see an error, please open an issue, and if you would like "
+    "to improve it, please make a contribution.",
+    "VERSION": "0.0.1",
+    "SERVE_INCLUDE_SCHEMA": False,
+    # OTHER SETTINGS
 }
