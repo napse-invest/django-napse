@@ -1,7 +1,7 @@
 <h1 align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/theme/assets/napse_invest_logo_black.svg">
-  <source media="(prefers-color-scheme: light)" srcset="docs/theme/assets/napse_invest_logo_white.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/theme/assets/napse_invest_logo_white.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/theme/assets/napse_invest_logo_black.svg">
   <img alt="Napse's logo" src="" width=500>
 </picture>
 
