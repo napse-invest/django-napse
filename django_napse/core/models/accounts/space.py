@@ -11,6 +11,8 @@ from django_napse.utils.errors import SpaceError
 
 
 class NapseSpace(models.Model):
+    """Categorize and manage money."""
+
     name = models.CharField(max_length=200)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
     description = models.TextField()
@@ -26,6 +28,7 @@ class NapseSpace(models.Model):
         return f"SPACE: {self.name}"
 
     def info(self, verbose=True, beacon=""):
+        """Info documentation."""
         string = ""
         string += f"{beacon}Space ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
@@ -41,6 +44,7 @@ class NapseSpace(models.Model):
 
     @property
     def testing(self):
+        """Testing property documentation."""
         return self.exchange_account.testing
 
     @property

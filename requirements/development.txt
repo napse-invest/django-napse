@@ -13,10 +13,12 @@ platformdirs==3.11.0                # https://github.com/platformdirs/platformdi
 # Documentation
 mkdocs-material==9.4.10             # https://github.com/squidfunk/mkdocs-material
 pygments==2.17.1                    # https://github.com/pygments/pygments
-mkdocs-plugin-inline-svg==0.1.0     # https://pypi.org/project/mkdocs-plugin-inline-svg/
+mkdocs-plugin-inline-svg==0.1.0     # https://pypi.org/project/mkdocs-plugin-inline-svg
 mkdocs-coverage==1.0.0              # https://github.com/pawamoy/mkdocs-coverage
 neoteroi-mkdocs==1.0.4              # https://github.com/Neoteroi/mkdocs-plugins
-drf-spectacular==0.26.5             # https://github.com/tfranzel/drf-spectacular/
+drf-spectacular==0.26.5             # https://github.com/tfranzel/drf-spectacular
+mkdocstrings==0.24.0                # https://github.com/mkdocstrings/mkdocstrings
+mkdocstrings-python==1.7.5          # https://github.com/mkdocstrings/python
 # pyyaml==6.0.1                       # https://github.com/yaml/pyyaml
 # uritemplate==4.1.1                  # https://github.com/python-hyper/uritemplate
 # pymdown-extensions==10.5.1          # https://github.com/facelessuser/pymdown-extensions

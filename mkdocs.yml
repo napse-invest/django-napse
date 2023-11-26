@@ -65,6 +65,11 @@ plugins:
       html_report_dir: htmlcov  # default
   - neoteroi.mkdocsoad:
       use_pymdownx: true
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
 
 markdown_extensions:
   - toc:
@@ -113,8 +118,10 @@ nav:
     - "sources/guides/exchange_account.md"
     - "sources/guides/space.md"
     - "sources/guides/fleet.md"
+  - Reference:
+    - "sources/reference/space.md"
   - API: "api.md"
-  - Development: coverage.md
-  - Contributing:
+  - Development: 
     - Contributing: "contributing.md"
     - Security: "SECURITY.md"
+    - Coverage: coverage.md
