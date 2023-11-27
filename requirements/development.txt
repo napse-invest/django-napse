@@ -19,6 +19,4 @@ neoteroi-mkdocs==1.0.4              # https://github.com/Neoteroi/mkdocs-plugins
 drf-spectacular==0.26.5             # https://github.com/tfranzel/drf-spectacular
 mkdocstrings==0.24.0                # https://github.com/mkdocstrings/mkdocstrings
 mkdocstrings-python==1.7.5          # https://github.com/mkdocstrings/python
-# pyyaml==6.0.1                       # https://github.com/yaml/pyyaml
-# uritemplate==4.1.1                  # https://github.com/python-hyper/uritemplate
-# pymdown-extensions==10.5.1          # https://github.com/facelessuser/pymdown-extensions
+

@@ -27,8 +27,13 @@ class NapseSpace(models.Model):
     def __str__(self):
         return f"SPACE: {self.name}"
 
-    def info(self, verbose=True, beacon=""):
-        """Info documentation."""
+    def info(self, verbose: bool = True, beacon: str = "") -> str:
+        """Info documentation.
+
+        Params:
+            verbose: Print to console.
+            beacon: Indentation for printing.
+        """
         string = ""
         string += f"{beacon}Space ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
@@ -43,12 +48,13 @@ class NapseSpace(models.Model):
         return string
 
     @property
-    def testing(self):
+    def testing(self) -> bool:
         """Testing property documentation."""
         return self.exchange_account.testing
 
     @property
     def value(self) -> float:
+        """Value documentation."""
         connections = self.wallet.connections.all()
         return sum([connection.wallet.value_market() for connection in connections])
 
