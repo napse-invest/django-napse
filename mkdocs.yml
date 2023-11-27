@@ -13,13 +13,12 @@ extra_css:
   -  assets/stylesheets/api.css
 
 
-
 theme:
   name: 'material'
   custom_dir: theme
   favicon: 'theme/assets/napse_logo_white.svg'
-  language: 'en'
   logo: 'theme/assets/napse_invest_logo_white.svg'
+  language: 'en'
   palette:
     # Palette toggle for light mode
     - media: "prefers-color-scheme: light"
@@ -34,8 +33,8 @@ theme:
     # Palette toggle for dark mode
     - media: "prefers-color-scheme: dark"
       scheme: slate
-      primary: blue grey
-      accent: indigo
+      primary: teal
+      accent: blue grey
       toggle:
         # icon: material/toggle-switch-off-outline
         icon: material/toggle-switch
@@ -48,9 +47,9 @@ theme:
     - navigation.instant
     - navigation.instant.prefetch
     - navigation.tracking
-    # - navigation.section
+    - navigation.section
     - content.code.annotate
-    - toc.integrate
+    # - toc.integrate
     - toc.follow
     - navigation.path
     - navigation.top
