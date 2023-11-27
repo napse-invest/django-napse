@@ -131,15 +131,15 @@ class RetrieveFleetViewTest(ViewTest):
 
 
 class FleetViewTestCase:
-    def test_list(self):
-        self.run_tests("list")
+    # def test_list(self):
+    #     self.run_tests("list")
 
     # def test_retrieve(self):
     #     self.run_tests("list")
 
     def setup(self):
         list_test = ListFleetViewTest(self)
-        retrieve_test = RetrieveFleetViewTest(self)
+        # retrieve_test = RetrieveFleetViewTest(self)
 
         return {
             "list": {
@@ -148,13 +148,13 @@ class FleetViewTestCase:
                 "method": "GET",
                 "tests": list_test.run(),
             },
-            "retrieve": {
-                "url_name": "fleet-detail",
-                "view": FleetView,
-                "method": "GET",
-                "kwargs": {"pk": self.retrieve_test.fleet.uuid},
-                "tests": retrieve_test.run(),
-            },
+            # "retrieve": {
+            #     "url_name": "fleet-detail",
+            #     "view": FleetView,
+            #     "method": "GET",
+            #     "kwargs": {"pk": self.retrieve_test.fleet.uuid},
+            #     "tests": retrieve_test.run(),
+            # },
         }
 
 

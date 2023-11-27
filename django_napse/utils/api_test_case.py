@@ -164,6 +164,7 @@ class ViewTest:
 
     def setup(self, data: dict | None = None):
         def _setup(data=data):
+            # TODO: Add other methods (post, put, patch, delete)
             return self.testcase_instance.client.get(
                 path=self.testcase_instance.url,
                 data=data,
