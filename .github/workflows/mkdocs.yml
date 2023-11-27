@@ -26,4 +26,6 @@ jobs:
             mkdocs-material-
       - run: |
           pip install -r requirements/development.txt
-      - run: mkdocs gh-deploy --force
+      - run: |
+        python tests/test_app/manage.py spectacular --file docs/schema.yml
+        mkdocs gh-deploy --force
