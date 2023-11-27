@@ -36,7 +36,7 @@ jobs:
       run: python tests/test_app/manage.py spectacular --file docs/schema.yml
 
   deploy:
-    # needs: api-schema
+    needs: api-schema
     name: Deploy documentation
     runs-on: ubuntu-latest
     steps:
