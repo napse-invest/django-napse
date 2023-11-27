@@ -1,12 +1,12 @@
-<h1 align="center">
+<div align="center">
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/NapseInvestLogoSVGWhite.svg">
-  <source media="(prefers-color-scheme: light)" srcset="https://github.com/napse-invest/Napse/blob/main/desktop-app/renderer/public/images/NapseInvestLogoSVG.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/theme/assets/napse_invest_logo_white.svg">
+  <source media="(prefers-color-scheme: light)" srcset="docs/theme/assets/napse_invest_logo_black.svg">
   <img alt="Napse's logo" src="" width=500>
 </picture>
+</div>
 
-<!-- <img src="./branding/napse_white.svg" width=500/> -->
-</h1><br>
+<br>
 
 <p align="center">
   <a href="https://twitter.com/NapseInvest">

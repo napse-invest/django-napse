@@ -227,8 +227,8 @@ class Controller(models.Model):
 
         Args:
         ----
-        closed_candle (dict): The candle that just closed.
-        current_candle (dict): The candle that is currently open.
+        closed_candle : The candle that just closed.
+        current_candle : The candle that is currently open.
 
         Returns:
         -------

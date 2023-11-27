@@ -8,6 +8,68 @@ copyright: MIT Licence
 docs_dir: "docs/"
 
 
+extra_css:
+  -  assets/stylesheets/extra.css
+  -  assets/stylesheets/api.css
+
+
+theme:
+  name: 'material'
+  custom_dir: theme
+  favicon: 'theme/assets/napse_logo_white.svg'
+  logo: 'theme/assets/napse_invest_logo_white.svg'
+  language: 'en'
+  palette:
+    # Palette toggle for light mode
+    - media: "prefers-color-scheme: light"
+      scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        # icon: material/toggle-switch
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "prefers-color-scheme: dark"
+      scheme: slate
+      primary: teal
+      accent: blue grey
+      toggle:
+        # icon: material/toggle-switch-off-outline
+        icon: material/toggle-switch
+        name: Switch to light mode
+
+  custom_dir: 'docs/theme'
+  features:
+    - navigation.tabs
+    - navigation.tabs.stickyx
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - navigation.section
+    - content.code.annotate
+    # - toc.integrate
+    - toc.follow
+    - navigation.path
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+
+plugins:
+  - search
+  - inline-svg
+  - coverage:
+      page_name: coverage  # default
+      html_report_dir: htmlcov  # default
+  - neoteroi.mkdocsoad:
+      use_pymdownx: true
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths: [src]
+
 markdown_extensions:
   - toc:
       permalink: "#"
@@ -19,12 +81,9 @@ markdown_extensions:
       anchor_linenums: true
   - pymdownx.inlinehilite:
   - pymdownx.superfences:
-  - markdown.extensions.attr_list:
   - pymdownx.keys:
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.highlight:
-      anchor_linenums: true
   - admonition
   - codehilite:
       use_pygments: true
@@ -33,53 +92,7 @@ markdown_extensions:
   - pymdownx.details:
   - pymdownx.tabbed:
       alternate_style: true
-  - attr_list:
-  - md_in_html:
 
-
-plugins:
-  - search
-  - inline-svg
-
-
-theme:
-  name: 'material'
-  logo: 'assets/images/NapseInvestLogoSVG.svg'
-  favicon: 'theme/assets/images/logo.ico'
-  language: 'en'
-  palette:
-    # Palette toggle for light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: 'white'
-      toggle:
-        # icon: material/toggle-switch
-        icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
-
-    # Palette toggle for dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: black
-      toggle:
-        # icon: material/toggle-switch-off-outline
-        icon: material/toggle-switch
-        name: Switch to light mode
-  custom_dir: 'docs/theme'
-  features:
-    - navigation.tabs
-    - navigation.tabs.stickyx
-    - navigation.instant
-    - navigation.instant.prefetch
-    - navigation.tracking
-    # - navigation.section
-    - content.code.annotate
-    - toc.integrate
-    - toc.follow
-    - navigation.path
-    - navigation.top
-    - content.code.copy
-    - search.suggest
 
 extra:
   social:
@@ -99,7 +112,15 @@ extra:
 nav:
   - Home: 
     - Overview: "index.md"
-  - Contributing: "contributing.md"
-  #   - Installation:
-  #   - Tutorial:
-  # - API:
+  - How to guides:
+    - "sources/guides/exchange.md"
+    - "sources/guides/exchange_account.md"
+    - "sources/guides/space.md"
+    - "sources/guides/fleet.md"
+  - Reference:
+    - "sources/reference/space.md"
+  - API: "api.md"
+  - Development: 
+    - Contributing: "contributing.md"
+    - Security: "SECURITY.md"
+    - Coverage: coverage.md
