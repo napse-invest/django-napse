@@ -34,7 +34,7 @@ theme:
     - media: "prefers-color-scheme: dark"
       scheme: slate
       primary: teal
-      accent: blue grey
+      accent: teal
       toggle:
         # icon: material/toggle-switch-off-outline
         icon: material/toggle-switch

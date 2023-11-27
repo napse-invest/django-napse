@@ -2,9 +2,6 @@ name: mkdocs
 
 on:
   push:
-    branches:
-      - main
-      - feature/mkdocs
 
 permissions:
   contents: write
@@ -33,24 +30,4 @@ jobs:
         pip install -r ./full-requirements.txt
 
     - name: Write open-api schema
-      run: python tests/test_app/manage.py spectacular --file docs/schema.yml
-
-  deploy:
-    needs: api-schema
-    name: Deploy documentation
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
-      - uses: actions/cache@v3
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
-      - run: |
-          pip install -r requirements/development.txt
-          mkdocs gh-deploy --force
+      run: print("DONE!")
