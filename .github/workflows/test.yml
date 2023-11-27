@@ -8,7 +8,7 @@ permissions:
   
 jobs:
   api-schema:
-    name: API schema
+    name: test
     runs-on: ubuntu-latest
 
     steps:
@@ -29,5 +29,5 @@ jobs:
         pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
         pip install -r ./full-requirements.txt
 
-    - name: Write open-api schema
-      run: print("DONE!")
+    - name: Print end of work
+      run: echo -e "DONE!"
