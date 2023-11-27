@@ -10,6 +10,6 @@ django-debug-toolbar==4.2.0  # https://github.com/jazzband/django-debug-toolbar
 
 # Documentation
 mkdocs-material==9.4.14 # https://github.com/squidfunk/mkdocs-material
-pygments==2.17.1 # https://github.com/pygments/pygments
+pygments==2.17.2 # https://github.com/pygments/pygments
 mkdocs-plugin-inline-svg==0.1.0 # https://pypi.org/project/mkdocs-plugin-inline-svg/
 platformdirs==3.11.0
