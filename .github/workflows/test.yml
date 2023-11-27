@@ -1,4 +1,4 @@
-name: mkdocs
+name: test
 
 on:
   push:
