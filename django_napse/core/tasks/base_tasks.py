@@ -19,9 +19,8 @@ class BaseTask(celery.Task):
     def create_task(self) -> None:
         """Build task feed_bots_with_candles.
 
-        Raises
-        ------
-        ValidationError: if task already exist
+        Raises:
+            ValidationError: if task already exist
         """
         try:
             schedule = IntervalSchedule.objects.get(every=self.interval_time, period=IntervalSchedule.SECONDS)
@@ -38,9 +37,8 @@ class BaseTask(celery.Task):
     def delete_task(self) -> None:
         """Destroy task feed_bots_with_candles.
 
-        Raises
-        ------
-        ValidationError: if task doesn't exist
+        Raises:
+            ValidationError: if task doesn't exist
         """
         try:
             PeriodicTask.objects.get(task=self.name).delete()

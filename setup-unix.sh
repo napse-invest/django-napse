@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-deactivate
+# deactivate
 sudo apt install git-flow
 sudo apt install python3
 sudo apt install python3.11

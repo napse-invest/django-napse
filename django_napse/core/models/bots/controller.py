@@ -227,8 +227,8 @@ class Controller(models.Model):
 
         Args:
         ----
-        closed_candle (dict): The candle that just closed.
-        current_candle (dict): The candle that is currently open.
+        closed_candle : The candle that just closed.
+        current_candle : The candle that is currently open.
 
         Returns:
         -------
@@ -257,8 +257,7 @@ class Controller(models.Model):
 
         Always calls the exchange API. (Can be costly)
 
-        Returns
-        -------
+        Returns:
         float: The price of the pair.
         """
         exchange_controller = self.exchange_controller
@@ -284,9 +283,8 @@ class Controller(models.Model):
 
         Only updates the price if it is older than 1 minute.
 
-        Returns
-        -------
-        float: The price of the pair.
+        Returns:
+            price: The price of the pair.
         """
         if self.last_price_update is None or self.last_price_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
             self._get_price()

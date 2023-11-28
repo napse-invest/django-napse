@@ -3,7 +3,14 @@ from django.db import models
 
 
 class ExchangeAccountManager(models.Manager):
-    def create(self, exchange, testing: bool, name: str, description: str = "", **kwargs):
+    def create(
+        self,
+        exchange,
+        testing: bool,
+        name: str,
+        description: str = "",
+        **kwargs,
+    ):
         NapseSpace = apps.get_model("django_napse_core", "NapseSpace")
         exchange_account = self.model(
             exchange=exchange,

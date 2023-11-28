@@ -5,12 +5,13 @@ from django_napse.core.models import Bot
 
 
 class BotSerializer(serializers.ModelSerializer):
-    StrategySerializer = StrategySerializer()
+    strategy = StrategySerializer()
 
     class Meta:
         model = Bot
         fields = [
             "name",
             "uuid",
+            "strategy",
         ]
         read_only_fields = fields

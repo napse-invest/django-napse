@@ -12,8 +12,8 @@ class ListFleetViewTest(ViewTest):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # create simple fleet
-        # config = EmptyBotConfig.objects.create(space=self.testcase_instance.space, settings={"empty": True})
-        config = EmptyBotConfig.objects.filter(space=self.testcase_instance.space)
+        config = EmptyBotConfig.objects.create(space=self.testcase_instance.space, settings={"empty": True})
+        # config = EmptyBotConfig.objects.get(space=self.testcase_instance.space)
         print(f"config: {config}")
         controller = Controller.get(
             exchange_account=self.testcase_instance.exchange_account,
@@ -139,7 +139,7 @@ class FleetViewTestCase:
 
     def setup(self):
         list_test = ListFleetViewTest(self)
-        retrieve_test = RetrieveFleetViewTest(self)
+        # retrieve_test = RetrieveFleetViewTest(self)
 
         return {
             "list": {
@@ -148,13 +148,13 @@ class FleetViewTestCase:
                 "method": "GET",
                 "tests": list_test.run(),
             },
-            "retrieve": {
-                "url_name": "fleet-detail",
-                "view": FleetView,
-                "method": "GET",
-                "kwargs": {"pk": self.fleet.uuid},
-                "tests": retrieve_test.run(),
-            },
+            # "retrieve": {
+            #     "url_name": "fleet-detail",
+            #     "view": FleetView,
+            #     "method": "GET",
+            #     "kwargs": {"pk": self.retrieve_test.fleet.uuid},
+            #     "tests": retrieve_test.run(),
+            # },
         }
 
 

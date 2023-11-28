@@ -4,6 +4,7 @@ from django.db import models
 
 class NapseSpaceManager(models.Manager):
     def create(self, name: str, exchange_account, description: str = ""):
+        """Create a Space instance."""
         SpaceWallet = apps.get_model("django_napse_core", "SpaceWallet")
         SpaceSimulationWallet = apps.get_model("django_napse_core", "SpaceSimulationWallet")
 

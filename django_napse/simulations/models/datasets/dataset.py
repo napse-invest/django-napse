@@ -74,8 +74,7 @@ class DataSet(models.Model):
     def set_downloading(self):
         """Set the dataset status to downloading.
 
-        Raises
-        ------
+        Raises:
             ValueError: If the dataset isn't in IDLE status.
         """
         if self.status == DOWNLOAD_STATUS.IDLE:

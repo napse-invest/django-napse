@@ -49,6 +49,7 @@ exclude = [
     "migrations",
 ]
 
+pydocstyle.convention ="google"
 # Same as Black.
 line-length = 150
 
