@@ -1,3 +1,14 @@
+## [1.10.2](https://github.com/napse-invest/django-napse/compare/v1.10.1...v1.10.2) (2023-11-28)
+
+
+### Bug Fixes
+
+* **api:** minor fixes ([4a9ff34](https://github.com/napse-invest/django-napse/commit/4a9ff349fe8e9d22e94839e51e10df72aa9298f1))
+* **mkdocs & api:** fix currency serializer & mkdocs issues ([ef5a749](https://github.com/napse-invest/django-napse/commit/ef5a7492eb4bab353f259978767742d6a6ce7a4e))
+* **mkdocs:** fix mkdocs workflow ([0e9537a](https://github.com/napse-invest/django-napse/commit/0e9537a2241ce2d4483bf5660eca1131e3a321c1))
+* **readme:** fix logo ([8aa2d0e](https://github.com/napse-invest/django-napse/commit/8aa2d0eea245bbd1e7373e8f8c487c93ae4647a4))
+* **readme:** logo color ([494be3e](https://github.com/napse-invest/django-napse/commit/494be3e65a36f6ae0e369abc05576dfdc0abf8d4))
+
 ## [1.10.1](https://github.com/napse-invest/django-napse/compare/v1.10.0...v1.10.1) (2023-11-21)
 
 
