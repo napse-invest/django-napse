@@ -64,4 +64,4 @@ exchange_account_query = ExchangeAccount.objects.all()
 
 django-napse is compatible with a few exchanges (for now):
 
-- [Binance]()
+- [Binance](https://www.binance.com/en)

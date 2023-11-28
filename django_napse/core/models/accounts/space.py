@@ -11,10 +11,36 @@ from django_napse.utils.errors import SpaceError
 
 
 class NapseSpace(models.Model):
-    """Categorize and manage money."""
+    """Categorize and manage money.
+
+    Attributes:
+        name: Name of the space.
+        uuid: Unique identifier of the space.
+        description: Description of the space.
+        exchange_account: Exchange account of the space.
+        created_at: Date of creation of the space.
+
+
+    Examples:
+        Create a space:
+        ```python
+        import django_napse.core.models import NapseSpace, ExchangeAccount
+
+        exchange_account: ExchangeAccount = ...
+        space = NapseSpace.objects.create(
+            name="Space",
+            description="Space description",
+            exchange_account=exchange_account,
+        )
+        ```
+    """
 
     name = models.CharField(max_length=200)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
     description = models.TextField()
     exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="spaces")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -49,21 +75,23 @@ class NapseSpace(models.Model):
 
     @property
     def testing(self) -> bool:
-        """Testing property documentation."""
+        """Testing property."""
         return self.exchange_account.testing
 
     @property
     def value(self) -> float:
-        """Value documentation."""
+        """Value market of space's wallet."""
         connections = self.wallet.connections.all()
         return sum([connection.wallet.value_market() for connection in connections])
 
     @property
     def fleets(self) -> models.QuerySet:
+        """Fleets of the space."""
         connections = self.wallet.connections.all()
         return Fleet.objects.filter(clusters__links__bot__connections__in=connections).distinct()
 
-    def get_stats(self) -> dict:
+    def get_stats(self) -> dict[str, int | float | str]:
+        """Statistics of space."""
         order_count_30 = Order.objects.filter(
             connection__in=self.wallet.connections.all(),
             created_at__gt=datetime.now(tz=get_default_timezone()) - timedelta(days=30),
@@ -76,6 +104,7 @@ class NapseSpace(models.Model):
         }
 
     def delete(self) -> None:
+        """Delete space."""
         if self.testing:
             return super().delete()
         if self.value > 0:
