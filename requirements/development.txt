@@ -7,7 +7,7 @@ watchfiles==0.21.0                  # https://github.com/samuelcolvin/watchfiles
 Werkzeug==3.0.1                     # https://github.com/pallets/werkzeug
 django-extensions==3.2.3            # https://github.com/django-extensions/django-extensions
 django-debug-toolbar==4.2.0         # https://github.com/jazzband/django-debug-toolbar
-ruff==0.1.5                         # https://github.com/astral-sh/ruff
+ruff==0.1.6                         # https://github.com/astral-sh/ruff
 platformdirs==3.11.0                # https://github.com/platformdirs/platformdirs
 
 # Documentation
