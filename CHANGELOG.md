@@ -1,3 +1,18 @@
+## [1.10.1](https://github.com/napse-invest/django-napse/compare/v1.10.0...v1.10.1) (2023-11-21)
+
+
+### Bug Fixes
+
+* **accessibility:** added ease of use tools for the secrets ([5713ca2](https://github.com/napse-invest/django-napse/commit/5713ca2b1464c2dd46e293709dea5c97d550e804))
+* **api:** minor changes ([3079288](https://github.com/napse-invest/django-napse/commit/3079288a18c6eacc2496ede51e0c0dcf84629126))
+* **history:** remove history serializers ([76c467e](https://github.com/napse-invest/django-napse/commit/76c467e91ab59c024e3b7e38b4e3347fb007e29f))
+* **permission:** add relative name between a permission & a NapseSpace ([11ea521](https://github.com/napse-invest/django-napse/commit/11ea52144c89a87e8db750ddd6c94f2d0ca166e5))
+* **space & history:** some fixes & space's delta ([c173a3b](https://github.com/napse-invest/django-napse/commit/c173a3bbe25e10a1af6a0afd35af23742d6fe2a4))
+* **space:** add get_exchange_account endpoints to spaces and fix circular import on serializers ([64975f2](https://github.com/napse-invest/django-napse/commit/64975f2de85d9ac2229685c299addcf7821d3318))
+* **space:** add update endpoints & get_premissions ([7f6d69d](https://github.com/napse-invest/django-napse/commit/7f6d69d1a3b6999fa8e9ddf55ca526e473098772))
+* **space:** improvement on views & tests ([3a45999](https://github.com/napse-invest/django-napse/commit/3a45999a2c284a479e3071122fe8694433c10919))
+* **wallet serializer:** improve operations ([72a7fa6](https://github.com/napse-invest/django-napse/commit/72a7fa6a870f2ce3aac7f3665fba7630412ec3b3))
+
 # [1.10.0](https://github.com/napse-invest/django-napse/compare/v1.9.0...v1.10.0) (2023-10-20)
 
 
