@@ -15,8 +15,7 @@ class ConflictingUrlNames(Exception):
 def build_main_router() -> DefaultRouter:
     """Create a main router object and register the appropriate viewsets to it based on the modules and classes found in the `api` directory.
 
-    Returns
-    -------
+    Returns:
         DefaultRouter: The main router object with registered URL patterns.
     """
     main_router = DefaultRouter()
