@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/mkdocs
 
 permissions:
   contents: write
@@ -17,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: ${{ github.event.pull_request.head.sha || github.ref }}
+        python-version: 3.11
 
     - name: Set up python
       uses: actions/setup-python@v4
@@ -32,7 +31,7 @@ jobs:
         pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
         pip install -r ./full-requirements.txt
 
-    - name: Lint with ruff
+    - name: Write open-api schema
       run: python tests/test_app/manage.py spectacular --file docs/schema.yml
 
   deploy:

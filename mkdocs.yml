@@ -4,14 +4,26 @@ repo_name: napse-invest/django-napse
 repo_url: https://github.com/napse-invest/django-napse
 copyright: MIT Licence
 
-
 docs_dir: "docs/"
 
-
 extra_css:
-  -  assets/stylesheets/extra.css
-  -  assets/stylesheets/api.css
+  -  theme/assets/stylesheets/extra.css
+  -  theme/assets/stylesheets/api.css
 
+extra:
+  social:
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/NapseInvest
+      name: X
+    - icon: fontawesome/brands/linkedin
+      link: https://fr.linkedin.com/company/napse-investment
+      name: Linkedin
+    - icon: fontawesome/brands/discord
+      link: https://discord.com/invite/47gKBreSXa
+      name: Discord
+    - icon: fontawesome/brands/github
+      link: https://github.com/napse-invest/Napse
+      name: Github
 
 theme:
   name: 'material'
@@ -34,7 +46,7 @@ theme:
     - media: "prefers-color-scheme: dark"
       scheme: slate
       primary: teal
-      accent: blue grey
+      accent: teal
       toggle:
         # icon: material/toggle-switch-off-outline
         icon: material/toggle-switch
@@ -57,7 +69,8 @@ theme:
     - search.suggest
 
 plugins:
-  - search
+  - search 
+  - autorefs
   - inline-svg
   - coverage:
       page_name: coverage  # default
@@ -67,47 +80,50 @@ plugins:
   - mkdocstrings:
       default_handler: python
       handlers:
-        python:
-          paths: [src]
+        python: 
+          paths: [.] 
+          options: 
+            show_source: false
+            allow_inspection: false 
+            show_bases: false 
+            show_root_heading: false 
+            docstring_style: google 
+            docstring_section_style: list
+            docstring_options:
+              ignore_init_summary: false
+              trim_doctest_flags: true
+            heading_level: 3
+  # Contributors
+  - neoteroi.contribs:
+      contributors:
+          - email: firenix.nex@gmail.com
+            image: https://avatars.githubusercontent.com/u/11559668?s=400&u=6564188698fbd519f21b7f400e522659e41a158e&v=4
+
 
 markdown_extensions:
   - toc:
-      permalink: "#"
+      permalink: "#" 
   - pymdownx.snippets:
   - pymdownx.magiclink:
   - attr_list:
   - md_in_html:
-  - pymdownx.highlight:
-      anchor_linenums: true
   - pymdownx.inlinehilite:
   - pymdownx.superfences:
-  - pymdownx.keys:
+  - pymdownx.keys: 
   - pymdownx.tasklist:
-      custom_checkbox: true
+      custom_checkbox: true 
   - admonition
-  - codehilite:
+  - codehilite:  
       use_pygments: true
       noclasses: true
       pygments_style: tango
   - pymdownx.details:
   - pymdownx.tabbed:
       alternate_style: true
-
-
-extra:
-  social:
-    - icon: fontawesome/brands/twitter
-      link: https://twitter.com/NapseInvest
-      name: X
-    - icon: fontawesome/brands/linkedin
-      link: https://fr.linkedin.com/company/napse-investment
-      name: Linkedin
-    - icon: fontawesome/brands/discord
-      link: https://discord.com/invite/47gKBreSXa
-      name: Discord
-    - icon: fontawesome/brands/github
-      link: https://github.com/napse-invest/Napse
-      name: Github
+  - pymdownx.highlight:
+      anchor_linenums: true
+      # line_spans: __span
+      # pygments_lang_class: true
 
 nav:
   - Home: 
@@ -118,7 +134,17 @@ nav:
     - "sources/guides/space.md"
     - "sources/guides/fleet.md"
   - Reference:
-    - "sources/reference/space.md"
+    - "sources/reference/bots.md"
+    - "sources/reference/connections.md"
+    - "sources/reference/exchanges.md"
+    - "sources/reference/fleets.md"
+    - "sources/reference/histories.md"
+    - "sources/reference/keys.md"
+    - "sources/reference/orders.md"
+    - "sources/reference/permissions.md"
+    - "sources/reference/spaces.md"
+    - "sources/reference/transactions.md"
+    - "sources/reference/wallets.md"
   - API: "api.md"
   - Development: 
     - Contributing: "contributing.md"
