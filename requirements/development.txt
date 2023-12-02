@@ -19,4 +19,5 @@ neoteroi-mkdocs==1.0.4              # https://github.com/Neoteroi/mkdocs-plugins
 drf-spectacular==0.26.5             # https://github.com/tfranzel/drf-spectacular
 mkdocstrings==0.24.0                # https://github.com/mkdocstrings/mkdocstrings
 mkdocstrings-python==1.7.5          # https://github.com/mkdocstrings/python
+watchfiles==0.21.0                  # https://github.com/samuelcolvin/watchfiles
 
