@@ -95,8 +95,8 @@ jobs:
           label: Coverage
           message: ${{ env.COVERAGE }} %
           valColorRange: ${{ env.COVERAGE }}
-          minColorRange: 50
-          maxColorRange: 95
+          minColorRange: 70
+          maxColorRange: 100
 
   stop-runner:
     name: Stop self-hosted EC2 runner
