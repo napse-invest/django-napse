@@ -41,9 +41,12 @@ jobs:
   deploy:
     needs: start-runner
     name: Deploy documentation
-    runs-on: ubuntu-latest
+    runs-on: ${{ needs.start-runner.outputs.label }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
       - uses: actions/setup-python@v4
         with:
           python-version: 3.11
