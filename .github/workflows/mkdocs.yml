@@ -52,9 +52,21 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: |
-          pip install -r requirements/development.txt
-          coverage run tests/test_app/manage.py test -v2 --keepdb
-          coverage html
-          coverage report
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-tools
+          pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
+          pip install -r ./full-requirements.txt
+      - name: Tests with coverage
+        run: |
+          export PYTHONPATH="$PYTHONPATH:./django-napse/"
+          export NAPSE_IS_IN_PIPELINE=True
+          cd tests/test_app
+          bash setup_secrets.sh
+          cd ../..
+          python3 tests/test_app/manage.py makemigrations && python3 tests/test_app/manage.py migrate 
+          coverage run ./tests/test_app/manage.py test -v2 --keepdb && coverage html
+      - name: Deploy documentation
+        run: |
           mkdocs gh-deploy --force
