@@ -44,7 +44,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.x
+          python-version: 3.11
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
       - uses: actions/cache@v3
         with:
@@ -54,5 +54,7 @@ jobs:
             mkdocs-material-
       - run: |
           pip install -r requirements/development.txt
-          make coverage
+          coverage run tests/test_app/manage.py test -v2 --keepdb
+          coverage html
+          coverage report
           mkdocs gh-deploy --force
