@@ -34,6 +34,8 @@ jobs:
           ec2-image-id: ${{ secrets.AWS_EC2_IMAGE_ID }}
           ec2-instance-type: t3.micro
           subnet-id: ${{ secrets.AWS_SUBNET_ID }}
+          security-group-id: ${{ secrets.AWS_SECURITY_GROUP_ID }}
+
     
 
   deploy:
