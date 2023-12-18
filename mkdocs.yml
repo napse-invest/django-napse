@@ -98,14 +98,21 @@ plugins:
               ignore_init_summary: true
             merge_init_into_class: true
             heading_level: 3
-            extensions:
-              - docs/plugins/griffe_doclinks.py
+            # extensions:
+            #   - docs/plugins/griffe_doclinks.py
             show_source: false
             allow_inspection: false 
             show_bases: false 
             show_root_heading: false 
-            docstring_style: google 
+            docstring_style: google
             # docstring_section_style: list
+            
+            # Signature
+            show_signature: true
+            separate_signature: true
+            show_signature_annotations: true
+            annotations_path: full
+            line_length: 80
   # Contributors
   - neoteroi.contribs:
       contributors:

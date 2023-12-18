@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - main
-      - dev
-      - feature/mkdocstring
 
 permissions:
   contents: write
@@ -43,6 +41,7 @@ jobs:
     name: Deploy documentation
     runs-on: ${{ needs.start-runner.outputs.label }}
     timeout-minutes: 10
+    environment: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && 'external' || 'internal' }}
     steps:
       - uses: actions/checkout@v4
         with:
