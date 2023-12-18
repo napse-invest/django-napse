@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - dev
+      - feature/mkdocstring
 
 permissions:
   contents: write
@@ -53,4 +54,5 @@ jobs:
             mkdocs-material-
       - run: |
           pip install -r requirements/development.txt
+          make coverage
           mkdocs gh-deploy --force
