@@ -2,12 +2,18 @@ from rest_framework import serializers
 from rest_framework.fields import empty
 
 from django_napse.api.bots.serializers import BotSerializer
+from django_napse.api.fleets.serializers.cluster_serialisers import ClusterSerializer
 from django_napse.core.models import ConnectionWallet, Fleet
 
 
 class FleetSerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField(read_only=True)
     bot_count = serializers.SerializerMethodField(read_only=True)
+    clusters = ClusterSerializer(
+        write_only=True,
+        many=True,
+        required=True,
+    )
 
     class Meta:
         model = Fleet
@@ -20,8 +26,6 @@ class FleetSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "uuid",
-            "value",
-            "bot_count",
         ]
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
