@@ -95,8 +95,10 @@ At `tests/test_app/`, build a `secret.json` file (or run the `./setup_secrets.sh
         }
     }
 }
-
 ```
+
+!!! note
+    We **strongly recommend** to add the `secret.json` file to your `.gitignore` file to avoid sharing your API keys.
 
 #### Run 
 

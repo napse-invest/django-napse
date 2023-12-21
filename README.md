@@ -22,7 +22,7 @@
 
 <p align="center">
   <a href="#django-napse"><strong>Django Napse</strong></a> ·
-  <a href="#usefull-commands"><strong>Usefull commands</strong></a> .
+  <a href="#documentation"><strong>Documentation</strong></a> .
   <a href="#how-to-contribute"><strong>How to contribute</strong></a>
 </p>
 <br/>
@@ -30,48 +30,21 @@
 ## django-napse
 
 Django napse is a portfolio management module using trading bots.
-
 This directory can be used as a django module, which you can install as follows:
 
 ```bash
 pip install django-napse
 ```
 
-Or you can use it as a local backend for the [Napse desktop application](https://github.com/napse-invest/Napse), by cloning the repo (possibly after forking it).
+Or you can use it as a local backend for the [Napse desktop application](https://github.com/napse-invest/Napse), by cloning the repository.
 
-## Useful commands
-Unless otherwise specified, all commands are to be run at the root folder of the project.
+Find more details for installation in the [documentation](https://napse-invest.github.io/django-napse/#installation).
 
-### Create a new project
-- Unix \
-```source setup-unix.sh```
+### Documentation
 
-- Windows \
-```.\setup-windows.ps1```
+You can find the documentation [here](https://napse-invest.github.io/django-napse/).
 
-### Run a test version of the project
 
-- Build migrations \
-```make makemigrations```
-- Apply migrations \
-```make migrate``` 
-- Run server \
-```make runserver```
+## How to contribute
 
-### Run coverage tests
-
-- Run tests \
-```test-napse```
-- Run tests with coverage \
-```coverage```
-- Run tests with coverage and open coverage report \
-```coverage-open```
-
-## Documentation
-
-[Docs](https://napse-invest.github.io/django-napse/)
-
-Run mkdocs server:
-```
-make mkdocs
-```
+If you want to contribute to the project, please read the [contributing guidelines](https://napse-invest.github.io/django-napse/contributing/) first. You will find the setup instructions and our standards.
