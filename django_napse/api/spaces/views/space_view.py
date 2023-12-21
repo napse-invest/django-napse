@@ -1,13 +1,11 @@
 from rest_framework import status
-from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_api_key.permissions import HasAPIKey
 
 from django_napse.api.custom_permissions import HasFullAccessPermission, HasMasterKey, HasReadPermission
 from django_napse.api.custom_viewset import CustomViewSet
-from django_napse.api.exchanges.serializers.exchange_account_serializer import ExchangeAccountSerializer
 from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceSerializer
-from django_napse.core.models import ExchangeAccount, NapseSpace
+from django_napse.core.models import NapseSpace
 from django_napse.utils.errors import SpaceError
 
 
@@ -38,7 +36,7 @@ class SpaceView(CustomViewSet):
                 return [HasReadPermission()]
             case "list":
                 return [HasAPIKey()]
-            case "possible_exchange_accounts" | "create":
+            case "create":
                 return [HasMasterKey()]
 
             case _:
@@ -82,11 +80,3 @@ class SpaceView(CustomViewSet):
         except SpaceError.DeleteError:
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-    @action(detail=False, methods=["GET"])
-    def possible_exchange_accounts(self, request):
-        serialized_exchange_account = ExchangeAccountSerializer(ExchangeAccount.objects.all(), many=True)
-        return Response(
-            serialized_exchange_account.data,
-            status=status.HTTP_200_OK,
-        )
