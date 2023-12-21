@@ -23,6 +23,8 @@ class FleetSerializer(serializers.ModelSerializer):
             "uuid",
             "value",
             "bot_count",
+            # write-only
+            "clusters",
         ]
         read_only_fields = [
             "uuid",
