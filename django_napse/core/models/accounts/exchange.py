@@ -28,7 +28,11 @@ class Exchange(models.Model):
 class ExchangeAccount(models.Model, FindableClass):
     uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
 
-    exchange = models.ForeignKey("Exchange", on_delete=models.CASCADE, related_name="accounts")
+    exchange = models.ForeignKey(
+        "Exchange",
+        on_delete=models.CASCADE,
+        related_name="accounts",
+    )
     name = models.CharField(max_length=200)
     testing = models.BooleanField(default=True)
     description = models.TextField()
