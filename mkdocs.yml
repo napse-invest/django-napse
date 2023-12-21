@@ -167,7 +167,7 @@ nav:
     - "sources/reference/spaces.md"
     - "sources/reference/transactions.md"
     - "sources/reference/wallets.md"
-  - API: "api.md"
+  - API: "sources/api.md"
   - Development: 
     - Contributing: "contributing.md"
     - Security: "SECURITY.md"

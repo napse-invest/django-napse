@@ -64,13 +64,19 @@ You can commit the code from your fork through a pull request on the official re
 === "Linux"
 
     ```bash
-    source setup-unix.sh
+    source setup/setup-unix.sh
+    ```
+
+=== "MacOS"
+
+    ```bash
+    source setup/setup-osx.sh
     ```
 
 === "Windows"
 
     ```powershell
-    .\setup-windows.ps1
+    .\setup\setup-windows.ps1
     ```
 
 #### Setup initial exchange accounts

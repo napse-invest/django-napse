@@ -28,7 +28,16 @@
 <br/>
 
 ## django-napse
-....
+
+Django napse is a portfolio management module using trading bots.
+
+This directory can be used as a django module, which you can install as follows:
+
+```bash
+pip install django-napse
+```
+
+Or you can use it as a local backend for the [Napse desktop application](https://github.com/napse-invest/Napse), by cloning the repo (possibly after forking it).
 
 ## Useful commands
 Unless otherwise specified, all commands are to be run at the root folder of the project.
