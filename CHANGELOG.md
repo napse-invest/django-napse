@@ -1,3 +1,12 @@
+## [1.10.3](https://github.com/napse-invest/django-napse/compare/v1.10.2...v1.10.3) (2023-12-21)
+
+
+### Bug Fixes
+
+* **docs:** finish mkdocs setup ([a900525](https://github.com/napse-invest/django-napse/commit/a900525b36e19f40cf0019ed35540b673a3727ae))
+* **fleet:** improve list endpoint ([039479f](https://github.com/napse-invest/django-napse/commit/039479fb0cd5b1cc15a7ada83cce5b0eb522c73b))
+* **space:** remove possible_exchange_account ([2a46272](https://github.com/napse-invest/django-napse/commit/2a4627289b33b537b9c045296cca33090e30d45a))
+
 ## [1.10.2](https://github.com/napse-invest/django-napse/compare/v1.10.1...v1.10.2) (2023-11-28)
 
 
