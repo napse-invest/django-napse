@@ -24,7 +24,7 @@ extra:
       link: https://discord.com/invite/47gKBreSXa
       name: Discord
     - icon: fontawesome/brands/github
-      link: https://github.com/napse-invest/Napse
+      link: https://github.com/napse-invest/
       name: Github
 
 theme:
@@ -150,6 +150,7 @@ markdown_extensions:
 nav:
   - Home: 
     - Overview: "index.md"
+    - Quickstart: "sources/quickstart.md"
   - How to guides:
     - "sources/guides/exchange.md"
     - "sources/guides/exchange_account.md"
