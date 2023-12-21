@@ -22,12 +22,18 @@
 
 # Welcome to django-napse's documentation!
 
-## Installation
+Django napse is a portfolio management module using trading bots.
 
-To install the latest version of django-napse:
+## Installation
+---
+
+This project can be used as a django module, which you can install as follows:
+
 ```bash
 pip install django-napse
 ```
+
+Or you can use it as a local backend for the [Napse desktop application](https://github.com/napse-invest/Napse), by cloning the repo (possibly after forking it).
 
 ### Setup initial exchange accounts
 
@@ -38,7 +44,7 @@ At the root of your project, build a `secret.json` file. Here is an exemple with
 {
     "Exchange Accounts": {
         "Binance EA_NAME": {
-            "exchange": "BINANCE",     # Name of your exchange (BINANCE, DYDX, ...)
+            "exchange": "BINANCE",     # Name of your exchange
             "testing": true,
             "public_key": "YOUR_PUBLIC_KEY",
             "private_key": "YOUR_PRIVATE_KEY"
@@ -46,10 +52,27 @@ At the root of your project, build a `secret.json` file. Here is an exemple with
     }
 }
 ```
-We **strongly** recommand you to add the `secret.json` file to your `.gitignore`.
-
+??? note "Note for developers"
+    We **strongly recommend** to add the `secret.json` file to your `.gitignore` file to avoid sharing your API keys.
 
 ## Use django-napse
+---
+
+### Local backend
+
+If you want to use django-napse as a local backend for the Napse desktop application, clone the repository and setup the project:
+```bash
+make setup
+```
+  
+Then, you can run the server:
+```bash
+make up
+```
+
+Please check the documentation for more information about [endpoints](https://napse-invest.github.io/django-napse/api/).
+
+### Django module
 
 After the installation step, in a `.py` file you can use django-napse after importing it:
 ```python
@@ -59,6 +82,7 @@ exchange_account_query = ExchangeAccount.objects.all()
 ```
 
 ## Miscellaneous
+---
 
 ### Compatible exchanges
 

@@ -6,11 +6,11 @@ all: setup-testing-environment makemigrations migrate runserver
 
 setup:
 ifeq ($(OS),Darwin)        # Mac OS X
-	./setup-osx.sh
+	./setup/setup-osx.sh
 else ifeq ($(OS),Linux)
-	./setup-unix.sh
+	./setup/setup-unix.sh
 else 
-	./setup-windows.sh
+	./setup/setup-windows.sh
 endif
 
 setup-testing-environment:

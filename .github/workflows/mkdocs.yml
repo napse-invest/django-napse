@@ -9,40 +9,46 @@ permissions:
   contents: write
   
 jobs:
-  api-schema:
-    name: API schema
+
+  start-runner:
+    name: Start self-hosted EC2 runner
     runs-on: ubuntu-latest
-
+    outputs:
+      label: ${{ steps.start-ec2-runner.outputs.label }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
     steps:
-    - uses: actions/checkout@v4
-      with:
-        python-version: 3.11
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Start EC2 runner
+        id: start-ec2-runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: start
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          ec2-image-id: ${{ secrets.AWS_EC2_IMAGE_ID }}
+          ec2-instance-type: t3.micro
+          subnet-id: ${{ secrets.AWS_SUBNET_ID }}
+          security-group-id: ${{ secrets.AWS_SECURITY_GROUP_ID }}
 
-    - name: Set up python
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-        architecture: "x64"
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pip-tools
-        pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
-        pip install -r ./full-requirements.txt
-
-    - name: Write open-api schema
-      run: python tests/test_app/manage.py spectacular --file docs/schema.yml
+    
 
   deploy:
-    needs: api-schema
+    needs: start-runner
     name: Deploy documentation
-    runs-on: ubuntu-latest
+    runs-on: ${{ needs.start-runner.outputs.label }}
+    timeout-minutes: 10
+    environment: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository && 'external' || 'internal' }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.ref }}
       - uses: actions/setup-python@v4
         with:
-          python-version: 3.x
+          python-version: 3.11
       - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV 
       - uses: actions/cache@v3
         with:
@@ -50,6 +56,45 @@ jobs:
           path: .cache
           restore-keys: |
             mkdocs-material-
-      - run: |
-          pip install -r requirements/development.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pip-tools
+          pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking
+          pip install -r ./full-requirements.txt
+      - name: Tests with coverage
+        run: |
+          export PYTHONPATH="$PYTHONPATH:./django-napse/"
+          export NAPSE_IS_IN_PIPELINE=True
+          cd tests/test_app
+          bash setup_secrets.sh
+          cd ../..
+          python3 tests/test_app/manage.py makemigrations && python3 tests/test_app/manage.py migrate 
+          coverage run ./tests/test_app/manage.py test -v2 --keepdb && coverage html
+      - name: Write open-api schema
+        run: python tests/test_app/manage.py spectacular --file docs/schema.yml
+      - name: Deploy documentation
+        run: |
           mkdocs gh-deploy --force
+
+  stop-runner:
+    name: Stop self-hosted EC2 runner
+    needs:
+      - start-runner # required to get output from the start-runner job
+      - deploy # required to wait when the main job is done
+    runs-on: ubuntu-latest
+    if: ${{ always() }} # required to stop the runner even if the error happened in the previous jobs
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Stop EC2 runner
+        uses: machulav/ec2-github-runner@v2
+        with:
+          mode: stop
+          github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          label: ${{ needs.start-runner.outputs.label }}
+          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}

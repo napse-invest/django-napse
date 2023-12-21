@@ -7,8 +7,10 @@ copyright: MIT Licence
 docs_dir: "docs/"
 
 extra_css:
-  -  theme/assets/stylesheets/extra.css
-  -  theme/assets/stylesheets/api.css
+  -  assets/stylesheets/extra.css
+  -  assets/stylesheets/api.css
+  -  assets/stylesheets/docstring.css
+
 
 extra:
   social:
@@ -67,6 +69,12 @@ theme:
     - navigation.top
     - content.code.copy
     - search.suggest
+    - content.tabs.link
+    - content.code.annotate
+
+watch:
+  - django_napse
+  - docs
 
 plugins:
   - search 
@@ -83,26 +91,38 @@ plugins:
         python: 
           paths: [.] 
           options: 
+            members_order: source
+            separate_signature: true
+            filters: ["!^_"]
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            heading_level: 3
+            # extensions:
+            #   - docs/plugins/griffe_doclinks.py
             show_source: false
             allow_inspection: false 
             show_bases: false 
             show_root_heading: false 
-            docstring_style: google 
-            docstring_section_style: list
-            docstring_options:
-              ignore_init_summary: false
-              trim_doctest_flags: true
-            heading_level: 3
+            docstring_style: google
+            # docstring_section_style: list
+            
+            # Signature
+            show_signature: true
+            separate_signature: true
+            show_signature_annotations: true
+            annotations_path: full
+            line_length: 80
   # Contributors
   - neoteroi.contribs:
       contributors:
-          - email: firenix.nex@gmail.com
+          - email: Firenix.nex@gmail.com
             image: https://avatars.githubusercontent.com/u/11559668?s=400&u=6564188698fbd519f21b7f400e522659e41a158e&v=4
 
 
 markdown_extensions:
   - toc:
-      permalink: "#" 
+      permalink: true
   - pymdownx.snippets:
   - pymdownx.magiclink:
   - attr_list:
@@ -122,8 +142,10 @@ markdown_extensions:
       alternate_style: true
   - pymdownx.highlight:
       anchor_linenums: true
+      pygments_lang_class: true
       # line_spans: __span
-      # pygments_lang_class: true
+
+
 
 nav:
   - Home: 
@@ -145,7 +167,7 @@ nav:
     - "sources/reference/spaces.md"
     - "sources/reference/transactions.md"
     - "sources/reference/wallets.md"
-  - API: "api.md"
+  - API: "sources/api.md"
   - Development: 
     - Contributing: "contributing.md"
     - Security: "SECURITY.md"

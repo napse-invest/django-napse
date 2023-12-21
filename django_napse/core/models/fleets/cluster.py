@@ -8,8 +8,16 @@ from django_napse.utils.errors import BotError, ClusterError
 
 
 class Cluster(models.Model):
-    fleet = models.ForeignKey("Fleet", on_delete=models.CASCADE, related_name="clusters")
-    template_bot = models.OneToOneField("Bot", on_delete=models.CASCADE, related_name="cluster")
+    fleet = models.ForeignKey(
+        "Fleet",
+        on_delete=models.CASCADE,
+        related_name="clusters",
+    )
+    template_bot = models.OneToOneField(
+        "Bot",
+        on_delete=models.CASCADE,
+        related_name="cluster",
+    )
     share = models.FloatField()
     breakpoint = models.FloatField()
     autoscale = models.BooleanField()

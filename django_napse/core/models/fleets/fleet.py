@@ -11,12 +11,25 @@ from django_napse.core.models.orders.order import Order
 
 
 class Fleet(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    name = models.CharField(max_length=100, default="Fleet")
-    exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
+    name = models.CharField(
+        max_length=100,
+        default="Fleet",
+    )
+    exchange_account = models.ForeignKey(
+        "ExchangeAccount",
+        on_delete=models.CASCADE,
+    )
     running = models.BooleanField(default=False)
     setup_finished = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        blank=True,
+    )
 
     objects = FleetManager()
 
