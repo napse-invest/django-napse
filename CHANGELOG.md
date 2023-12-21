@@ -1,3 +1,10 @@
+## [1.10.4](https://github.com/napse-invest/django-napse/compare/v1.10.3...v1.10.4) (2023-12-21)
+
+
+### Bug Fixes
+
+* **fleet:** add cluster into serializer ([3f34b00](https://github.com/napse-invest/django-napse/commit/3f34b0066eb4ea018ca9fdc8668f87798ae7811a))
+
 ## [1.10.3](https://github.com/napse-invest/django-napse/compare/v1.10.2...v1.10.3) (2023-12-21)
 
 
