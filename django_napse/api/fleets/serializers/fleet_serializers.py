@@ -35,10 +35,15 @@ class FleetSerializer(serializers.ModelSerializer):
         super().__init__(instance=instance, data=data, **kwargs)
 
     def get_value(self, instance):
-        return instance.value(space=self.space)
+        if self.space is None:
+            return instance.value()
+        return instance.space_frame_value(space=self.space)
 
     def get_bot_count(self, instance):
-        return instance.bots.count()
+        query_bot = instance.bots.all()
+        if self.space is None:
+            return len(query_bot)
+        return len([bot for bot in query_bot if bot.space == self.space])
 
 
 class FleetDetailSerializer(serializers.Serializer):
