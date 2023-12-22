@@ -41,10 +41,51 @@ space = NapseSpace.objects.create(
         )
 ```
 
+## Bot
+---
+
+Now let's build your first bot. A bot will trade on your behalf according to the strategy you have defined.
+```python
+from django_napse.core.models import Bot, EmptyBotConfig, Controller, SinglePairArchitecture, EmptyStrategy
+
+# Create the config of the bot
+config = EmptyBotConfig.objects.create(space=space, settings={"empty": True})
+# The controller will discuss with the exchange's API
+controller = Controller.get(
+    exchange_account=exchange_account,
+    base="BTC",
+    quote="USDT",
+    interval="1m",
+)
+# The architecture
+        architecture = SinglePairArchitecture.objects.create(constants={"controller": controller})
+        strategy = EmptyStrategy.objects.create(config=config, architecture=architecture)
+        bot = Bot.objects.create(name="Test Bot", strategy=strategy)
+```
+
 ## Fleet
 ---
 
 Then it's time to build a fleet. A fleet is a set of bot. This allows bots to be scaled up according to the amount of money they manage.
 ```python
+from django_napse.core.models import Fleet
+Fleet.objects.create(
+    name="Test Fleet",
+    exchange_account=exchange_account,
+    clusters=[
+        {
+            "template_bot": bot,
+            "share": 0.7,
+            "breakpoint": 1000,
+            "autoscale": False,
+        },
+        {
+            "template_bot": bot,
+            "share": 0.3,
+            "breakpoint": 1000,
+            "autoscale": True,
+        },
+    ],
+)
 
 ```
