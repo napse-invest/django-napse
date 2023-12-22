@@ -21,9 +21,9 @@ binance_exchange = Exchange.objects.get(name = "BINANCE")
 from django_napse.core.models import ExchangeAccount
 
 new_binance_exchange_account = ExchangeAccount.objects.create(
-                                                        exchange=binance_exchange,
-                                                        testing=True
-                                                        name="binance_test_exchange_account",
-                                                        description="This is a test exchange account for Binance."
-                                                        )
+                                    exchange=binance_exchange,
+                                    testing=True
+                                    name="binance_test_exchange_account",
+                                    description="This is a test exchange account for Binance."
+                                    )
 ```
