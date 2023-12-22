@@ -24,6 +24,6 @@ new_binance_exchange_account = ExchangeAccount.objects.create(
                                     exchange=binance_exchange,
                                     testing=True
                                     name="binance_test_exchange_account",
-                                    description="This is a test exchange account for Binance."
+                                    description="This is a test E.A."
                                     )
 ```

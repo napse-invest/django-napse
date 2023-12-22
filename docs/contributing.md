@@ -5,10 +5,11 @@ Welcome ! Thank you in advance for your contribution to Napse !
 There are several ways in which you can contribute, beyond writing code. The goal of this document is to provide a high-level overview of how you can get involved.
 
 ## Questions & Feedbacks
-
+---
 Have a question ? Want to give a feedback ? Instead of opening an issue, please use the [discussion](https://github.com/napse-invest/django-napse/discussions) section.
 
 ## Basics
+---
 
 For small changes (e.g., bug fixes, documentation improvement), feel free to submit a PR.
 For larger changes (e.g., new feature), please open an issue first to discuss the proposed changes.
@@ -35,6 +36,7 @@ If you open a new issue for a bug report or a feature request, please read the f
 
 
 ## Setup development environnement
+---
 
 If you would like to go a steup further and write some code to contributing, we would love to hear from you! 
 
@@ -60,6 +62,12 @@ git clone https://github.com/<your-github-account>/django-napse.git
 You can commit the code from your fork through a pull request on the official repository.
 
 #### Build the virtual environment:
+
+To setup the virtual environment, you can run the command:
+```bash
+make setup
+```
+Or run manually the following script depending on your operating system:
 
 === "Linux"
 
@@ -97,6 +105,11 @@ At `tests/test_app/`, build a `secret.json` file (or run the `./setup_secrets.sh
 }
 ```
 
+You can create this file with the commande:
+```bash
+make setup-testing-environment
+```
+
 !!! note
     We **strongly recommend** to add the `secret.json` file to your `.gitignore` file to avoid sharing your API keys.
 
@@ -130,6 +143,7 @@ The project contains 5 parts:
 
 
 ## Documentation
+---
 
 In order to produce the best possible documentation, it is based on the [diataxis](https://diataxis.fr/) framework. 
 
@@ -147,6 +161,7 @@ make mkdocs
 The documentation should then be available locally at http://localhost:8005/.
 
 ## Code contribution
+---
 
 The code you contribute to the project must follow a standard. This standard ensures that all code is consistent, thant it has a certain quality and, above all, makes it easier for the various contributors to handle it.
 
@@ -173,3 +188,16 @@ We strongly recommand to use a formatter to format your code. You can use both r
 ### Tests
 
 ⚠️ Work in progress ⚠️
+
+Run tests:
+```bash
+make test
+```
+Run tests with coverage:
+```bash
+make coverage
+```
+Run tests with coverage and open the html report:
+```bash
+make coverage-open
+```
