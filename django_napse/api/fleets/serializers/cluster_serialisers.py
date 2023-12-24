@@ -20,6 +20,7 @@ class ClusterSerializerV1(serializers.ModelSerializer):
 class ClusterFormatterSerializer(serializers.Serializer):
     """Format cluster dictionnary for fleet creation."""
 
+    # TODO: use bot UUID instead of bot name
     bot_strategy = serializers.UUIDField(required=True)
     bot_name = serializers.CharField(required=True)
     share = serializers.FloatField(required=True)

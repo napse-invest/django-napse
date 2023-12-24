@@ -205,7 +205,12 @@ class SpaceSimulationWallet(Wallet):
         self.currencies.all().delete()
 
     def connect_to_bot(self, bot):
-        return Connection.objects.create(owner=self, bot=bot)
+        """Get or create connection to bot."""
+        try:
+            connection = self.connections.get(owner=self, bot=bot)
+        except Connection.DoesNotExist:
+            connection = Connection.objects.create(owner=self, bot=bot)
+        return connection
 
 
 class OrderWallet(Wallet):

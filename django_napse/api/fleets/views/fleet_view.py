@@ -67,7 +67,8 @@ class FleetView(CustomViewSet):
         space = self.get_space(request)
         serializer = self.serializer_class(data=request.data, space=space)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        fleet = serializer.save()
+
         return Response(status=status.HTTP_201_CREATED)
 
     def delete(self):

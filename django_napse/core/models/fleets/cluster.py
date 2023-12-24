@@ -1,6 +1,6 @@
 from django.db import models
 
-from django_napse.core.models.connections.connection import Connection
+# from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.fleets.link import Link
 from django_napse.core.models.transactions.transaction import Transaction
 from django_napse.utils.constants import TRANSACTION_TYPES
@@ -82,11 +82,9 @@ class Cluster(models.Model):
             if ticker not in bot.architecture.accepted_investment_tickers() or ticker not in bot.architecture.accepted_tickers():
                 error_msg = f"Bot {bot} does not accept ticker {ticker}."
                 raise BotError.InvalidTicker(error_msg)
-            try:
-                connection = Connection.objects.get(bot=bot, owner=space.wallet)
-            except Connection.DoesNotExist:
-                # connection = Connection.objects.create(bot=bot, owner=sace.wallet)
-                connection = space.wallet.connect_to_bot(bot)
+
+            connection = space.wallet.connect_to_bot(bot)
+            # connection = Connection.objects.get(bot=bot, owner=space.wallet)
             Transaction.objects.create(
                 from_wallet=space.wallet,
                 to_wallet=connection.wallet,
