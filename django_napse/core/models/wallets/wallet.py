@@ -179,7 +179,11 @@ class SpaceWallet(Wallet):
         return self.space.exchange_account.find()
 
     def connect_to(self, bot):
-        return Connection.objects.create(owner=self, bot=bot)
+        try:
+            connection = self.connections.get(owner=self, bot=bot)
+        except Connection.DoesNotExist:
+            connection = Connection.objects.create(owner=self, bot=bot)
+        return connection
 
 
 class SpaceSimulationWallet(Wallet):
