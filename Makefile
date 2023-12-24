@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-
+.PHONY: setup
 OS := $(shell uname)
 
 all: setup-testing-environment makemigrations migrate runserver
