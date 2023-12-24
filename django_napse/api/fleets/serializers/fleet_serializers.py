@@ -2,14 +2,14 @@ from rest_framework import serializers
 from rest_framework.fields import empty
 
 from django_napse.api.bots.serializers import BotSerializer
-from django_napse.api.fleets.serializers.cluster_serialisers import ClusterSerializer
+from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
 from django_napse.core.models import ConnectionWallet, Fleet
 
 
 class FleetSerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField(read_only=True)
     bot_count = serializers.SerializerMethodField(read_only=True)
-    clusters = ClusterSerializer(
+    clusters = ClusterFormatterSerializer(
         write_only=True,
         many=True,
         required=True,
@@ -44,6 +44,13 @@ class FleetSerializer(serializers.ModelSerializer):
         if self.space is None:
             return len(query_bot)
         return len([bot for bot in query_bot if bot.space == self.space])
+
+    def create(self, validated_data):
+        clusters = validated_data.pop("clusters")
+        fleet = Fleet.objects.create(**validated_data)
+        for cluster in clusters:
+            fleet.clusters.create(**cluster)
+        return fleet
 
 
 class FleetDetailSerializer(serializers.Serializer):
