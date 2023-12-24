@@ -135,7 +135,7 @@ class Bot(models.Model):
     def _get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):
         return self.architecture._get_orders(data=data, no_db_data=no_db_data)
 
-    def connect_to(self, wallet):
+    def connect_to_wallet(self, wallet):
         connection = Connection.objects.create(owner=wallet, bot=self)
         for plugin in self._strategy.plugins.all():
             plugin.connect(connection)
