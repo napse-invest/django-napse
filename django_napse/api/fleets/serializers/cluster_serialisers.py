@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from django_napse.api.bots.serializers import BotSerializer
-from django_napse.core.models import Bot, Cluster, Strategy
+from django_napse.core.models import Bot, Cluster
 
 
 class ClusterSerializerV1(serializers.ModelSerializer):
@@ -20,9 +20,7 @@ class ClusterSerializerV1(serializers.ModelSerializer):
 class ClusterFormatterSerializer(serializers.Serializer):
     """Format cluster dictionnary for fleet creation."""
 
-    # TODO: use bot UUID instead of bot name
-    bot_strategy = serializers.UUIDField(required=True)
-    bot_name = serializers.CharField(required=True)
+    template_bot = serializers.UUIDField(required=True)
     share = serializers.FloatField(required=True)
     breakpoint = serializers.IntegerField(required=True)
     autoscale = serializers.BooleanField(required=True)
@@ -30,18 +28,12 @@ class ClusterFormatterSerializer(serializers.Serializer):
     def validate(self, data):
         data = super().validate(data)
         try:
-            strategy = Strategy.objects.get(uuid=data["bot_strategy"])
-        except Strategy.DoesNotExist:
-            error_msg: str = "Strategy does not exist"
+            bot = Bot.objects.get(uuid=data.pop("template_bot"))
+        except Bot.DoesNotExist:
+            error_msg: str = "Template bot does not exist."
             raise serializers.ValidationError(error_msg) from None
-        else:
-            data["bot_strategy"] = strategy
+        data["template_bot"] = bot
         return data
 
     def create(self, validated_data):
-        """Return cluster dict for fleet creation."""
-        template_bot = Bot.objects.create(
-            name=validated_data.pop("bot_name"),
-            strategy=validated_data.pop("bot_strategy"),
-        )
-        return {"template_bot": template_bot, **validated_data}
+        return super().create(validated_data)

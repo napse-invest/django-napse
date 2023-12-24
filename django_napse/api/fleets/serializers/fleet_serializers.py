@@ -36,7 +36,7 @@ class FleetSerializer(serializers.ModelSerializer):
 
     def get_value(self, instance):
         if self.space is None:
-            return instance.value()
+            return instance.value
         return instance.space_frame_value(space=self.space)
 
     def get_bot_count(self, instance):
@@ -45,15 +45,17 @@ class FleetSerializer(serializers.ModelSerializer):
             return len(query_bot)
         return len([bot for bot in query_bot if bot.space == self.space])
 
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        data["exchange_account"] = self.space.exchange_account
+        return data
+
     def create(self, validated_data):
-        clusters = validated_data.pop("clusters")
-        fleet = Fleet.objects.create(**validated_data)
-        for cluster in clusters:
-            fleet.clusters.create(**cluster)
-        return fleet
+        print(f"validated_data: {validated_data}")
+        return Fleet.objects.create(**validated_data)
 
 
-class FleetDetailSerializer(serializers.Serializer):
+class FleetDetailSerializer(serializers.ModelSerializer):
     wallet = serializers.SerializerMethodField(read_only=True)
     statistics = serializers.SerializerMethodField(read_only=True)
     bots = BotSerializer(many=True, read_only=True)
@@ -97,6 +99,8 @@ class FleetDetailSerializer(serializers.Serializer):
             else:
                 merged_wallet[index]["amount"] += currency.amount
 
+        if self.space is None:
+            return None
         wallets = ConnectionWallet.objects.filter(owner__owner=self.space.wallet, owner__bot__in=instance.bots)
         merged_wallet: list[dict[str, str | float]] = []
 

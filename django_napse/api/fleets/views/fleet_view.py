@@ -26,7 +26,7 @@ class FleetView(CustomViewSet):
         self.get_space = NapseSpace.objects.get(uuid=space_uuid)
         return self.get_space.fleets
 
-    def get_serialiser_class(self, *args, **kwargs):
+    def get_serializer_class(self, *args, **kwargs):
         actions: dict = {
             "list": FleetSerializer,
             "retrieve": FleetDetailSerializer,
@@ -42,10 +42,16 @@ class FleetView(CustomViewSet):
             case _:
                 return super().get_permissions()
 
+    def get_object(self):
+        uuid = self.kwargs.get("pk", None)
+        if uuid is None:
+            return super().get_object()
+        return Fleet.objects.get(uuid=uuid)
+
     def list(self, request):
         space_containers = request.query_params.get("space_containers", True)
         if not space_containers:
-            serializer = self.serializer_class(self.get_queryset(), many=True)
+            serializer = self.get_serializer(self.get_queryset(), many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         # Get spaces from API key
@@ -54,21 +60,23 @@ class FleetView(CustomViewSet):
         fleets = []
         for space in spaces:
             print("FLEET", space.fleets)
-            serializer = self.serializer_class(space.fleets, many=True)
+            serializer = self.get_serializer(space.fleets, many=True)
             if serializer.data != []:
-                fleets.append(*serializer.data)
+                fleets += serializer.data
         return Response(fleets, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        pass
+        instance = self.get_object()
+        space = self.get_space(request)
+        serializer = self.get_serializer(instance, space=space)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
         space = self.get_space(request)
-        serializer = self.serializer_class(data=request.data, space=space)
+        serializer = self.get_serializer(data=request.data, space=space)
         serializer.is_valid(raise_exception=True)
         fleet = serializer.save()
-
+        fleet.invest(space, 0, "USDT")
         return Response(status=status.HTTP_201_CREATED)
 
     def delete(self):
