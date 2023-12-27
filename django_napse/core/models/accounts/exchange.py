@@ -75,11 +75,11 @@ class BinanceAccount(ExchangeAccount):
     public_key = models.CharField(max_length=200)
     private_key = models.CharField(max_length=200)
 
-    def __str__(self):
-        return "BINANCE " + super().__str__()
-
     class Meta:
         unique_together = ("public_key", "private_key")
+
+    def __str__(self):
+        return "BINANCE " + super().__str__()
 
     def ping(self):
         request = self.exchange_controller().get_info()
