@@ -170,6 +170,9 @@ class Wallet(models.Model, FindableClass):
 class SpaceWallet(Wallet):
     owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="wallet")
 
+    def __str__(self):
+        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
+
     @property
     def space(self):
         return self.owner
@@ -188,6 +191,9 @@ class SpaceWallet(Wallet):
 
 class SpaceSimulationWallet(Wallet):
     owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="simulation_wallet")
+
+    def __str__(self):
+        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
 
     @property
     def testing(self):
@@ -216,6 +222,9 @@ class SpaceSimulationWallet(Wallet):
 class OrderWallet(Wallet):
     owner = models.OneToOneField("Order", on_delete=models.CASCADE, related_name="wallet")
 
+    def __str__(self):
+        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
+
     @property
     def exchange_account(self):
         return self.owner.exchange_account.find()
@@ -223,6 +232,9 @@ class OrderWallet(Wallet):
 
 class ConnectionWallet(Wallet):
     owner = models.OneToOneField("Connection", on_delete=models.CASCADE, related_name="wallet")
+
+    def __str__(self):
+        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
 
     @property
     def space(self):
