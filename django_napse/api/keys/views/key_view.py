@@ -86,10 +86,10 @@ class KeyView(CustomViewSet):
             if "description" in request.data:
                 key.description = request.data["description"]
             if "permissions" in request.data:
-                for permission in key.permissions.filter(space=self.space(request)):
+                for permission in key.permissions.filter(space=self.get_space(request)):
                     permission.delete()
                 for permission in request.data["permissions"]:
-                    key.add_permission(self.space(request), permission)
+                    key.add_permission(self.get_space(request), permission)
             key.save()
             if request.data.get("revoked", False) and not key.is_master_key:
                 key.revoke()

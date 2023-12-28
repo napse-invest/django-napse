@@ -81,6 +81,9 @@ class Fleet(models.Model):
             bot_clusters.append(Bot.objects.filter(link__cluster=cluster))
         return bot_clusters
 
+    def connect_to_space(self, space):
+        ...
+
     def invest(self, space, amount, ticker):
         connections = []
         for cluster in self.clusters.all():
