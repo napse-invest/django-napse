@@ -50,13 +50,25 @@ class FleetView(CustomViewSet):
 
     def list(self, request):
         space_containers = request.query_params.get("space_containers", True)
-        if not space_containers:
+        space_uuid = request.query_params.get("space", None)
+        api_key = self.get_api_key(request)
+
+        if not space_containers and api_key.is_master_key:
+            # Not space_containers mode is only available for master key
             serializer = self.get_serializer(self.get_queryset(), many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         # Get spaces from API key
-        api_key = self.get_api_key(request)
         spaces = NapseSpace.objects.all() if api_key.is_master_key else [permission.space for permission in api_key.permissions.all()]
+
+        # Filter by specific space
+        if space_uuid is not None:
+            space = NapseSpace.objects.get(uuid=space_uuid)
+            if space not in spaces:
+                return Response(status=status.HTTP_403_FORBIDDEN)
+            spaces = [space]
+
+        # Fleet list
         fleets = []
         for space in spaces:
             print("FLEET", space.fleets)
