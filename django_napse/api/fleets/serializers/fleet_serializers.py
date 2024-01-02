@@ -50,6 +50,12 @@ class FleetSerializer(serializers.ModelSerializer):
         data["exchange_account"] = self.space.exchange_account
         return data
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if self.space is not None:
+            data["space"] = self.space
+        return data
+
     def create(self, validated_data):
         print(f"validated_data: {validated_data}")
         return Fleet.objects.create(**validated_data)
