@@ -104,6 +104,7 @@ class FleetDetailSerializer(serializers.ModelSerializer):
             "statistics",
             "wallet",
             "bots",
+            "exchange_account",
         ]
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
@@ -146,6 +147,12 @@ class FleetDetailSerializer(serializers.ModelSerializer):
 
         return merged_wallet
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if self.space is not None:
+            data["space"] = self.space.uuid
+        return data
+
     def save(self, **kwargs):
         error_msg: str = "Impossible to update a fleet through the detail serializer."
-        raise ValueError(error_msg)
+        raise serializers.ValidationError(error_msg)
