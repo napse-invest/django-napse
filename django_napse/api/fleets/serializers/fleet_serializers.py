@@ -3,7 +3,7 @@ from rest_framework.fields import empty
 
 from django_napse.api.bots.serializers import BotSerializer
 from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
-from django_napse.core.models import ConnectionWallet, Fleet, NapseSpace
+from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, NapseSpace
 from django_napse.utils.errors import BotError
 
 
@@ -16,6 +16,7 @@ class FleetSerializer(serializers.ModelSerializer):
         required=True,
     )
     space = serializers.UUIDField(write_only=True, required=True)
+    delta = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Fleet
@@ -28,6 +29,7 @@ class FleetSerializer(serializers.ModelSerializer):
             "uuid",
             "value",
             "bot_count",
+            "delta",
             "exchange_account",
         ]
         read_only_fields = [
@@ -57,6 +59,14 @@ class FleetSerializer(serializers.ModelSerializer):
             if bot_space == self.space:
                 result.append(bot)
         return len(result)
+
+    def get_delta(self, instance) -> float:
+        """Delta on the last 30 days."""
+        try:
+            history = FleetHistory.objects.get(owner=instance)
+        except FleetHistory.DoesNotExist:
+            return 0
+        return history.get_delta()
 
     def validate(self, attrs):
         data = super().validate(attrs)

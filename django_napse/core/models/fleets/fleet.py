@@ -98,5 +98,5 @@ class Fleet(models.Model):
         return {
             "value": self.value,
             "order_count_30": order_count,
-            "change_30": None,  # TODO: Need history
+            "change_30": 0,  # TODO: Need history
         }
