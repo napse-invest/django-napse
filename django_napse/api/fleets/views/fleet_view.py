@@ -48,8 +48,24 @@ class FleetView(CustomViewSet):
             return super().get_object()
         return Fleet.objects.get(uuid=uuid)
 
+    def _get_boolean_query_param(self, param: str) -> bool | None:
+        """Return None if a boolean cannot be found."""
+        if isinstance(param, bool):
+            return param
+
+        if not isinstance(param, str):
+            return None
+
+        match param.lower():
+            case "true" | "1":
+                return True
+            case "false" | "0":
+                return False
+            case _:
+                return None
+
     def list(self, request):
-        space_containers = request.query_params.get("space_containers", True)
+        space_containers = self._get_boolean_query_param(request.query_params.get("space_containers", True))
         space_uuid = request.query_params.get("space", None)
         api_key = self.get_api_key(request)
 
