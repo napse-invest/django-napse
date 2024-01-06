@@ -37,7 +37,7 @@ class FleetView(CustomViewSet):
 
     def get_permissions(self):
         match self.action:
-            case "list":
+            case "list" | "create":
                 return [HasAPIKey()]
             case _:
                 return super().get_permissions()
@@ -87,7 +87,7 @@ class FleetView(CustomViewSet):
         fleet = serializer.save()
         space = serializer.space
         fleet.invest(space, 0, "USDT")
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
