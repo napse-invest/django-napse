@@ -37,7 +37,7 @@ class FleetView(CustomViewSet):
 
     def get_permissions(self):
         match self.action:
-            case "list":
+            case "list" | "create":
                 return [HasAPIKey()]
             case _:
                 return super().get_permissions()
@@ -48,8 +48,24 @@ class FleetView(CustomViewSet):
             return super().get_object()
         return Fleet.objects.get(uuid=uuid)
 
+    def _get_boolean_query_param(self, param: str) -> bool | None:
+        """Return None if a boolean cannot be found."""
+        if isinstance(param, bool):
+            return param
+
+        if not isinstance(param, str):
+            return None
+
+        match param.lower():
+            case "true" | "1":
+                return True
+            case "false" | "0":
+                return False
+            case _:
+                return None
+
     def list(self, request):
-        space_containers = request.query_params.get("space_containers", True)
+        space_containers = self._get_boolean_query_param(request.query_params.get("space_containers", True))
         space_uuid = request.query_params.get("space", None)
         api_key = self.get_api_key(request)
 
@@ -60,7 +76,6 @@ class FleetView(CustomViewSet):
 
         # Get spaces from API key
         spaces = NapseSpace.objects.all() if api_key.is_master_key else [permission.space for permission in api_key.permissions.all()]
-
         # Filter by specific space
         if space_uuid is not None:
             space = NapseSpace.objects.get(uuid=space_uuid)
@@ -71,8 +86,7 @@ class FleetView(CustomViewSet):
         # Fleet list
         fleets = []
         for space in spaces:
-            print("FLEET", space.fleets)
-            serializer = self.get_serializer(space.fleets, many=True)
+            serializer = self.get_serializer(space.fleets, many=True, space=space)
             if serializer.data != []:
                 fleets += serializer.data
         return Response(fleets, status=status.HTTP_200_OK)
@@ -84,12 +98,12 @@ class FleetView(CustomViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def create(self, request, *args, **kwargs):
-        space = self.get_space(request)
-        serializer = self.get_serializer(data=request.data, space=space)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         fleet = serializer.save()
+        space = serializer.space
         fleet.invest(space, 0, "USDT")
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)

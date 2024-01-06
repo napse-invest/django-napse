@@ -3,7 +3,8 @@ from rest_framework.fields import empty
 
 from django_napse.api.bots.serializers import BotSerializer
 from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
-from django_napse.core.models import ConnectionWallet, Fleet
+from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, NapseSpace
+from django_napse.utils.errors import BotError
 
 
 class FleetSerializer(serializers.ModelSerializer):
@@ -14,20 +15,26 @@ class FleetSerializer(serializers.ModelSerializer):
         many=True,
         required=True,
     )
+    space = serializers.UUIDField(write_only=True, required=True)
+    delta = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Fleet
         fields = [
             "name",
+            # write-only
+            "clusters",
+            "space",
             # read-only
             "uuid",
             "value",
             "bot_count",
-            # write-only
-            "clusters",
+            "delta",
+            "exchange_account",
         ]
         read_only_fields = [
             "uuid",
+            "exchange_account",
         ]
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
@@ -43,15 +50,43 @@ class FleetSerializer(serializers.ModelSerializer):
         query_bot = instance.bots.all()
         if self.space is None:
             return len(query_bot)
-        return len([bot for bot in query_bot if bot.space == self.space])
+        result = []
+        for bot in query_bot:
+            try:
+                bot_space = bot.space
+            except BotError.InvalidSetting:
+                continue
+            if bot_space == self.space:
+                result.append(bot)
+        return len(result)
+
+    def get_delta(self, instance) -> float:
+        """Delta on the last 30 days."""
+        try:
+            history = FleetHistory.objects.get(owner=instance)
+        except FleetHistory.DoesNotExist:
+            return 0
+        return history.get_delta()
 
     def validate(self, attrs):
         data = super().validate(attrs)
+
+        try:
+            self.space = NapseSpace.objects.get(uuid=attrs.pop("space"))
+        except NapseSpace.DoesNotExist:
+            error_msg: str = "Space does not exist."
+            raise serializers.ValidationError(error_msg) from None
+
         data["exchange_account"] = self.space.exchange_account
         return data
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if self.space is not None:
+            data["space"] = self.space.uuid
+        return data
+
     def create(self, validated_data):
-        print(f"validated_data: {validated_data}")
         return Fleet.objects.create(**validated_data)
 
 
@@ -69,6 +104,7 @@ class FleetDetailSerializer(serializers.ModelSerializer):
             "statistics",
             "wallet",
             "bots",
+            "exchange_account",
         ]
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
@@ -111,6 +147,12 @@ class FleetDetailSerializer(serializers.ModelSerializer):
 
         return merged_wallet
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if self.space is not None:
+            data["space"] = self.space.uuid
+        return data
+
     def save(self, **kwargs):
         error_msg: str = "Impossible to update a fleet through the detail serializer."
-        raise ValueError(error_msg)
+        raise serializers.ValidationError(error_msg)
