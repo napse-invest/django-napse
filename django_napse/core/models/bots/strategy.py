@@ -13,6 +13,17 @@ class Strategy(models.Model, FindableClass):
     def __str__(self) -> str:  # pragma: no cover
         return f"STRATEGY {self.pk}"
 
+    def info(self, verbose=True, beacon=""):
+        string = ""
+        string += f"{beacon}Strategy {self.pk}:\n"
+        string += f"{beacon}Args:\n"
+        string += f"{beacon}\t{self.config=}\n"
+        string += f"{beacon}\t{self.architecture=}\n"
+
+        if verbose:
+            print(string)
+        return string
+
     def give_order(self, data: dict) -> list[dict]:
         if self.__class__ == Strategy:
             error_msg = "give_order not implemented for the Strategy base class, please implement it in a subclass."
