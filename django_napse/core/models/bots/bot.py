@@ -60,6 +60,12 @@ class Bot(models.Model):
         raise BotError.InvalidSetting(error_msg)
 
     @property
+    def fleet(self):
+        if self.is_in_fleet:
+            return self.bot_in_cluster.cluster.fleet
+        return None
+
+    @property
     def space(self):
         if self.is_in_simulation:
             return self.simulation.space
