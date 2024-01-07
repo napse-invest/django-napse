@@ -4,7 +4,6 @@ from rest_framework.fields import empty
 from django_napse.api.bots.serializers import BotSerializer
 from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
 from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, NapseSpace
-from django_napse.utils.errors import BotError
 
 
 class FleetSerializer(serializers.ModelSerializer):
@@ -17,6 +16,7 @@ class FleetSerializer(serializers.ModelSerializer):
     )
     space = serializers.UUIDField(write_only=True, required=True)
     delta = serializers.SerializerMethodField(read_only=True)
+    exchange_account = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Fleet
@@ -47,18 +47,7 @@ class FleetSerializer(serializers.ModelSerializer):
         return instance.space_frame_value(space=self.space)
 
     def get_bot_count(self, instance):
-        query_bot = instance.bots.all()
-        if self.space is None:
-            return len(query_bot)
-        result = []
-        for bot in query_bot:
-            try:
-                bot_space = bot.space
-            except BotError.InvalidSetting:
-                continue
-            if bot_space == self.space:
-                result.append(bot)
-        return len(result)
+        return instance.bot_count(space=self.space)
 
     def get_delta(self, instance) -> float:
         """Delta on the last 30 days."""
@@ -68,11 +57,15 @@ class FleetSerializer(serializers.ModelSerializer):
             return 0
         return history.get_delta()
 
+    def get_exchange_account(self, instance):
+        return instance.exchange_account.uuid
+
     def validate(self, attrs):
         data = super().validate(attrs)
 
         try:
             self.space = NapseSpace.objects.get(uuid=attrs.pop("space"))
+            print("get space", self.space)
         except NapseSpace.DoesNotExist:
             error_msg: str = "Space does not exist."
             raise serializers.ValidationError(error_msg) from None
@@ -84,9 +77,13 @@ class FleetSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         if self.space is not None:
             data["space"] = self.space.uuid
+
         return data
 
     def create(self, validated_data):
+        from pprint import pprint
+
+        pprint(validated_data)
         return Fleet.objects.create(**validated_data)
 
 
