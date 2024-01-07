@@ -91,6 +91,7 @@ class NapseSpace(models.Model):
         connections = self.wallet.connections.all()
         return Fleet.objects.filter(clusters__links__bot__connections__in=connections).distinct()
 
+    @property
     def bots(self) -> models.QuerySet:
         """Bots of the space."""
         connections = self.wallet.connections.all()

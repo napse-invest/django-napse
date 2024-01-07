@@ -48,7 +48,8 @@ class Bot(models.Model):
 
     @property
     def is_in_fleet(self):
-        return hasattr(self, "bot_in_cluster")
+        # return hasattr(self, "bot_in_cluster")
+        return hasattr(self, "link")
 
     @property
     def testing(self):
@@ -62,7 +63,7 @@ class Bot(models.Model):
     @property
     def fleet(self):
         if self.is_in_fleet:
-            return self.bot_in_cluster.cluster.fleet
+            return self.link.cluster.fleet
         return None
 
     @property
@@ -80,7 +81,7 @@ class Bot(models.Model):
         if self.is_in_simulation:
             return self.simulation.space.exchange_account
         if self.is_in_fleet:
-            return self.bot_in_cluster.cluster.fleet.exchange_account
+            return self.link.cluster.fleet.exchange_account
         error_msg = "Bot is not in simulation or fleet."
         raise BotError.InvalidSetting(error_msg)
 
