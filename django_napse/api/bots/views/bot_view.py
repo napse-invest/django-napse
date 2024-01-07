@@ -22,6 +22,13 @@ class BotView(CustomViewSet):
         result = actions.get(self.action)
         return result if result else super().get_serializer_class()
 
+    def get_permissions(self):
+        match self.action:
+            case "list" | "create":
+                return [HasAPIKey()]
+            case _:
+                return super().get_permissions()
+
     def list(self, request):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

@@ -16,6 +16,7 @@ class FleetSerializer(serializers.ModelSerializer):
     )
     space = serializers.UUIDField(write_only=True, required=True)
     delta = serializers.SerializerMethodField(read_only=True)
+    exchange_account = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Fleet
@@ -56,11 +57,15 @@ class FleetSerializer(serializers.ModelSerializer):
             return 0
         return history.get_delta()
 
+    def get_exchange_account(self, instance):
+        return instance.exchange_account.uuid
+
     def validate(self, attrs):
         data = super().validate(attrs)
 
         try:
             self.space = NapseSpace.objects.get(uuid=attrs.pop("space"))
+            print("get space", self.space)
         except NapseSpace.DoesNotExist:
             error_msg: str = "Space does not exist."
             raise serializers.ValidationError(error_msg) from None
@@ -72,9 +77,13 @@ class FleetSerializer(serializers.ModelSerializer):
         data = super().to_representation(instance)
         if self.space is not None:
             data["space"] = self.space.uuid
+
         return data
 
     def create(self, validated_data):
+        from pprint import pprint
+
+        pprint(validated_data)
         return Fleet.objects.create(**validated_data)
 
 

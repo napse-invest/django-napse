@@ -86,6 +86,7 @@ class FleetView(CustomViewSet):
         # Fleet list
         fleets = []
         for space in spaces:
+            print("fleet list", space, space.fleets)
             serializer = self.get_serializer(space.fleets, many=True, space=space)
             if serializer.data != []:
                 fleets += serializer.data

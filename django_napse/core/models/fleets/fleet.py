@@ -71,6 +71,7 @@ class Fleet(models.Model):
 
     def space_frame_value(self, space) -> float:
         """Sum value of all bots connected to the space."""
+        # TODO: remove property to values and add the following lines to the new `value()` method
         fleet_connections = Connection.objects.filter(bot__in=self.bots)
         space_connections = space.wallet.connections.all()
         commun_connections = space_connections.intersection(fleet_connections)
