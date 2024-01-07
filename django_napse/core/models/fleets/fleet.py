@@ -8,6 +8,7 @@ from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.fleets.managers import FleetManager
 from django_napse.core.models.orders.order import Order
+from django_napse.utils.errors import BotError
 
 
 class Fleet(models.Model):
@@ -90,13 +91,28 @@ class Fleet(models.Model):
             connections += cluster.invest(space, amount * cluster.share, ticker)
         return connections
 
+    def bot_count(self, space=None) -> int:
+        """Count number of bots in fleet, depends on space frame."""
+        query_bot = self.bots.all()
+        if space is None:
+            return len(query_bot)
+        result = []
+        for bot in query_bot:
+            try:
+                bot_space = bot.space
+            except BotError.InvalidSetting:
+                continue
+            if bot_space == self.space:
+                result.append(bot)
+        return len(result)
+
     def get_stats(self):
-        order_count = Order.objects.filter(
+        order_count = Order.objects.filter(  # noqa: F841
             connection__bot__in=self.bots,
             created_at__gt=datetime.now(tz=get_default_timezone()) - timedelta(days=30),
         ).count()
         return {
             "value": self.value,
-            "order_count_30": order_count,
-            "change_30": 0,  # TODO: Need history
+            "bot_count": self.bot_count(),
+            "delta_30": 0,  # TODO: Need history
         }

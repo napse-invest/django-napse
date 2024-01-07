@@ -47,18 +47,7 @@ class FleetSerializer(serializers.ModelSerializer):
         return instance.space_frame_value(space=self.space)
 
     def get_bot_count(self, instance):
-        query_bot = instance.bots.all()
-        if self.space is None:
-            return len(query_bot)
-        result = []
-        for bot in query_bot:
-            try:
-                bot_space = bot.space
-            except BotError.InvalidSetting:
-                continue
-            if bot_space == self.space:
-                result.append(bot)
-        return len(result)
+        return instance.bot_count(space=self.space)
 
     def get_delta(self, instance) -> float:
         """Delta on the last 30 days."""
