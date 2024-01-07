@@ -4,7 +4,6 @@ from rest_framework.fields import empty
 from django_napse.api.bots.serializers import BotSerializer
 from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
 from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, NapseSpace
-from django_napse.utils.errors import BotError
 
 
 class FleetSerializer(serializers.ModelSerializer):
