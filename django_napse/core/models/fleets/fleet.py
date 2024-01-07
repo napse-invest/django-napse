@@ -101,7 +101,7 @@ class Fleet(models.Model):
         for bot in query_bot:
             try:
                 bot_space = bot.space
-            except BotError.InvalidSetting:
+            except BotError.NoSpace:
                 continue
             if bot_space == self.space:
                 result.append(bot)
