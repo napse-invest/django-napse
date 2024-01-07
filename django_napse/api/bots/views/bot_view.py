@@ -13,7 +13,7 @@ class BotView(CustomViewSet):
     serializer_class = BotSerializer
 
     def get_queryset(self):
-        return Bot.objects.all()
+        return Bot.objects.exclude(connections__isnull=True)
 
     def get_serializer_class(self, *args, **kwargs):
         actions: dict = {
