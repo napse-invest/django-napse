@@ -97,6 +97,11 @@ class Bot(models.Model):
     def controllers(self):
         return self.architecture.controllers_dict()
 
+    @property
+    def orders(self):
+        connections = self.connections.select_related("orders").all()
+        return [connection.orders for connection in connections]
+
     def hibernate(self):
         if not self.active:
             error_msg = "Bot is already hibernating."
@@ -160,3 +165,10 @@ class Bot(models.Model):
             return sum([connection.wallet.value_market() for connection in self.connections.all()])
         connection = Connection.objects.get(owner__owner=space.wallet, bot=self)
         return connection.wallet.value_market()
+
+    def get_stats(self, space=None):
+        return {
+            "value": self.value(space),
+            "profit": 0,
+            "delta_30": 0,  # TODO: Need history
+        }
