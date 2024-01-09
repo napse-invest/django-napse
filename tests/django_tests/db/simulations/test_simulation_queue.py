@@ -46,6 +46,11 @@ class SimulationQueueTestCase:
     def test_irl_simulation(self):
         simulation_queue = self.simple_create()
         simulation_queue.run_irl_simulation(verbose=False)
+        space = simulation_queue.space
+        connection = space.wallet.connections.first()
+        orders = connection.orders.filter(fees__gt=0)
+        order = orders.first()
+        order.info()
 
 
 class SimulationQueueBINANCETestCase(SimulationQueueTestCase, ModelTestCase):
