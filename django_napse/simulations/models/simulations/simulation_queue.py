@@ -70,7 +70,7 @@ class SimulationQueue(models.Model):
                 amount=investment.amount,
             )
         new_bot = self.bot.copy()
-        connection = new_bot.connect_to(self.space.simulation_wallet)
+        connection = new_bot.connect_to_wallet(self.space.simulation_wallet)
         for investment in self.investments.all():
             connection.deposit(investment.ticker, investment.amount)
         no_db_data = new_bot.architecture.prepare_db_data()

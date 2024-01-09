@@ -2,32 +2,39 @@ from rest_framework import serializers
 from rest_framework.fields import empty
 
 from django_napse.api.bots.serializers import BotSerializer
-from django_napse.api.fleets.serializers.cluster_serialisers import ClusterSerializer
-from django_napse.core.models import ConnectionWallet, Fleet
+from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
+from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, NapseSpace
 
 
 class FleetSerializer(serializers.ModelSerializer):
     value = serializers.SerializerMethodField(read_only=True)
     bot_count = serializers.SerializerMethodField(read_only=True)
-    clusters = ClusterSerializer(
+    clusters = ClusterFormatterSerializer(
         write_only=True,
         many=True,
         required=True,
     )
+    space = serializers.UUIDField(write_only=True, required=True)
+    delta = serializers.SerializerMethodField(read_only=True)
+    exchange_account = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Fleet
         fields = [
             "name",
+            # write-only
+            "clusters",
+            "space",
             # read-only
             "uuid",
             "value",
             "bot_count",
-            # write-only
-            "clusters",
+            "delta",
+            "exchange_account",
         ]
         read_only_fields = [
             "uuid",
+            "exchange_account",
         ]
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
@@ -35,13 +42,52 @@ class FleetSerializer(serializers.ModelSerializer):
         super().__init__(instance=instance, data=data, **kwargs)
 
     def get_value(self, instance):
-        return instance.value(space=self.space)
+        if self.space is None:
+            return instance.value
+        return instance.space_frame_value(space=self.space)
 
     def get_bot_count(self, instance):
-        return instance.bots.count()
+        return instance.bot_count(space=self.space)
+
+    def get_delta(self, instance) -> float:
+        """Delta on the last 30 days."""
+        try:
+            history = FleetHistory.objects.get(owner=instance)
+        except FleetHistory.DoesNotExist:
+            return 0
+        return history.get_delta()
+
+    def get_exchange_account(self, instance):
+        return instance.exchange_account.uuid
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        try:
+            self.space = NapseSpace.objects.get(uuid=attrs.pop("space"))
+            print("get space", self.space)
+        except NapseSpace.DoesNotExist:
+            error_msg: str = "Space does not exist."
+            raise serializers.ValidationError(error_msg) from None
+
+        data["exchange_account"] = self.space.exchange_account
+        return data
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if self.space is not None:
+            data["space"] = self.space.uuid
+
+        return data
+
+    def create(self, validated_data):
+        from pprint import pprint
+
+        pprint(validated_data)
+        return Fleet.objects.create(**validated_data)
 
 
-class FleetDetailSerializer(serializers.Serializer):
+class FleetDetailSerializer(serializers.ModelSerializer):
     wallet = serializers.SerializerMethodField(read_only=True)
     statistics = serializers.SerializerMethodField(read_only=True)
     bots = BotSerializer(many=True, read_only=True)
@@ -55,6 +101,7 @@ class FleetDetailSerializer(serializers.Serializer):
             "statistics",
             "wallet",
             "bots",
+            "exchange_account",
         ]
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
@@ -85,6 +132,8 @@ class FleetDetailSerializer(serializers.Serializer):
             else:
                 merged_wallet[index]["amount"] += currency.amount
 
+        if self.space is None:
+            return None
         wallets = ConnectionWallet.objects.filter(owner__owner=self.space.wallet, owner__bot__in=instance.bots)
         merged_wallet: list[dict[str, str | float]] = []
 
@@ -95,6 +144,12 @@ class FleetDetailSerializer(serializers.Serializer):
 
         return merged_wallet
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if self.space is not None:
+            data["space"] = self.space.uuid
+        return data
+
     def save(self, **kwargs):
         error_msg: str = "Impossible to update a fleet through the detail serializer."
-        raise ValueError(error_msg)
+        raise serializers.ValidationError(error_msg)

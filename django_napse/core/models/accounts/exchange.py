@@ -78,6 +78,9 @@ class BinanceAccount(ExchangeAccount):
     class Meta:
         unique_together = ("public_key", "private_key")
 
+    def __str__(self):
+        return "BINANCE " + super().__str__()
+
     def ping(self):
         request = self.exchange_controller().get_info()
         if "error" in request:

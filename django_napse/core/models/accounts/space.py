@@ -5,6 +5,7 @@ from django.db import models
 from django.utils.timezone import get_default_timezone
 
 from django_napse.core.models.accounts.managers import NapseSpaceManager
+from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.fleets.fleet import Fleet
 from django_napse.core.models.orders.order import Order
 from django_napse.utils.errors import SpaceError
@@ -89,6 +90,12 @@ class NapseSpace(models.Model):
         """Fleets of the space."""
         connections = self.wallet.connections.all()
         return Fleet.objects.filter(clusters__links__bot__connections__in=connections).distinct()
+
+    @property
+    def bots(self) -> models.QuerySet:
+        """Bots of the space."""
+        connections = self.wallet.connections.all()
+        return Bot.objects.filter(connections__in=connections)
 
     def get_stats(self) -> dict[str, int | float | str]:
         """Statistics of space."""
