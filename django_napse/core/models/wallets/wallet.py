@@ -23,7 +23,7 @@ class Wallet(models.Model, FindableClass):
     def info(self, verbose=True, beacon=""):
         self = self.find()
         string = ""
-        string += f"{beacon}Wallet ({self.pk=}):\n"
+        string += f"{beacon}Wallet ({self.pk=}):\t{type(self)}\n"
         string += f"{beacon}Args:\n"
         string += f"{beacon}\t{self.title=}\n"
         string += f"{beacon}\t{self.testing=}\n"

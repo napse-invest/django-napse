@@ -59,8 +59,8 @@ class Order(models.Model):
     debited_amount = models.FloatField(default=0)
 
     batch_share = models.FloatField(default=0)
-    exit_base_amount = models.FloatField(default=0)
-    exit_quote_amount = models.FloatField(default=0)
+    exit_amount_base = models.FloatField(default=0)
+    exit_amount_quote = models.FloatField(default=0)
     fees = models.FloatField(default=0)
     fee_ticker = models.CharField(max_length=10, blank=True)
 
