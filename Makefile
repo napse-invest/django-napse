@@ -37,6 +37,9 @@ clean:
 celery:
 	source .venv/bin/activate && watchfiles --filter python celery.__main__.main --args "-A tests.test_app worker --beat -l INFO"
 
+shell:
+	source .venv/bin/activate && python tests/test_app/manage.py shell
+
 test:
 	source .venv/bin/activate && python tests/test_app/manage.py test -v2 --keepdb --parallel
 
