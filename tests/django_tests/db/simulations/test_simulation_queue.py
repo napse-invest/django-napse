@@ -7,7 +7,7 @@ from django_napse.simulations.models import SimulationQueue
 from django_napse.utils.model_test_case import ModelTestCase
 
 """
-python tests/test_app/manage.py test tests.django_tests.simulations.test_simulation_queue -v2 --keepdb --parallel
+python tests/test_app/manage.py test tests.django_tests.db.simulations.test_simulation_queue -v2 --keepdb --parallel
 """
 
 

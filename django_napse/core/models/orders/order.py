@@ -59,8 +59,8 @@ class Order(models.Model):
     debited_amount = models.FloatField(default=0)
 
     batch_share = models.FloatField(default=0)
-    exit_base_amount = models.FloatField(default=0)
-    exit_quote_amount = models.FloatField(default=0)
+    exit_amount_base = models.FloatField(default=0)
+    exit_amount_quote = models.FloatField(default=0)
     fees = models.FloatField(default=0)
     fee_ticker = models.CharField(max_length=10, blank=True)
 
@@ -81,8 +81,8 @@ class Order(models.Model):
         string += f"{beacon}\t{self.asked_for_ticker=}\n"
         string += f"{beacon}\t{self.debited_amount=}\n"
         string += f"{beacon}\t{self.batch_share=}\n"
-        string += f"{beacon}\t{self.exit_base_amount=}\n"
-        string += f"{beacon}\t{self.exit_quote_amount=}\n"
+        string += f"{beacon}\t{self.exit_amount_base=}\n"
+        string += f"{beacon}\t{self.exit_amount_quote=}\n"
         string += f"{beacon}\t{self.fees=}\n"
         string += f"{beacon}\t{self.fee_ticker=}\n"
         string += f"{beacon}\t{self.side=}\n"

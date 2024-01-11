@@ -2,7 +2,7 @@ from django_napse.core.models import Bot, Controller, Credit, EmptyBotConfig, Em
 from django_napse.utils.model_test_case import ModelTestCase
 
 """
-python tests/test_app/manage.py test tests.django_tests.fleets.test_fleet -v2 --keepdb --parallel
+python tests/test_app/manage.py test tests.django_tests.db.fleets.test_fleet -v2 --keepdb --parallel
 """
 
 

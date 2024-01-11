@@ -81,9 +81,6 @@ class FleetSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        from pprint import pprint
-
-        pprint(validated_data)
         return Fleet.objects.create(**validated_data)
 
 
