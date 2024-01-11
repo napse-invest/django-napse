@@ -1,1 +1,2 @@
 from .currency_serializer import CurrencySerializer
+from .wallet_serializers import WalletSerializer
