@@ -24,10 +24,11 @@ def build_main_router() -> DefaultRouter:
     api_dir = Path(__file__).parent
     api_modules_folders_names = [folder.name for folder in api_dir.iterdir() if folder.is_dir() and not folder.name.startswith("_")]
     for module_name in api_modules_folders_names:
+        # print(f"module name: {module_name}")
         try:
             module: ModuleType = import_module(f"django_napse.api.{module_name}.views")
         except (ImportError, ModuleNotFoundError) as error:  # noqa: F841
-            # print(f"Could not import module {module_name}")
+            # print(f"Could not import module {module_name} ({type(error)})")
             # print(error)
             continue
         for obj in vars(module).values():
