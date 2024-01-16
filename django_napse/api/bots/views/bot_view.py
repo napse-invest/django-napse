@@ -72,12 +72,5 @@ class BotView(CustomViewSet):
                 bots += serializer.data
         return Response(bots, status=status.HTTP_200_OK)
 
-        # TODO: make space containerization
-        serializer = self.get_serializer(self.get_queryset(), many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
     def retrieve(self, request, pk=None):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
-
-    def create(self, request, *args, **kwargs):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
