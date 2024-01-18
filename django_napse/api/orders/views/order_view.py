@@ -15,6 +15,7 @@ class OrderView(CustomViewSet):
     serializer_class = OrderSerializer
 
     def get_queryset(self):
+        print(f"count: {Order.objects.count()}")
         return Order.objects.all()
 
     def list(self, request):
