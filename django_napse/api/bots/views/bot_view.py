@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_api_key.permissions import HasAPIKey
 
-from django_napse.api.bots.serializers.bot_serializers import BotSerializer
+from django_napse.api.bots.serializers.bot_serializers import BotDetailSerializer, BotSerializer
 from django_napse.api.custom_permissions import HasSpace
 from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.core.models import Bot, NapseSpace
@@ -18,6 +18,7 @@ class BotView(CustomViewSet):
     def get_serializer_class(self, *args, **kwargs):
         actions: dict = {
             "list": BotSerializer,
+            "retrieve": BotDetailSerializer,
         }
         result = actions.get(self.action)
         return result if result else super().get_serializer_class()
@@ -28,6 +29,12 @@ class BotView(CustomViewSet):
                 return [HasAPIKey()]
             case _:
                 return super().get_permissions()
+
+    def get_object(self):
+        uuid = self.kwargs.get("pk", None)
+        if uuid is None:
+            return super().get_object()
+        return Bot.objects.get(uuid=uuid)
 
     def _get_boolean_query_param(self, param: str) -> bool | None:
         """Return None if a boolean cannot be found."""
@@ -73,4 +80,7 @@ class BotView(CustomViewSet):
         return Response(bots, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+        instance = self.get_object()
+        space = self.get_space(request)
+        serializer = self.get_serializer(instance, space=space)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -65,18 +65,22 @@ class BotDetailSerializer(serializers.ModelSerializer):
             "name",
             "uuid",
             "value",
+            "delta",
             "statistics",
-            "wallet",
             "fleet",
             "space",
             "exchange_account",
+            "wallet",
+            "orders",
         ]
         read_only_fields = [
             "uuid",
             "value",
+            "delta",
             "statistics",
-            "wallet",
             "space",
+            "wallet",
+            "orders",
         ]
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
@@ -95,6 +99,9 @@ class BotDetailSerializer(serializers.ModelSerializer):
         if self.space is None:
             return None
         return self.space.uuid
+
+    def get_statistics(self, instance):
+        return instance.get_stats(space=self.space)
 
     def get_wallet(self, instance):
         def _search_ticker(ticker: str, merged_wallet) -> int | None:
@@ -143,7 +150,7 @@ class BotDetailSerializer(serializers.ModelSerializer):
         return OrderSerializer(
             Order.objects.filter(
                 connection__bot=instance,
-                connection__owner__owner=self.space.wallet,
+                connection__owner=self.space.wallet,
             ),
             many=True,
         ).data

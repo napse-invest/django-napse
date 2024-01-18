@@ -163,7 +163,7 @@ class Bot(models.Model):
     def value(self, space=None):
         if space is None:
             return sum([connection.wallet.value_market() for connection in self.connections.all()])
-        connection = Connection.objects.get(owner__owner=space.wallet, bot=self)
+        connection = Connection.objects.get(owner=space.wallet, bot=self)
         return connection.wallet.value_market()
 
     def get_stats(self, space=None):
