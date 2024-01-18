@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from rest_framework.fields import empty
 
+from django_napse.api.orders.serializers import OrderSerializer
 from django_napse.api.wallets.serializers import WalletSerializer
-from django_napse.core.models import Bot, BotHistory, ConnectionWallet
+from django_napse.core.models import Bot, BotHistory, ConnectionWallet, Order
 
 
 class BotSerializer(serializers.ModelSerializer):
@@ -56,6 +57,7 @@ class BotDetailSerializer(serializers.ModelSerializer):
 
     statistics = serializers.SerializerMethodField(read_only=True)
     wallet = serializers.SerializerMethodField(read_only=True)
+    orders = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Bot
@@ -131,3 +133,17 @@ class BotDetailSerializer(serializers.ModelSerializer):
                 _update_merged_wallet(index, currency, merged_wallet)
 
         return merged_wallet
+
+    def get_orders(self, instance):
+        if self.space is None:
+            return OrderSerializer(
+                Order.objects.filter(connection__bot=instance),
+                many=True,
+            ).data
+        return OrderSerializer(
+            Order.objects.filter(
+                connection__bot=instance,
+                connection__owner__owner=self.space.wallet,
+            ),
+            many=True,
+        ).data

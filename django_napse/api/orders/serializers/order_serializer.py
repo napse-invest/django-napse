@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from django_napse.core.models import Order
-from django_napse.core.models.bots.controller import Controller
 from django_napse.utils.constants import SIDES
 
 
