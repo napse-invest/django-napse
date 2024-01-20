@@ -17,7 +17,7 @@ Write-Host "Virtual env is now activated "
 
 python.exe -m pip install --upgrade pip
 python.exe -m pip install pip-tools
-pip-compile .\backend\requirements\development.txt --output-file .\full-requirements.txt --resolver=backtracking
+pip-compile .\requirements\development.txt --output-file .\full-requirements.txt --resolver=backtracking
 python -m pip install -r .\full-requirements.txt
 
 Write-Host "Have fun with coding"

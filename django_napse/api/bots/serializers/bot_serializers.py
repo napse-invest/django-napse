@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from rest_framework.fields import empty
 
+from django_napse.api.orders.serializers import OrderSerializer
 from django_napse.api.wallets.serializers import WalletSerializer
-from django_napse.core.models import Bot, BotHistory, ConnectionWallet
+from django_napse.core.models import Bot, BotHistory, ConnectionWallet, Order
 
 
 class BotSerializer(serializers.ModelSerializer):
@@ -56,6 +57,7 @@ class BotDetailSerializer(serializers.ModelSerializer):
 
     statistics = serializers.SerializerMethodField(read_only=True)
     wallet = serializers.SerializerMethodField(read_only=True)
+    orders = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Bot
@@ -63,18 +65,22 @@ class BotDetailSerializer(serializers.ModelSerializer):
             "name",
             "uuid",
             "value",
+            "delta",
             "statistics",
-            "wallet",
             "fleet",
             "space",
             "exchange_account",
+            "wallet",
+            "orders",
         ]
         read_only_fields = [
             "uuid",
             "value",
+            "delta",
             "statistics",
-            "wallet",
             "space",
+            "wallet",
+            "orders",
         ]
 
     def __init__(self, instance=None, data=empty, space=None, **kwargs):
@@ -93,6 +99,9 @@ class BotDetailSerializer(serializers.ModelSerializer):
         if self.space is None:
             return None
         return self.space.uuid
+
+    def get_statistics(self, instance):
+        return instance.get_stats(space=self.space)
 
     def get_wallet(self, instance):
         def _search_ticker(ticker: str, merged_wallet) -> int | None:
@@ -131,3 +140,17 @@ class BotDetailSerializer(serializers.ModelSerializer):
                 _update_merged_wallet(index, currency, merged_wallet)
 
         return merged_wallet
+
+    def get_orders(self, instance):
+        if self.space is None:
+            return OrderSerializer(
+                Order.objects.filter(connection__bot=instance),
+                many=True,
+            ).data
+        return OrderSerializer(
+            Order.objects.filter(
+                connection__bot=instance,
+                connection__owner=self.space.wallet,
+            ),
+            many=True,
+        ).data
