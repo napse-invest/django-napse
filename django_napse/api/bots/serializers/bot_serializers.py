@@ -10,8 +10,10 @@ class BotSerializer(serializers.ModelSerializer):
     # strategy = StrategySerializer()
     delta = serializers.SerializerMethodField(read_only=True)
     space = serializers.SerializerMethodField(read_only=True)
-    exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
+    # exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
+    exchange_account = serializers.SerializerMethodField(read_only=True)
     fleet = serializers.CharField(source="fleet.uuid", read_only=True)
+    # fleet = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Bot
@@ -47,6 +49,11 @@ class BotSerializer(serializers.ModelSerializer):
         if self.space is None:
             return None
         return self.space.uuid
+
+    def get_exchange_account(self, instance):
+        if not instance.is_in_fleet and not instance.is_in_simulation:
+            return None
+        return instance.exchange_account.uuid
 
 
 class BotDetailSerializer(serializers.ModelSerializer):

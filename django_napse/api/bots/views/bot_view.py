@@ -13,6 +13,8 @@ class BotView(CustomViewSet):
     serializer_class = BotSerializer
 
     def get_queryset(self):
+        if self.request.query_params.get("free", False):
+            return [bot for bot in Bot.objects.all() if bot.is_free]
         return Bot.objects.exclude(connections__isnull=True)
 
     def get_serializer_class(self, *args, **kwargs):
@@ -53,6 +55,10 @@ class BotView(CustomViewSet):
                 return None
 
     def list(self, request):
+        """Return a list of bots.
+
+        Warning: space_containers can lead to undesirable behaviour.
+        """
         space_containers = self._get_boolean_query_param(request.query_params.get("space_containers", True))
         space_uuid = request.query_params.get("space", None)
         api_key = self.get_api_key(request)
@@ -74,7 +80,11 @@ class BotView(CustomViewSet):
         # Bot list
         bots = []
         for space in spaces:
-            serializer = self.get_serializer(space.bots, many=True, space=space)
+            if self.request.query_params.get("free", False):
+                space_bots = [bot for bot in Bot.objects.filter(strategy__config__space=space) if bot.is_free]
+            else:
+                space_bots = space.bots.exclude(connections__isnull=True)
+            serializer = self.get_serializer(space_bots, many=True, space=space)
             if serializer.data != []:
                 bots += serializer.data
         return Response(bots, status=status.HTTP_200_OK)
