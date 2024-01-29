@@ -57,6 +57,11 @@ class Bot(models.Model):
         return hasattr(self, "cluster")
 
     @property
+    def is_free(self):
+        """Is self not in a simulation, not in a fleet and not a cluster's template bot?"""
+        return not self.is_in_simulation and not self.is_in_fleet and not self.is_templace
+
+    @property
     def testing(self):
         if self.is_in_simulation:
             return True
