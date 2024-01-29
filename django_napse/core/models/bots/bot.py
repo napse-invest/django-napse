@@ -52,6 +52,11 @@ class Bot(models.Model):
         return hasattr(self, "link")
 
     @property
+    def is_templace(self):
+        """Is self a template bot of a cluster?"""
+        return hasattr(self, "cluster")
+
+    @property
     def testing(self):
         if self.is_in_simulation:
             return True
