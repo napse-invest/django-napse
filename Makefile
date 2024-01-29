@@ -10,7 +10,7 @@ ifeq ($(OS),Darwin)        # Mac OS X
 else ifeq ($(OS),Linux)
 	./setup/setup-unix.sh
 else 
-	./setup/setup-windows.ps1
+	powershell -NoProfile -ExecutionPolicy Bypass -File ".\setup\setup-windows.ps1"
 endif
 
 setup-testing-environment:
