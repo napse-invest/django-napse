@@ -117,3 +117,9 @@ class Fleet(models.Model):
             "bot_count": self.bot_count(),
             "delta_30": 0,  # TODO: Need history
         }
+
+    def delete(self) -> None:
+        """Delete clusters & relative (template) bots."""
+        self.bots.delete()
+        self.clusters.all().delete()
+        super().delete()

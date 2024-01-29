@@ -1,3 +1,4 @@
+from django.db.models import QuerySet
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_api_key.permissions import HasAPIKey
@@ -12,8 +13,50 @@ class BotView(CustomViewSet):
     permission_classes = [HasAPIKey, HasSpace]
     serializer_class = BotSerializer
 
-    def get_queryset(self):
-        return Bot.objects.exclude(connections__isnull=True)
+    def get_queryset(self) -> list[QuerySet[Bot]] | dict[str, QuerySet[Bot]]:
+        """Return bot queryset.
+
+        Can return
+            Free bots across all available spaces
+            Bots with connections without space containerization
+            Bots with connections with a specific space containerization
+            Bots with connections with space containerization
+
+        Raises:
+            ValueError: Not space_containers mode is only available for master key.
+            ValueError: Space not found.
+        """
+        api_key = self.get_api_key(self.request)
+        spaces = NapseSpace.objects.all() if api_key.is_master_key else [permission.space for permission in api_key.permissions.all()]
+
+        # Free bots across all available spaces
+        if self.request.query_params.get("free", False):
+            # Cross space free bots
+            return [bot for bot in Bot.objects.filter(strategy__config__space__in=spaces) if bot.is_free]
+
+        # Bots with connections without space containerization
+        if not self.request.query_params.get("space_containers", True):
+            if not api_key.is_master_key:
+                error_msg: str = "Not space_containers mode is only available for master key."
+                raise ValueError(error_msg)
+            return Bot.objects.exclude(connections__isnull=True)
+
+        # Filter by specific space
+        space_uuid = self.request.query_params.get("space", None)
+        if space_uuid is not None:
+            for space in spaces:
+                if space.uuid == space_uuid:
+                    spaces = [space]
+                    break
+            else:
+                error_msg: str = "Space not found."
+                raise ValueError(error_msg)
+
+        # Space container mode
+        bots_per_space: dict[str, QuerySet[Bot]] = {}
+        for space in spaces:
+            bots_per_space[space] = space.bots.exclude(connections__isnull=True)
+        return bots_per_space
 
     def get_serializer_class(self, *args, **kwargs):
         actions: dict = {
@@ -53,31 +96,28 @@ class BotView(CustomViewSet):
                 return None
 
     def list(self, request):
-        space_containers = self._get_boolean_query_param(request.query_params.get("space_containers", True))
-        space_uuid = request.query_params.get("space", None)
-        api_key = self.get_api_key(request)
+        """Return a list of bots.
 
-        if not space_containers and api_key.is_master_key:
-            # Not space_containers mode is only available for master key
-            serializer = self.get_serializer(self.get_queryset(), many=True)
+        Warning: space_containers can lead to undesirable behaviour.
+        """
+        try:
+            queryset = self.get_queryset()
+        except ValueError as error:
+            return Response({"detail": str(error)}, status=status.HTTP_400_BAD_REQUEST)
+
+        if isinstance(queryset, list):
+            serializer = self.get_serializer(queryset, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        # Get spaces from API key
-        spaces = NapseSpace.objects.all() if api_key.is_master_key else [permission.space for permission in api_key.permissions.all()]
-        # Filter by specific space
-        if space_uuid is not None:
-            space = NapseSpace.objects.get(uuid=space_uuid)
-            if space not in spaces:
-                return Response(status=status.HTTP_403_FORBIDDEN)
-            spaces = [space]
+        if isinstance(queryset, dict):
+            bots: QuerySet[Bot] = []
+            for space, query in queryset.items():
+                serializer = self.get_serializer(query, many=True, space=space)
+                if serializer.data != []:
+                    bots += serializer.data
+            return bots
 
-        # Bot list
-        bots = []
-        for space in spaces:
-            serializer = self.get_serializer(space.bots, many=True, space=space)
-            if serializer.data != []:
-                bots += serializer.data
-        return Response(bots, status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, pk=None):
         instance = self.get_object()
