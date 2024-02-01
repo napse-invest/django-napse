@@ -110,12 +110,12 @@ class BotView(CustomViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         if isinstance(queryset, dict):
-            bots: QuerySet[Bot] = []
+            serialized_bots: QuerySet[Bot] = []
             for space, query in queryset.items():
                 serializer = self.get_serializer(query, many=True, space=space)
                 if serializer.data != []:
-                    bots += serializer.data
-            return bots
+                    serialized_bots += serializer.data
+            return Response(serialized_bots, status=status.HTTP_200_OK)
 
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
