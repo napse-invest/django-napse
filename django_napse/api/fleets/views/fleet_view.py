@@ -1,10 +1,11 @@
 from rest_framework import status
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_api_key.permissions import HasAPIKey
 
 from django_napse.api.custom_permissions import HasSpace
 from django_napse.api.custom_viewset import CustomViewSet
-from django_napse.api.fleets.serializers import FleetDetailSerializer, FleetSerializer
+from django_napse.api.fleets.serializers import FleetDetailSerializer, FleetMoneyFlowSerializer, FleetSerializer
 from django_napse.core.models import Fleet, NapseSpace
 
 
@@ -31,6 +32,8 @@ class FleetView(CustomViewSet):
             "list": FleetSerializer,
             "retrieve": FleetDetailSerializer,
             "create": FleetSerializer,
+            "invest": FleetMoneyFlowSerializer,
+            "withdraw": FleetMoneyFlowSerializer,
         }
         result = actions.get(self.action)
         return result if result else super().get_serializer_class()
@@ -107,3 +110,18 @@ class FleetView(CustomViewSet):
 
     def delete(self):
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+    @action(detail=True, methods=["post"])
+    def invest(self, request, pk=None):
+        fleet = self.get_object()
+        space = self.get_space(request)
+
+        if not space.testing:
+            error_msg: str = "Investing in real is not allowed yet."
+            return Response(error_msg, status=status.HTTP_403_FORBIDDEN)
+
+        serializer = self.get_serializer(data=request.data, instance=fleet, space=space, side="INVEST")
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(status=status.HTTP_200_OK)
