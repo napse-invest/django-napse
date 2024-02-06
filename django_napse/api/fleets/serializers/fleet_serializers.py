@@ -3,7 +3,7 @@ from rest_framework.fields import empty
 
 from django_napse.api.bots.serializers import BotSerializer
 from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
-from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, NapseSpace
+from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, NapseSpace, SpaceWallet
 
 
 class FleetSerializer(serializers.ModelSerializer):
@@ -109,6 +109,7 @@ class FleetDetailSerializer(serializers.ModelSerializer):
         return instance.get_stats()
 
     def get_wallet(self, instance):
+        # Method not tested, high chance of being buggy
         def _search_ticker(ticker: str, merged_wallet) -> int | None:
             """Return the index of the currency in the list if found, None otherwise."""
             for i, currency in enumerate(merged_wallet):
@@ -150,3 +151,49 @@ class FleetDetailSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         error_msg: str = "Impossible to update a fleet through the detail serializer."
         raise serializers.ValidationError(error_msg)
+
+
+class FleetMoneyFlowSerializer(serializers.Serializer):
+    amount = serializers.FloatField(write_only=True, required=True)
+    ticker = serializers.CharField(write_only=True, required=True)
+
+    def __init__(self, instance=None, data=empty, side=None, space=None, **kwargs):
+        if side is None or side not in ["INVEST", "WITHDRAW"]:
+            error_msg: str = "Side is required."
+            raise ValueError(error_msg)
+        self.side = side
+        self.space = space
+        super().__init__(instance=instance, data=data, **kwargs)
+
+    def _invest_validation(self, attrs):
+        space_wallet = self.space.wallet
+        try:
+            currency: SpaceWallet = space_wallet.currencies.get(ticker=attrs["ticker"])
+        except SpaceWallet.DoesNotExist:
+            error_msg: str = f"{attrs['ticker']} does not exist in space ({self.space.name})."
+            raise serializers.ValidationError(error_msg) from None
+
+        if currency.amount < attrs["amount"]:
+            error_msg: str = f"Not enough {currency.ticker} in the wallet."
+            raise serializers.ValidationError(error_msg)
+
+        return attrs
+
+    def validate(self, attrs):
+        """Check if the wallet has enough money to invest."""
+        if not self.space.testing:
+            error_msg: str = "Investing in real is not allowed yet."
+            raise serializers.ValidationError(error_msg)
+
+        match self.side:
+            case "INVEST":
+                return self._invest_validation(attrs)
+            case "WITHDRAW":
+                error_msg: str = "Withdraw is not implemented yet."
+                raise serializers.ValidationError(error_msg)
+
+    def save(self, **kwargs):
+        """Make the transaction."""
+        amount = self.validated_data["amount"]
+        ticker = self.validated_data["ticker"]
+        self.instance.invest(self.space, amount, ticker)

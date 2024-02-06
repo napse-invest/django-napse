@@ -7,13 +7,10 @@ from django_napse.core.models import Bot, BotHistory, ConnectionWallet, Order
 
 
 class BotSerializer(serializers.ModelSerializer):
-    # strategy = StrategySerializer()
     delta = serializers.SerializerMethodField(read_only=True)
     space = serializers.SerializerMethodField(read_only=True)
-    # exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
     exchange_account = serializers.SerializerMethodField(read_only=True)
     fleet = serializers.CharField(source="fleet.uuid", read_only=True)
-    # fleet = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Bot

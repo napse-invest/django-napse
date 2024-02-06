@@ -49,7 +49,7 @@ You will need the following tools:
 - [Git](https://git-scm.com/)
 - `make` ([make for windows](https://linuxhint.com/install-use-make-windows/))
 - [Python](https://www.python.org/downloads/) `>=3.11`
-- [Ruff](https://docs.astral.sh/ruff/) `>=1.3`
+- [Ruff](https://docs.astral.sh/ruff/) `>=2.0`
 
 
 #### Clone the project from github
