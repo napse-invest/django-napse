@@ -161,15 +161,11 @@ class FleetMoneyFlowSerializer(serializers.Serializer):
         if side is None or side not in ["INVEST", "WITHDRAW"]:
             error_msg: str = "Side is required."
             raise ValueError(error_msg)
+        self.side = side
         self.space = space
         super().__init__(instance=instance, data=data, **kwargs)
 
-    def validate(self, attrs):
-        """Check if the wallet has enough money to invest."""
-        if not self.space.testing:
-            error_msg: str = "Investing in real is not allowed yet."
-            raise serializers.ValidationError(error_msg)
-
+    def _invest_validation(self, attrs):
         space_wallet = self.space.wallet
         try:
             currency: SpaceWallet = space_wallet.currencies.get(ticker=attrs["ticker"])
@@ -182,6 +178,19 @@ class FleetMoneyFlowSerializer(serializers.Serializer):
             raise serializers.ValidationError(error_msg)
 
         return attrs
+
+    def validate(self, attrs):
+        """Check if the wallet has enough money to invest."""
+        if not self.space.testing:
+            error_msg: str = "Investing in real is not allowed yet."
+            raise serializers.ValidationError(error_msg)
+
+        match self.side:
+            case "INVEST":
+                return self._invest_validation(attrs)
+            case "WITHDRAW":
+                error_msg: str = "Withdraw is not implemented yet."
+                raise serializers.ValidationError(error_msg)
 
     def save(self, **kwargs):
         """Make the transaction."""
