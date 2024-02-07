@@ -13,7 +13,7 @@ from django_napse.core.models.transactions.debit import Debit
 from django_napse.utils.constants import EXCHANGE_TICKERS
 from django_napse.utils.errors import SpaceError
 from django_napse.utils.errors.exchange import ExchangeError
-from django_napse.utils.errors.wallet import WalletError
+from django_napse.utils.errors.wallets import WalletError
 
 
 class NapseSpace(models.Model):
