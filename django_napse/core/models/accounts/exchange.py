@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 
 from django_napse.core.models.accounts.managers.exchange import ExchangeAccountManager
+from django_napse.utils.constants import EXCHANGE_TICKERS
 from django_napse.utils.errors import ExchangeAccountError
 from django_napse.utils.findable_class import FindableClass
 from django_napse.utils.trading.binance_controller import BinanceController
@@ -23,6 +24,10 @@ class Exchange(models.Model):
         if verbose:  # pragma: no cover
             print(string)
         return string
+
+    def get_tickers(self):
+        """Return a list of available tickers on the exchange."""
+        return EXCHANGE_TICKERS.get(self.name, [])
 
 
 class ExchangeAccount(models.Model, FindableClass):
@@ -69,6 +74,9 @@ class ExchangeAccount(models.Model, FindableClass):
     def exchange_controller(self):  # pragma: no cover
         error_msg = f"exchange_controller() not implemented for {self.__class__.__name__}"
         raise NotImplementedError(error_msg)
+
+    def get_tickers(self):
+        return self.exchange.get_tickers()
 
 
 class BinanceAccount(ExchangeAccount):

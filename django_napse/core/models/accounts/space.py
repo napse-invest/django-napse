@@ -8,7 +8,12 @@ from django_napse.core.models.accounts.managers import NapseSpaceManager
 from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.fleets.fleet import Fleet
 from django_napse.core.models.orders.order import Order
+from django_napse.core.models.transactions.credit import Credit
+from django_napse.core.models.transactions.debit import Debit
+from django_napse.utils.constants import EXCHANGE_TICKERS
 from django_napse.utils.errors import SpaceError
+from django_napse.utils.errors.exchange import ExchangeError
+from django_napse.utils.errors.wallets import WalletError
 
 
 class NapseSpace(models.Model):
@@ -117,3 +122,31 @@ class NapseSpace(models.Model):
         if self.value > 0:
             raise SpaceError.DeleteError
         return super().delete()
+
+    def invest(self, amount: float, ticker: str):
+        """Invest in space."""
+        if ticker not in EXCHANGE_TICKERS.get("BINANCE"):
+            error_msg: str = f"{ticker} is not available on {self.exchange_account.name} exchange."
+            raise ExchangeError.UnavailableTicker(error_msg)
+
+        # Real invest
+        if not self.testing:
+            error_msg: str = "Investing for real is not available yet."
+            raise NotImplementedError(error_msg)
+
+        # Testing invest
+        Credit.objects.create(wallet=self.wallet, amount=amount, ticker=ticker)
+
+    def withdraw(self, amount: float, ticker: str):
+        """Withdraw from space."""
+        if ticker not in [currency.ticker for currency in self.wallet.currencies.all()]:
+            error_msg: str = f"{ticker} is not on your {self.name}(space)'s wallet."
+            raise WalletError.UnavailableTicker(error_msg)
+
+        # Real withdraw
+        if not self.testing:
+            error_msg: str = "Withdrawing for real is not available yet."
+            raise NotImplementedError(error_msg)
+
+        # Testing withdraw
+        Debit.objects.create(wallet=self.wallet, amount=-amount, ticker=ticker)

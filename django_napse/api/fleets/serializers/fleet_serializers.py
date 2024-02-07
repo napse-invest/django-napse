@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from rest_framework.fields import empty
 
 from django_napse.api.bots.serializers import BotSerializer
 from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
@@ -37,7 +36,7 @@ class FleetSerializer(serializers.ModelSerializer):
             "exchange_account",
         ]
 
-    def __init__(self, instance=None, data=empty, space=None, **kwargs):
+    def __init__(self, instance=None, data=serializers.empty, space=None, **kwargs):
         self.space = space
         super().__init__(instance=instance, data=data, **kwargs)
 
@@ -101,7 +100,7 @@ class FleetDetailSerializer(serializers.ModelSerializer):
             "exchange_account",
         ]
 
-    def __init__(self, instance=None, data=empty, space=None, **kwargs):
+    def __init__(self, instance=None, data=serializers.empty, space=None, **kwargs):
         self.space = space
         super().__init__(instance=instance, data=data, **kwargs)
 
@@ -157,15 +156,12 @@ class FleetMoneyFlowSerializer(serializers.Serializer):
     amount = serializers.FloatField(write_only=True, required=True)
     ticker = serializers.CharField(write_only=True, required=True)
 
-    def __init__(self, instance=None, data=empty, side=None, space=None, **kwargs):
-        if side is None or side not in ["INVEST", "WITHDRAW"]:
-            error_msg: str = "Side is required."
-            raise ValueError(error_msg)
+    def __init__(self, side, instance=None, data=serializers.empty, space=None, **kwargs):
         self.side = side
         self.space = space
         super().__init__(instance=instance, data=data, **kwargs)
 
-    def _invest_validation(self, attrs):
+    def _test_invest_validate(self, attrs):
         space_wallet = self.space.wallet
         try:
             currency: SpaceWallet = space_wallet.currencies.get(ticker=attrs["ticker"])
@@ -179,18 +175,38 @@ class FleetMoneyFlowSerializer(serializers.Serializer):
 
         return attrs
 
+    def _real_invest_validate(self, attrs):
+        error_msg: str = "Withdraw is not implemented yet."
+        raise NotImplementedError(error_msg)
+
+    def _test_withdraw_validate(self, attrs):
+        error_msg: str = "Withdraw is not implemented yet."
+        raise NotImplementedError(error_msg)
+
+    def _real_withdraw_validate(self, attrs):
+        error_msg: str = "Withdraw is not implemented yet."
+        raise NotImplementedError(error_msg)
+
     def validate(self, attrs):
         """Check if the wallet has enough money to invest."""
-        if not self.space.testing:
-            error_msg: str = "Investing in real is not allowed yet."
-            raise serializers.ValidationError(error_msg)
-
-        match self.side:
-            case "INVEST":
-                return self._invest_validation(attrs)
-            case "WITHDRAW":
-                error_msg: str = "Withdraw is not implemented yet."
-                raise serializers.ValidationError(error_msg)
+        if self.space.testing:
+            match self.side.upper():
+                case "INVEST":
+                    return self._test_invest_validate(attrs)
+                case "WITHDRAW":
+                    return self._test_withdraw_validate(attrs)
+                case _:
+                    error_msg: str = "Invalid side."
+                    raise ValueError(error_msg)
+        else:
+            match self.side.upper():
+                case "INVEST":
+                    return self._real_invest_validate(attrs)
+                case "WITHDRAW":
+                    return self._real_withdraw_validate(attrs)
+                case _:
+                    error_msg: str = "Invalid side."
+                    raise ValueError(error_msg)
 
     def save(self, **kwargs):
         """Make the transaction."""
