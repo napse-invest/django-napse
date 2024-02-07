@@ -120,7 +120,12 @@ class FleetView(CustomViewSet):
             error_msg: str = "Investing in real is not allowed yet."
             return Response(error_msg, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = self.get_serializer(data=request.data, instance=fleet, space=space, side="INVEST")
+        serializer = self.get_serializer(
+            data=request.data,
+            instance=fleet,
+            space=space,
+            side="INVEST",
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
 
