@@ -97,3 +97,34 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
             return []
 
         return loads(history.to_dataframe().to_json(orient="records"))
+
+
+class SpaceMoneyFlowSerializer(serializers.Serializer):
+    amount = serializers.FloatField(write_only=True, required=True)
+    ticker = serializers.CharField(write_only=True, required=True)
+
+    def __init__(self, side, instance=None, data=serializers.empty, **kwargs):
+        self.side = side
+        super().__init__(instance=instance, data=data, **kwargs)
+
+    def _invest_validate(self, attrs):
+        error_msg: str = "Not implemented yet."
+        raise NotImplementedError(error_msg)
+
+    def _withdraw_validate(self, attrs):
+        error_msg: str = "Not implemented yet."
+        raise NotImplementedError(error_msg)
+
+    def validate(self, attrs):
+        if not self.instance.testing:
+            error_msg: str = "Investing for real is not available yet."
+            raise serializers.ValidationError(error_msg)
+
+        match self.side.upper():
+            case "INVEST":
+                return self._invest_validate(attrs)
+            case "WITHDRAW":
+                return self._withdraw_validate(attrs)
+            case _:
+                error_msg: str = "Invalid side."
+                raise ValueError(error_msg)
