@@ -161,52 +161,42 @@ class FleetMoneyFlowSerializer(serializers.Serializer):
         self.space = space
         super().__init__(instance=instance, data=data, **kwargs)
 
-    def _test_invest_validate(self, attrs):
-        space_wallet = self.space.wallet
-        try:
-            currency: SpaceWallet = space_wallet.currencies.get(ticker=attrs["ticker"])
-        except SpaceWallet.DoesNotExist:
-            error_msg: str = f"{attrs['ticker']} does not exist in space ({self.space.name})."
-            raise serializers.ValidationError(error_msg) from None
+    def _invest_validate(self, attrs):
+        if self.space.testing:
+            space_wallet = self.space.wallet
+            try:
+                currency: SpaceWallet = space_wallet.currencies.get(ticker=attrs["ticker"])
+            except SpaceWallet.DoesNotExist:
+                error_msg: str = f"{attrs['ticker']} does not exist in space ({self.space.name})."
+                raise serializers.ValidationError(error_msg) from None
 
-        if currency.amount < attrs["amount"]:
-            error_msg: str = f"Not enough {currency.ticker} in the wallet."
-            raise serializers.ValidationError(error_msg)
+            if currency.amount < attrs["amount"]:
+                error_msg: str = f"Not enough {currency.ticker} in the wallet."
+                raise serializers.ValidationError(error_msg)
 
-        return attrs
+            return attrs
 
-    def _real_invest_validate(self, attrs):
-        error_msg: str = "Withdraw is not implemented yet."
+        error_msg: str = "Real invest is not implemented yet."
         raise NotImplementedError(error_msg)
 
-    def _test_withdraw_validate(self, attrs):
-        error_msg: str = "Withdraw is not implemented yet."
-        raise NotImplementedError(error_msg)
+    def _withdraw_validate(self, attrs):
+        if self.space.testing:
+            error_msg: str = "Withdraw is not implemented yet."
+            raise NotImplementedError(error_msg)
 
-    def _real_withdraw_validate(self, attrs):
-        error_msg: str = "Withdraw is not implemented yet."
+        error_msg: str = "Real withdraw is not implemented yet."
         raise NotImplementedError(error_msg)
 
     def validate(self, attrs):
         """Check if the wallet has enough money to invest."""
-        if self.space.testing:
-            match self.side.upper():
-                case "INVEST":
-                    return self._test_invest_validate(attrs)
-                case "WITHDRAW":
-                    return self._test_withdraw_validate(attrs)
-                case _:
-                    error_msg: str = "Invalid side."
-                    raise ValueError(error_msg)
-        else:
-            match self.side.upper():
-                case "INVEST":
-                    return self._real_invest_validate(attrs)
-                case "WITHDRAW":
-                    return self._real_withdraw_validate(attrs)
-                case _:
-                    error_msg: str = "Invalid side."
-                    raise ValueError(error_msg)
+        match self.side.upper():
+            case "INVEST":
+                return self._invest_validate(attrs)
+            case "WITHDRAW":
+                return self._withdraw_validate(attrs)
+            case _:
+                error_msg: str = "Invalid side."
+                raise ValueError(error_msg)
 
     def save(self, **kwargs):
         """Make the transaction."""

@@ -107,21 +107,21 @@ class SpaceMoneyFlowSerializer(serializers.Serializer):
         self.side = side
         super().__init__(instance=instance, data=data, **kwargs)
 
-    def _test_invest_validate(self, attrs):
-        error_msg: str = "Not implemented yet."
-        raise NotImplementedError(error_msg)
+    def _invest_validate(self, attrs):
+        if not self.instance.testing:
+            error_msg: str = "Not implemented yet."
+            raise NotImplementedError(error_msg)
 
-    def _real_invest_validate(self, attrs):
-        error_msg: str = "Withdraw is not implemented yet."
-        raise NotImplementedError(error_msg)
+        # Test invest
+        return attrs
 
     def _withdraw_validate(self, attrs):
-        error_msg: str = "Not implemented yet."
-        raise NotImplementedError(error_msg)
+        if self.instance.testing:
+            error_msg: str = "Not implemented yet."
+            raise NotImplementedError(error_msg)
 
-    def _real_withdraw_validate(self, attrs):
-        error_msg: str = "Withdraw is not implemented yet."
-        raise NotImplementedError(error_msg)
+        # Test withdraw
+        return attrs
 
     def validate(self, attrs):
         if attrs.get("amount") <= 0:
@@ -132,21 +132,17 @@ class SpaceMoneyFlowSerializer(serializers.Serializer):
             error_msg: str = f"{attrs['ticker']} is not available on {self.instance.exchange_account.exchange.name} exchange."
             raise serializers.ValidationError(error_msg)
 
-        if self.space.testing:
-            match self.side.upper():
-                case "INVEST":
-                    return self._test_invest_validate(attrs)
-                case "WITHDRAW":
-                    return self._test_withdraw_validate(attrs)
-                case _:
-                    error_msg: str = "Invalid side."
-                    raise ValueError(error_msg)
+        match self.side.upper():
+            case "INVEST":
+                return self._invest_validate(attrs)
+            case "WITHDRAW":
+                return self._withdraw_validate(attrs)
+            case _:
+                error_msg: str = "Invalid side."
+                raise ValueError(error_msg)
+
+    def save(self, **kwargs):
+        if self.side.upper() == "INVEST":
+            self.instance.invest(self.amount, self.ticker)
         else:
-            match self.side.upper():
-                case "INVEST":
-                    return self._real_invest_validate(attrs)
-                case "WITHDRAW":
-                    return self._real_withdraw_validate(attrs)
-                case _:
-                    error_msg: str = "Invalid side."
-                    raise ValueError(error_msg)
+            self.instance.withdraw(self.amount, self.ticker)
