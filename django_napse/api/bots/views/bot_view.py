@@ -7,6 +7,7 @@ from django_napse.api.bots.serializers.bot_serializers import BotDetailSerialize
 from django_napse.api.custom_permissions import HasSpace
 from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.core.models import Bot, NapseSpace
+from django_napse.utils.errors import APIError
 
 
 class BotView(CustomViewSet):
@@ -31,6 +32,11 @@ class BotView(CustomViewSet):
 
         # Free bots across all available spaces
         if self.request.query_params.get("free", False):
+            # Exchange account containerization
+            request_space = self.get_space(self.request)
+            if request_space is None:
+                raise APIError.MissingSpace()
+            spaces = [space for space in spaces if space.exchange_account == request_space.exchange_account]
             # Cross space free bots
             return [bot for bot in Bot.objects.filter(strategy__config__space__in=spaces) if bot.is_free]
 

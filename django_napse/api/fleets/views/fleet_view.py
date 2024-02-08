@@ -130,3 +130,7 @@ class FleetView(CustomViewSet):
         serializer.save()
 
         return Response(status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["post"])
+    def withdraw(self, request, pk=None):
+        return Response(status=status.HTTP_501_NOT_IMPLEMENTED)

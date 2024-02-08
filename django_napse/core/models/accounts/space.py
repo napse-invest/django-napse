@@ -149,4 +149,8 @@ class NapseSpace(models.Model):
             raise NotImplementedError(error_msg)
 
         # Testing withdraw
-        Debit.objects.create(wallet=self.wallet, amount=-amount, ticker=ticker)
+        Debit.objects.create(
+            wallet=self.wallet,
+            amount=amount,
+            ticker=ticker,
+        )
