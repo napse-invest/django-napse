@@ -20,11 +20,13 @@ class SpaceSerializer(serializers.ModelSerializer):
             "exchange_account",
             # read-only
             "uuid",
+            "testing",
             "value",
             "delta",
         ]
         read_only_fields = [
             "uuid",
+            "testing",
             "value",
             "delta",
         ]
@@ -70,6 +72,7 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
             "description",
             # read-only
             "uuid",
+            "testing",
             "exchange_account",
             "created_at",
             "statistics",
@@ -79,6 +82,7 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             "uuid",
+            "testing",
             "exchange_account",
             "created_at",
             "statistics",
