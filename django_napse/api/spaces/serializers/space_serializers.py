@@ -147,6 +147,9 @@ class SpaceMoneyFlowSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         if self.side.upper() == "INVEST":
-            self.instance.invest(self.amount, self.ticker)
+            self.instance.invest(
+                self.validated_data.get("amount"),
+                self.validated_data.get("ticker"),
+            )
         else:
             self.instance.withdraw(self.amount, self.ticker)
