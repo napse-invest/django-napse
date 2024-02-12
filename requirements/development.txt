@@ -8,7 +8,7 @@ Werkzeug==3.0.1                     # https://github.com/pallets/werkzeug
 django-extensions==3.2.3            # https://github.com/django-extensions/django-extensions
 django-debug-toolbar==4.3.0         # https://github.com/jazzband/django-debug-toolbar
 ruff==0.2.1                         # https://github.com/astral-sh/ruff
-platformdirs==4.1.0                # https://github.com/platformdirs/platformdirs
+platformdirs==4.2.0                # https://github.com/platformdirs/platformdirs
 
 # Documentation
 mkdocs-material==9.5.8             # https://github.com/squidfunk/mkdocs-material
