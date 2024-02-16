@@ -1,26 +1,35 @@
 [tool.ruff]
 
-# Enable pycodestyle (`E`) and Pyflakes (`F`) codes by default.
-# https://beta.ruff.rs/docs/rules/
-lint.select = ["A", "B", "C", "D", "E", "F", "DTZ", "RUF", "S", "COM", "C4", "DJ", "EM", "ISC", "ICN", "PIE", "RET", "SLF", "SIM", "TID", "PD", "NPY"]
+lint.select = ["F", "E", "W", "C90", "I", "N", "D", "YTT", "ANN", "S", "BLE", "FBT", "B", "A", "C", "C4", "DTZ","T10","DJ",
+    "EM", "FA", "ISC", "ICN", "G", "INP", "PIE", "PYI", "Q", "RSE", "RET", "SLF", "SLOT", "SIM", "TID", "TCH", "INT", 
+    "ARG", "PTH", "TD", "FIX", "ERA", "PD", "PL", "TRY", "FLY", "NPY", "AIR", "PERF", "LOG", "RUF",
+    ]
 lint.ignore = [
-    "SLF001", # Private member accessed
-    "D100", # Missing docstring in public module
-    "D101", # Missing docstring in public class
-    "D102", # Missing docstring in public method
-    "D103", # Missing docstring in public function
-    "D105", # Missing docstring in magic method
-    "D106", # Missing docstring in public nested class
-    "D107", # Missing docstring in __init__
-    "A003", # attribute is shadowing a Python builtin
-    "D203", # 1 blank line required before class docstring
-    "D213", # Multi-line docstring summary should start at the first line
-    "C901", # McCabe complexity is too high
-    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
+    # Ruff formatter recommendations
+    "W19",
+    "E111",
+    "E114",
+    "E117",
+    "D206",
+    "D300",
+    "Q000",
+    "Q001",
+    "Q002",
+    "Q003",
+    "COM819",
+    "ISC001",
+    "ISC002",
+    # Depreciated
+    "ANN101",
+    "ANN102",
+    # Other
+    "D105",
+    # "N802",         # Function name `...` should be lowercase
+    "D100",         # Module documentation
     ]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided
-lint.fixable = ["A", "B", "C", "D", "E", "F", "DTZ", "RUF", "S", "COM", "C4", "DJ", "EM", "ISC", "ICN", "PIE", "RET", "SLF", "SIM", "TID", "PD", "NPY"]
+lint.fixable = ["ALL"]
 lint.unfixable = []
 
 # Exclude a variety of commonly ignored directories.
@@ -49,23 +58,30 @@ lint.exclude = [
     "migrations",
 ]
 
-lint.pydocstyle.convention ="google"
 # Same as Black.
 line-length = 150
+indent-width = 4
 
 # Allow unused variables when underscore-prefixed.
 lint.dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+lint.pydocstyle.convention ="google"
+lint.mccabe.max-complexity = 10
 
 # Assume Python 3.11.
 target-version = "py311"
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401", "F403", "D104"]
+"__init__.py" = ["F401", "F403", "D104"] # Imports in __init__
 
-[tool.ruff.lint.mccabe]
-# Unlike Flake8, default to a complexity level of 10.
-max-complexity = 10
+"tests/django_tests/*" = [
+    "D101", "D102",             # Method docstring
+    "ANN",         # Type annotations
+    "ERA001",                   # Found commented-out code
+    ]
 
 [tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
 docstring-code-format = true
-docstring-code-line-length = 60
+docstring-code-line-length = "dynamic"
+line-ending = "lf"

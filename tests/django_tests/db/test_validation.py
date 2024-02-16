@@ -41,9 +41,6 @@ class ValidateModelTestCaseSubclassesTestCase(TestCase):
         for subclass_name, exchanges in all_tests.items():
             if exchanges != napse_settings.NAPSE_EXCHANGES_TO_TEST:
                 print(exchanges, napse_settings.NAPSE_EXCHANGES_TO_TEST)
-                diff = []
-                for exchange in napse_settings.NAPSE_EXCHANGES_TO_TEST:
-                    if exchange not in exchanges:
-                        diff.append(exchange)
+                diff = [exchange for exchange in napse_settings.NAPSE_EXCHANGES_TO_TEST if exchange not in exchanges]
                 error_msg = f"ModelTestCase subclass {subclass_name} is missing tests for exchanges {diff}"
                 raise ValueError(error_msg)
