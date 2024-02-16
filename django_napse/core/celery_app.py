@@ -25,7 +25,7 @@ trace.info = mock.Mock()
 
 # Configure celery logging
 @setup_logging.connect
-def config_loggers(*args, **kwags):
+def config_loggers(*args: list, **kwargs: dict) -> None:  # noqa: ARG001
     """Take settings.LOGGING as config for celery loggers (especially for `formatters`)."""
     from logging.config import dictConfig
 
@@ -35,7 +35,7 @@ def config_loggers(*args, **kwags):
 
 
 # Remove the strategy from celery logs
-def strategy_log_free(*args, **kwargs):
+def strategy_log_free(*args: list, **kwargs: dict) -> callable:
     """Remove the strategy from celery logs."""
     kwargs["info"] = mock.Mock()
     return celery.worker.strategy.default(*args[1:], **kwargs)

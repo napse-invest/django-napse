@@ -1,5 +1,6 @@
 import json
 import logging
+from pathlib import Path
 
 import environ
 from django.conf import settings
@@ -11,8 +12,10 @@ logger = logging.getLogger("django_napse")
 
 
 class DjangoNapseSettings:
+    """Main django_napse settings."""
+
     @property
-    def NAPSE_EXCHANGE_CONFIGS(self):
+    def NAPSE_EXCHANGE_CONFIGS(self) -> dict[str, dict[str, any]]:  # noqa: D102
         return getattr(
             settings,
             "NAPSE_EXCHANGE_CONFIGS",
@@ -24,23 +27,37 @@ class DjangoNapseSettings:
         )
 
     @property
-    def NAPSE_IS_IN_PIPELINE(self):
+    def NAPSE_IS_IN_PIPELINE(self) -> bool:  # noqa: D102
         return environ.Env().bool("NAPSE_IS_IN_PIPELINE", default=False)
 
     @property
-    def NAPSE_SECRETS_FILE_PATH(self):
-        return settings.NAPSE_SECRETS_FILE_PATH
+    def NAPSE_SECRETS_FILE_PATH(self) -> Path:  # noqa: D102
+        if isinstance(settings.NAPSE_SECRETS_FILE_PATH, str):
+            return Path(settings.NAPSE_SECRETS_FILE_PATH).absolute()
+
+        if isinstance(settings.NAPSE_SECRETS_FILE_PATH, Path):
+            return settings.NAPSE_SECRETS_FILE_PATH
+
+        error_msg: str = "NAPSE_SECRETS_FILE_PATH must be a string or a Path object."
+        raise ValueError(error_msg)
 
     @property
-    def NAPSE_ENV_FILE_PATH(self):
-        return settings.NAPSE_ENV_FILE_PATH
+    def NAPSE_ENV_FILE_PATH(self) -> Path:  # noqa: D102
+        if isinstance(settings.NAPSE_ENV_FILE_PATH, str):
+            return Path(settings.NAPSE_ENV_FILE_PATH).absolute()
+
+        if isinstance(settings.NAPSE_ENV_FILE_PATH, Path):
+            return settings.NAPSE_ENV_FILE_PATH
+
+        error_msg: str = "NAPSE_ENV_FILE_PATH must be a string or a Path object."
+        raise ValueError(error_msg)
 
     @property
-    def NAPSE_EXCHANGES_TO_TEST(self):
+    def NAPSE_EXCHANGES_TO_TEST(self) -> list[str]:  # noqa: D102
         return getattr(settings, "NAPSE_EXCHANGES_TO_TEST", ["BINANCE"])
 
     @property
-    def NAPSE_MASTER_KEY(self):
+    def NAPSE_MASTER_KEY(self) -> str:  # noqa: D102
         return getattr(settings, "NAPSE_MASTER_KEY", "insecure_master_key")
 
 
@@ -72,26 +89,27 @@ if settings.configured:
     if "NAPSE_SECRETS_FILE_PATH" not in settings.__dir__():
         warning = "NAPSE_SECRETS_FILE_PATH not found in settings. Please add it to your settings file."
         logger.warning(warning)
-    try:
-        with open(napse_settings.NAPSE_SECRETS_FILE_PATH) as secrets_file:
-            secrets = json.load(secrets_file)
-    except FileNotFoundError:
-        warning = f"WARNING: No secrets file found at {napse_settings.NAPSE_SECRETS_FILE_PATH}. Creating one now."
-        logger.warning(warning)
-        with open(napse_settings.NAPSE_SECRETS_FILE_PATH, "w") as secrets_file:
-            json.dump({"Exchange Accounts": {}}, secrets_file)
+    if not napse_settings.NAPSE_SECRETS_FILE_PATH.exists():
+        logger.warning(
+            "WARNING: No secrets file found at %s. Creating one now.",
+            napse_settings.NAPSE_SECRETS_FILE_PATH,
+        )
+    secrets_file = napse_settings.NAPSE_SECRETS_FILE_PATH.open("w")
+    json.dump({"Exchange Accounts": {}}, secrets_file)
+    secrets_file.close()
 
     if "NAPSE_ENV_FILE_PATH" not in settings.__dir__():
         warning = "NAPSE_ENV_FILE_PATH not found in settings. Please add it to your settings file."
         logger.warning(warning)
-    try:
-        with open(napse_settings.NAPSE_ENV_FILE_PATH) as env_file:
-            pass
-    except FileNotFoundError:
-        warning = f"WARNING: No env file found at {napse_settings.NAPSE_ENV_FILE_PATH}. Creating one now."
-        logger.warning(warning)
-        with open(napse_settings.NAPSE_ENV_FILE_PATH, "w") as env_file:
-            env_file.write("")
+
+    if not napse_settings.NAPSE_ENV_FILE_PATH.exists():
+        logger.warning(
+            "WARNING: No env file found at %s. Creating one now.",
+            napse_settings.NAPSE_ENV_FILE_PATH,
+        )
+        env_file = napse_settings.NAPSE_ENV_FILE_PATH.open("w")
+        env_file.write("")
+        env_file.close()
 
     if {*list(napse_settings.NAPSE_EXCHANGE_CONFIGS.keys())} != set(EXCHANGES):
         error_msg = "NAPSE_EXCHANGE_CONFIGS does not match the list of exchanges. Can't start the server."

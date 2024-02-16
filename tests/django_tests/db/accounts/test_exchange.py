@@ -29,7 +29,7 @@ class ExchangeTestCase(ModelTestCase):
         self.assertEqual([exchange.name for exchange in all_exchanges], list(base_configs.keys()))
 
     def test_default_exchange_accounts(self):
-        path = Path(napse_settings.NAPSE_SECRETS_FILE_PATH).absolute()
+        path: Path = napse_settings.NAPSE_SECRETS_FILE_PATH
         json_file = path.open("r")
         secrets = json.load(json_file)
         json_file.close()
