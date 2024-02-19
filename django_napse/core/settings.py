@@ -94,9 +94,9 @@ if settings.configured:
             "WARNING: No secrets file found at %s. Creating one now.",
             napse_settings.NAPSE_SECRETS_FILE_PATH,
         )
-    secrets_file = napse_settings.NAPSE_SECRETS_FILE_PATH.open("w")
-    json.dump({"Exchange Accounts": {}}, secrets_file)
-    secrets_file.close()
+        secrets_file = napse_settings.NAPSE_SECRETS_FILE_PATH.open("w")
+        json.dump({"Exchange Accounts": {}}, secrets_file)
+        secrets_file.close()
 
     if "NAPSE_ENV_FILE_PATH" not in settings.__dir__():
         warning = "NAPSE_ENV_FILE_PATH not found in settings. Please add it to your settings file."
