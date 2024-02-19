@@ -5,7 +5,6 @@ from typing import Optional
 
 from django.db import models
 
-from django_napse.core.models.accounts.space import NapseSpace
 from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
@@ -140,11 +139,11 @@ class Bot(models.Model):
         for order in orders:
             controller = order["controller"]
             batches[controller] = OrderBatch.objects.create(controller=controller)
-        for order in orders:
-            controller = order.pop("controller")
-            strategy_modifications = order.pop("StrategyModifications")
-            connection_modifications = order.pop("ConnectionModifications")
-            architecture_modifications = order.pop("ArchitectureModifications")
+        for order_dict in orders:
+            controller = order_dict.pop("controller")
+            strategy_modifications = order_dict.pop("StrategyModifications")
+            connection_modifications = order_dict.pop("ConnectionModifications")
+            architecture_modifications = order_dict.pop("ArchitectureModifications")
             order = Order.objects.create(batch=batches[controller], **order)
             order_objects.append(order)
             for modification in strategy_modifications:
@@ -177,14 +176,14 @@ class Bot(models.Model):
             strategy=self.strategy.copy(),
         )
 
-    def value(self, space: NapseSpace = None) -> float:
+    def value(self, space=None) -> float:  # noqa: ANN001
         """Return value market of the bot, depending of space containerization."""
         if space is None:
             return sum([connection.wallet.value_market() for connection in self.connections.all()])
         connection = Connection.objects.get(owner=space.wallet, bot=self)
         return connection.wallet.value_market()
 
-    def get_stats(self, space: NapseSpace = None) -> dict[str, str | int | float]:
+    def get_stats(self, space=None) -> dict[str, str | int | float]:  # noqa: ANN001
         """Some bot's statistics used for KPI dashboards."""
         return {
             "value": self.value(space),
