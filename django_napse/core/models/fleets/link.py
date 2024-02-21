@@ -7,7 +7,7 @@ class Link(models.Model):
     importance = models.FloatField()
 
     def __str__(self):
-        return f"LINK: {self.bot} {self.fleet}"
+        return f"LINK: {self.bot=} {self.cluster=}"
 
     def info(self, verbose=True, beacon=""):
         string = ""

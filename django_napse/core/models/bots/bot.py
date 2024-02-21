@@ -48,7 +48,18 @@ class Bot(models.Model):
 
     @property
     def is_in_fleet(self):
-        return hasattr(self, "bot_in_cluster")
+        # return hasattr(self, "bot_in_cluster")
+        return hasattr(self, "link")
+
+    @property
+    def is_templace(self):
+        """Is self a template bot of a cluster?"""
+        return hasattr(self, "cluster")
+
+    @property
+    def is_free(self):
+        """Is self not in a simulation, not in a fleet and not a cluster's template bot?"""
+        return not self.is_in_simulation and not self.is_in_fleet and not self.is_templace
 
     @property
     def testing(self):
@@ -58,6 +69,12 @@ class Bot(models.Model):
             return self.bot_in_cluster.cluster.fleet.testing
         error_msg = "Bot is not in simulation or fleet."
         raise BotError.InvalidSetting(error_msg)
+
+    @property
+    def fleet(self):
+        if self.is_in_fleet:
+            return self.link.cluster.fleet
+        return None
 
     @property
     def space(self):
@@ -74,7 +91,7 @@ class Bot(models.Model):
         if self.is_in_simulation:
             return self.simulation.space.exchange_account
         if self.is_in_fleet:
-            return self.bot_in_cluster.cluster.fleet.exchange_account
+            return self.link.cluster.fleet.exchange_account
         error_msg = "Bot is not in simulation or fleet."
         raise BotError.InvalidSetting(error_msg)
 
@@ -89,6 +106,11 @@ class Bot(models.Model):
     @property
     def controllers(self):
         return self.architecture.controllers_dict()
+
+    @property
+    def orders(self):
+        connections = self.connections.select_related("orders").all()
+        return [connection.orders for connection in connections]
 
     def hibernate(self):
         if not self.active:
@@ -135,7 +157,7 @@ class Bot(models.Model):
     def _get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):
         return self.architecture._get_orders(data=data, no_db_data=no_db_data)
 
-    def connect_to(self, wallet):
+    def connect_to_wallet(self, wallet):
         connection = Connection.objects.create(owner=wallet, bot=self)
         for plugin in self._strategy.plugins.all():
             plugin.connect(connection)
@@ -147,3 +169,16 @@ class Bot(models.Model):
             name=f"Copy of {self.name}",
             strategy=self.strategy.copy(),
         )
+
+    def value(self, space=None):
+        if space is None:
+            return sum([connection.wallet.value_market() for connection in self.connections.all()])
+        connection = Connection.objects.get(owner=space.wallet, bot=self)
+        return connection.wallet.value_market()
+
+    def get_stats(self, space=None):
+        return {
+            "value": self.value(space),
+            "profit": 0,
+            "delta_30": 0,  # TODO: Need history
+        }

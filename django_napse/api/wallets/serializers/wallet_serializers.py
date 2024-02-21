@@ -35,7 +35,6 @@ class WalletSerializer(serializers.ModelSerializer):
         transactions_data = TransactionSerializer(transactions, many=True).data
         credits_data = CreditSerializer(instance.credits.all().order_by("created_at"), many=True).data
         debits_data = DebitSerializer(instance.debits.all().order_by("created_at"), many=True).data
-
         # return {
         #     "credits": CreditSerializer(instance.credits.all().order_by("created_at"), many=True).data,
         #     "debits": DebitSerializer(instance.debits.all().order_by("created_at"), many=True).data,

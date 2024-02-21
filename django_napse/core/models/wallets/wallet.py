@@ -23,7 +23,7 @@ class Wallet(models.Model, FindableClass):
     def info(self, verbose=True, beacon=""):
         self = self.find()
         string = ""
-        string += f"{beacon}Wallet ({self.pk=}):\n"
+        string += f"{beacon}Wallet ({self.pk=}):\t{type(self)}\n"
         string += f"{beacon}Args:\n"
         string += f"{beacon}\t{self.title=}\n"
         string += f"{beacon}\t{self.testing=}\n"
@@ -170,6 +170,9 @@ class Wallet(models.Model, FindableClass):
 class SpaceWallet(Wallet):
     owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="wallet")
 
+    def __str__(self):
+        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
+
     @property
     def space(self):
         return self.owner
@@ -178,12 +181,19 @@ class SpaceWallet(Wallet):
     def exchange_account(self):
         return self.space.exchange_account.find()
 
-    def connect_to(self, bot):
-        return Connection.objects.create(owner=self, bot=bot)
+    def connect_to_bot(self, bot):
+        try:
+            connection = self.connections.get(owner=self, bot=bot)
+        except Connection.DoesNotExist:
+            connection = Connection.objects.create(owner=self, bot=bot)
+        return connection
 
 
 class SpaceSimulationWallet(Wallet):
     owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="simulation_wallet")
+
+    def __str__(self):
+        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
 
     @property
     def testing(self):
@@ -200,12 +210,20 @@ class SpaceSimulationWallet(Wallet):
     def reset(self):
         self.currencies.all().delete()
 
-    def connect_to(self, bot):
-        return Connection.objects.create(owner=self, bot=bot)
+    def connect_to_bot(self, bot):
+        """Get or create connection to bot."""
+        try:
+            connection = self.connections.get(owner=self, bot=bot)
+        except Connection.DoesNotExist:
+            connection = Connection.objects.create(owner=self, bot=bot)
+        return connection
 
 
 class OrderWallet(Wallet):
     owner = models.OneToOneField("Order", on_delete=models.CASCADE, related_name="wallet")
+
+    def __str__(self):
+        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
 
     @property
     def exchange_account(self):
@@ -214,6 +232,9 @@ class OrderWallet(Wallet):
 
 class ConnectionWallet(Wallet):
     owner = models.OneToOneField("Connection", on_delete=models.CASCADE, related_name="wallet")
+
+    def __str__(self):
+        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
 
     @property
     def space(self):

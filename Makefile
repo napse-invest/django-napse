@@ -1,5 +1,5 @@
 SHELL := /bin/bash
-
+.PHONY: setup
 OS := $(shell uname)
 
 all: setup-testing-environment makemigrations migrate runserver
@@ -10,7 +10,7 @@ ifeq ($(OS),Darwin)        # Mac OS X
 else ifeq ($(OS),Linux)
 	./setup/setup-unix.sh
 else 
-	./setup/setup-windows.sh
+	powershell -NoProfile -ExecutionPolicy Bypass -File ".\setup\setup-windows.ps1"
 endif
 
 setup-testing-environment:
@@ -36,6 +36,9 @@ clean:
 
 celery:
 	source .venv/bin/activate && watchfiles --filter python celery.__main__.main --args "-A tests.test_app worker --beat -l INFO"
+
+shell:
+	source .venv/bin/activate && python tests/test_app/manage.py shell
 
 test:
 	source .venv/bin/activate && python tests/test_app/manage.py test -v2 --keepdb --parallel
