@@ -48,3 +48,4 @@ You can find the documentation [here](https://napse-invest.github.io/django-naps
 ## How to contribute
 
 If you want to contribute to the project, please read the [contributing guidelines](https://napse-invest.github.io/django-napse/contributing/) first. You will find the setup instructions and our standards.
+
