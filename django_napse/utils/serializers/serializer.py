@@ -89,7 +89,7 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):
             self.validate_data(self._data)
 
         # To use serializer in serializer
-        super().__init__()
+        super().__init__(**kwargs)
 
     @property
     def data(self):
@@ -132,13 +132,14 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):
         return serialized_instance
 
     def validate_data(self, data):
-        for name, (required, validator) in self._validators:
+        for name, (required, validator) in self._validators.items():
             elt = data.get(name)
             if elt is None:
                 if required:
                     error_msg: str = f"Field {name} is required."
                     raise ValidationError(error_msg)
                 continue
+
             result = validator(elt)
             if not result:
                 error_msg: str = f"Field {name} is invalid."
@@ -146,20 +147,23 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):
         self._validated_data = data
         return data
 
-    def _model_checks(self):
+    def _model_checks(self, validated_data):
         if not self.Model:
             error_msg: str = "Model is not defined."
             raise ValueError(error_msg)
-        if not self._validated_data:
+
+        if not validated_data:
             error_msg: str = "Data are not validated."
             raise ValueError(error_msg)
 
-    def create(self, validated_data):
-        self._model_checks()
+    def create(self, validated_data=None):
+        validated_data = validated_data or self._validated_data
+        self._model_checks(validated_data=validated_data)
         return self.Model.objects.create(**validated_data)
 
-    def update(self, instance, validated_data):
-        self._model_checks()
+    def update(self, instance, validated_data=None):
+        validated_data = validated_data or self._validated_data
+        self._model_checks(validated_data=validated_data)
         for key, value in validated_data.items():
             setattr(instance, key, value)
         instance.save()
