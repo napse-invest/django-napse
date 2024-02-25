@@ -1,9 +1,9 @@
 from django_napse.utils.serializers.fields import Field, IntField, StrField, BoolField, DatetimeField, MethodField, UUIDField
-from django_napse.utils.serializers.serializer import Serializer
+from django_napse.utils.serializers.serializer import Serializer, MetaSerializer
 
 from django_napse.core.models import Exchange, ExchangeAccount
-from django_napse.utils.custom_test_case import CustomTestCase
 from django.test import TestCase
+from rest_framework.serializers import ValidationError
 
 """
 python tests/test_app/manage.py test tests.django_tests.test_serializer -v2 --keepdb --parallel
@@ -11,16 +11,18 @@ python tests/test_app/manage.py test tests.django_tests.test_serializer -v2 --ke
 
 
 class ExchangeSerializer(Serializer):
-    name = StrField()
+    Model = Exchange
+    name = StrField(required=True)
     description = StrField()
     test_int_field = IntField()
 
 
 class ExchangeAccountSerializer(Serializer):
+    Model = ExchangeAccount
     uuid = UUIDField()
-    exchange = ExchangeSerializer()
-    name = StrField()
-    testing = BoolField()
+    exchange = ExchangeSerializer(required=True)
+    name = StrField(required=True)
+    testing = BoolField(required=True)
     description = StrField()
     default = BoolField()
     created_at = DatetimeField()
@@ -28,6 +30,10 @@ class ExchangeAccountSerializer(Serializer):
 
     def get_tickers(self, instance):
         return instance.exchange.get_tickers()
+
+    def validate_data(self, data):
+        data["testing"] = True
+        return super().validate_data(data)
 
 
 class SerializerSerializationTestCase(TestCase):
@@ -71,11 +77,49 @@ class SerializerSerializationTestCase(TestCase):
             },
         )
 
-    def test_exchange_validation(self):
-        pass
+    def test_serialization_with_missing_required_field(self):
+        exchange_account_serializer = ExchangeAccountSerializer()
+        exchange_account_serializer._fields["required_field"] = Field(required=True)
+        exchange_account_serializer._compiled_fields = MetaSerializer._compile_fields(
+            fields=exchange_account_serializer._fields,
+            serializer_cls=exchange_account_serializer.__class__,
+        )
 
-    def test_exchange_account_validation(self):
-        pass
+        with self.assertRaises(ValueError):
+            exchange_account_serializer.data  # noqa: B018
+
+    def test_exchange_validation_and_creation(self):
+        data = {"name": "TEST", "description": "Test exchange"}
+        exchange_serializer = ExchangeSerializer(data=data)
+        instance = exchange_serializer.create()
+        self.assertEqual(isinstance(instance, Exchange), True)
+
+    def test_exchange_account_validation_and_creation(self):
+        data = {
+            "name": "TEST exchange account",
+            "description": "Test exchange",
+            "exchange": self.exchange,
+            "testing": True,
+        }
+        exchange_serializer = ExchangeAccountSerializer(data=data)
+        instance = exchange_serializer.create()
+        self.assertEqual(isinstance(instance, ExchangeAccount), True)
+
+    def test_validation_with_missing_required_field(self):
+        with self.assertRaises(ValidationError):
+            exchange_serializer = ExchangeSerializer(data={"description": "Test exchange"})  # noqa: F841
+
+    def test_validation_overwrite(self):
+        data = {
+            "name": "TEST exchange account",
+            "description": "Test exchange",
+            "exchange": self.exchange,
+            "testing": False,
+        }
+        exchange_serializer = ExchangeAccountSerializer(data=data)
+        instance = exchange_serializer.create()
+        self.assertEqual(isinstance(instance, ExchangeAccount), True)
+        self.assertEqual(instance.testing, True)
 
 
 class SerializerValidationTestCase(TestCase):
