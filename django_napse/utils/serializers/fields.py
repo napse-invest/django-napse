@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 def instance_check(target_type) -> callable:
-    def _instance_check(instance):
+    def _instance_check(instance, target_type=target_type):
         return isinstance(instance, target_type)
 
     return _instance_check
@@ -29,27 +29,27 @@ class Field:
 
 class StrField(Field):
     to_value: callable = staticmethod(str)
-    validate: callable = instance_check(str)
+    validate: callable = staticmethod(instance_check(str))
 
 
 class IntField(Field):
     to_value: callable = staticmethod(int)
-    validate: callable = instance_check(int)
+    validate: callable = staticmethod(instance_check(int))
 
 
 class FloatField(Field):
     to_value: callable = staticmethod(float)
-    validate: callable = instance_check(float)
+    validate: callable = staticmethod(instance_check(float))
 
 
 class BoolField(Field):
     to_value: callable = staticmethod(bool)
-    validate: callable = instance_check(bool)
+    validate: callable = staticmethod(instance_check(bool))
 
 
 class UUIDField(Field):
     to_value: callable = staticmethod(uuid.UUID)
-    validate: callable = instance_check(uuid.UUID)
+    validate: callable = staticmethod(instance_check(uuid.UUID))
 
     @staticmethod
     def to_value(value):
@@ -82,7 +82,7 @@ class MethodField(Field):
         self.method_name = method_name
 
     def as_getter(self, serializer_field_name, serializer_cls) -> callable:
-        """Get the get_<field> method from the child class."""
+        """Get the (get_<field> | method_name) method from the serializer class."""
         return getattr(
             serializer_cls,
             self.method_name or f"get_{serializer_field_name}",
