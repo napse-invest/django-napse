@@ -75,9 +75,6 @@ class MethodField(Field):
     validate = None
 
     def __init__(self, method_name: str | None = None, **kwargs):
-        if kwargs.get("required"):
-            error_msg: str = "MethodField cannot be required."
-            raise ValueError(error_msg)
         super().__init__(**kwargs)
         self.method_name = method_name
 

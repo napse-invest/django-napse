@@ -65,7 +65,14 @@ class MetaSerializer(type):
 
         serializer_cls._fields = fields
         serializer_cls._compiled_fields = cls._compile_fields(fields, serializer_cls)
-        serializer_cls._validators = {name: (field.required, field.validate) for name, field in fields.items() if field.validate}
+        serializer_cls._validators = {
+            name: (
+                field.required,
+                field.validate,
+            )
+            for name, field in fields.items()
+            if field.validate
+        }
 
         return serializer_cls
 
@@ -132,6 +139,9 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):
         return serialized_instance
 
     def validate_data(self, data):
+        if not isinstance(data, dict):
+            error_msg: str = "Data must be a dictionary."
+            raise ValidationError(error_msg)
         for name, (required, validator) in self._validators.items():
             elt = data.get(name)
             if elt is None:
@@ -144,8 +154,24 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):
             if not result:
                 error_msg: str = f"Field {name} is invalid."
                 raise ValidationError(error_msg)
+
+        # Retrieve db instances if needed
+        for name, field in self._fields.items():
+            if isinstance(field, Serializer):
+                data[name] = field.get(data[name])
+
         self._validated_data = data
         return data
+
+    def validate(self, data):
+        """Used for automatic validation with serializer.
+
+        Please to not use this method.
+        Note: provided data must be id or uuid
+        """
+        instance = self.get(data)
+        data = self.to_value(instance)
+        return self.validate_data(data)
 
     def _model_checks(self, validated_data):
         if not self.Model:
@@ -155,6 +181,15 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):
         if not validated_data:
             error_msg: str = "Data are not validated."
             raise ValueError(error_msg)
+
+    def get(self, data):
+        """Retrieve instance from data."""
+        try:
+            instance = self.Model.objects.get(uuid=data) if hasattr(self.Model, "uuid") else self.Model.objects.get(id=data)
+        except (self.Model.DoesNotExist, TypeError):
+            error_msg: str = f"Instance with id {data} does not exist."
+            raise ValidationError(error_msg) from None
+        return instance
 
     def create(self, validated_data=None):
         validated_data = validated_data or self._validated_data
