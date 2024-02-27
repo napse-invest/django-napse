@@ -1,6 +1,5 @@
 import contextlib
 import json
-from pprint import pprint
 
 from django.apps import apps
 from django.db.models.signals import post_migrate
