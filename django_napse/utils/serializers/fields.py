@@ -59,7 +59,6 @@ class UUIDField(Field):
 
 
 class DatetimeField(Field):
-    # to_value: callable = staticmethod(datetime)
     validate: callable = instance_check(datetime)
 
     @staticmethod
@@ -68,17 +67,20 @@ class DatetimeField(Field):
 
 
 class MethodField(Field):
+    """MethodField can be used to serialize complexe behaviours."""
+
     getter_takes_serializer = True
 
     # Avoir type serialization on data
     to_value = None
     validate = None
 
-    def __init__(self, method_name: str | None = None, **kwargs):
+    def __init__(self, method_name: str | None = None, **kwargs: dict[str, any]) -> None:
+        """Define the method field."""
         super().__init__(**kwargs)
         self.method_name = method_name
 
-    def as_getter(self, serializer_field_name, serializer_cls) -> callable:
+    def as_getter(self, serializer_field_name: str, serializer_cls: type) -> callable:
         """Get the (get_<field> | method_name) method from the serializer class."""
         return getattr(
             serializer_cls,
