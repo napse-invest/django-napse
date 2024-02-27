@@ -27,9 +27,13 @@ def create_accounts(sender, **kwargs):
     Exchange = apps.get_model("django_napse_core", "Exchange")
     from django_napse.core.models.accounts.exchange import EXCHANGE_ACCOUNT_DICT
 
-    with open(settings.NAPSE_SECRETS_FILE_PATH, "r") as json_file:
-        secrets = json.load(json_file)
-        json_file.close()
+    try:
+        with open(settings.NAPSE_SECRETS_FILE_PATH, "r") as json_file:
+            secrets = json.load(json_file)
+    except FileNotFoundError:
+        with open(settings.NAPSE_SECRETS_FILE_PATH, "w") as json_file:
+            json.dump({"Exchange Accounts": {}}, json_file)
+        secrets = {"Exchange Accounts": {}}
     created_exchange_accounts = []
 
     with atomic():
