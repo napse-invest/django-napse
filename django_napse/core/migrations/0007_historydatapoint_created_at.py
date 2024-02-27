@@ -5,15 +5,14 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('django_napse_core', '0006_alter_exchangeaccount_name'),
+        ("django_napse_core", "0006_alter_exchangeaccount_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='historydatapoint',
-            name='created_at',
+            model_name="historydatapoint",
+            name="created_at",
             field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
             preserve_default=False,
         ),

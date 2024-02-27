@@ -4,20 +4,19 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('django_napse_core', '0008_bothistory'),
+        ("django_napse_core", "0008_bothistory"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='order',
-            old_name='exit_base_amount',
-            new_name='exit_amount_base',
+            model_name="order",
+            old_name="exit_base_amount",
+            new_name="exit_amount_base",
         ),
         migrations.RenameField(
-            model_name='order',
-            old_name='exit_quote_amount',
-            new_name='exit_amount_quote',
+            model_name="order",
+            old_name="exit_quote_amount",
+            new_name="exit_amount_quote",
         ),
     ]

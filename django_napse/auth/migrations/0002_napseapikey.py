@@ -5,7 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("rest_framework_api_key", "0005_auto_20220110_1102"),
         ("django_napse_auth", "0001_initial"),

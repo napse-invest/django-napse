@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("django_napse_core", "0004_spacehistory_fleethistory_exchangeaccounthistory"),
     ]
