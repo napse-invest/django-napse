@@ -17,3 +17,8 @@ jobs:
         with:
           src: "."
           args: --config .github/pyproject.toml
+
+      - name: Linting code with ruff
+        run: |
+          python -m pip install ruff
+          ruff . --config .github/pyproject.toml
