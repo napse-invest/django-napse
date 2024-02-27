@@ -10,6 +10,7 @@ python tests/test_app/manage.py test tests.django_tests.api.fleets.test_fleet_vi
 
 class ListFleetViewTest(ViewTest):
     def __init__(self, *args, **kwargs):
+        """Build a fleet."""
         super().__init__(*args, **kwargs)
         # create simple fleet
         config = EmptyBotConfig.objects.create(space=self.testcase_instance.space, settings={"empty": True})
@@ -68,6 +69,7 @@ class ListFleetViewTest(ViewTest):
 
 class RetrieveFleetViewTest(ViewTest):
     def __init__(self, *args, **kwargs):
+        """Build a fleet."""
         super().__init__(*args, **kwargs)
         # create simple fleet
         config = EmptyBotConfig.objects.create(space=self.testcase_instance.space, settings={"empty": True})
