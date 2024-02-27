@@ -13,4 +13,4 @@ jobs:
         uses: chartboost/ruff-action@v1
         with:
           src: "."
-          args: --config .github/pyproject.tomlt
+          args: --config .github/pyproject.toml
