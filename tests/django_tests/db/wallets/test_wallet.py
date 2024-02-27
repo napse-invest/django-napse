@@ -141,11 +141,11 @@ class SpaceWalletTestCase(BaseWalletTestCase):
         wallet = self.simple_create()
         self.assertEqual(wallet.space, self.owner)
 
-    def test_value_market_BTC(self):
+    def test_value_market_BTC(self):  # noqa: N802
         Currency.objects.create(wallet=self.space.wallet, ticker="BTC", amount=1, mbp=20000)
         self.assertTrue(self.space.wallet.value_market() > 0)
 
-    def test_value_market_USDT(self):
+    def test_value_market_USDT(self):  # noqa: N802
         Currency.objects.create(wallet=self.space.wallet, ticker="USDT", amount=1, mbp=1)
         self.assertEqual(self.space.wallet.value_market(), 1)
 

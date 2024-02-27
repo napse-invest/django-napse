@@ -14,7 +14,7 @@ def calculate_mbp(value: str, current_value: float, order, currencies: dict) -> 
     return (current_amount * current_value + received_quote) / (received_quote / price + current_amount)
 
 
-def process_value_from_type(value, target_type, **kwargs):
+def process_value_from_type(value, target_type, **kwargs) -> any:
     """Convert a value to a specific type."""
     target_type = target_type.lower()
     if value == "None":

@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from django.db import models
 
+from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
@@ -19,6 +20,8 @@ from .simulation import Simulation
 
 
 class SimulationQueue(models.Model):
+    """Queue wrapper for a simulation."""
+
     simulation_reference = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
     space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE, null=True)
     bot = models.OneToOneField("django_napse_core.Bot", on_delete=models.CASCADE, null=True)
@@ -40,7 +43,8 @@ class SimulationQueue(models.Model):
     def __str__(self) -> str:
         return f"BOT SIM QUEUE {self.pk}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, verbose: bool = True, beacon: str = "") -> str:  # noqa: FBT002, FBT001
+        """Return info on SimulationQueue."""
         string = ""
         string += f"{beacon}SimulationQueue {self.pk}:\n"
         string += f"{beacon}\t{self.bot=}\n"
@@ -61,7 +65,8 @@ class SimulationQueue(models.Model):
             print(string)
         return string
 
-    def setup_simulation(self):
+    def setup_simulation(self) -> tuple[Bot, dict[str, any]]:
+        """Setup investment and connections for the simulation."""
         self.space.simulation_wallet.find().reset()
         for investment in self.investments.all():
             Credit.objects.create(
@@ -76,7 +81,8 @@ class SimulationQueue(models.Model):
         no_db_data = new_bot.architecture.prepare_db_data()
         return new_bot, no_db_data
 
-    def cleanup_simulation(self, bot):
+    def cleanup_simulation(self, bot: Bot) -> None:
+        """Reset the simulation: reset wallet & deactivate the bot."""
         self.space.simulation_wallet.reset()
         bot.hibernate()
 

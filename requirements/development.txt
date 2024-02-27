@@ -2,21 +2,21 @@
 -r simulations.txt
 
 tblib==3.0.0                        # https://pypi.org/project/tblib/
-coverage==7.4.1                     # https://github.com/nedbat/coveragepy
+coverage==7.4.3                     # https://github.com/nedbat/coveragepy
 watchfiles==0.21.0                  # https://github.com/samuelcolvin/watchfiles
 Werkzeug==3.0.1                     # https://github.com/pallets/werkzeug
 django-extensions==3.2.3            # https://github.com/django-extensions/django-extensions
 django-debug-toolbar==4.3.0         # https://github.com/jazzband/django-debug-toolbar
-ruff==0.2.1                         # https://github.com/astral-sh/ruff
+ruff==0.2.2                         # https://github.com/astral-sh/ruff
 platformdirs==4.2.0                # https://github.com/platformdirs/platformdirs
 
 # Documentation
-mkdocs-material==9.5.9             # https://github.com/squidfunk/mkdocs-material
+mkdocs-material==9.5.11             # https://github.com/squidfunk/mkdocs-material
 pygments==2.17.2                    # https://github.com/pygments/pygments
 mkdocs-plugin-inline-svg==0.1.0     # https://pypi.org/project/mkdocs-plugin-inline-svg
 mkdocs-coverage==1.0.0              # https://github.com/pawamoy/mkdocs-coverage
 neoteroi-mkdocs==1.0.5              # https://github.com/Neoteroi/mkdocs-plugins
 drf-spectacular==0.27.1             # https://github.com/tfranzel/drf-spectacular
-mkdocstrings==0.24.0                # https://github.com/mkdocstrings/mkdocstrings
+mkdocstrings==0.24.1                # https://github.com/mkdocstrings/mkdocstrings
 mkdocstrings-python==1.8.0          # https://github.com/mkdocstrings/python
 

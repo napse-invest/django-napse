@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import uuid
 from typing import Optional
 
@@ -6,6 +8,7 @@ from django.db import models
 from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
+from django_napse.core.models.wallets.wallet import SpaceSimulationWallet, SpaceWallet
 from django_napse.utils.errors import BotError
 
 
@@ -136,11 +139,11 @@ class Bot(models.Model):
         for order in orders:
             controller = order["controller"]
             batches[controller] = OrderBatch.objects.create(controller=controller)
-        for order in orders:
-            controller = order.pop("controller")
-            strategy_modifications = order.pop("StrategyModifications")
-            connection_modifications = order.pop("ConnectionModifications")
-            architecture_modifications = order.pop("ArchitectureModifications")
+        for order_dict in orders:
+            controller = order_dict.pop("controller")
+            strategy_modifications = order_dict.pop("StrategyModifications")
+            connection_modifications = order_dict.pop("ConnectionModifications")
+            architecture_modifications = order_dict.pop("ArchitectureModifications")
             order = Order.objects.create(batch=batches[controller], **order)
             order_objects.append(order)
             for modification in strategy_modifications:
@@ -155,28 +158,33 @@ class Bot(models.Model):
         return order_objects, batches
 
     def _get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):
-        return self.architecture._get_orders(data=data, no_db_data=no_db_data)
+        """Get orders of the bot."""
+        return self.architecture._get_orders(data=data, no_db_data=no_db_data)  # noqa: SLF001
 
-    def connect_to_wallet(self, wallet):
+    def connect_to_wallet(self, wallet: SpaceSimulationWallet | SpaceWallet) -> Connection:
+        """Connect the bot to a (sim)space's wallet."""
         connection = Connection.objects.create(owner=wallet, bot=self)
         for plugin in self._strategy.plugins.all():
             plugin.connect(connection)
         self._strategy.connect(connection)
         return connection
 
-    def copy(self):
+    def copy(self) -> Bot:
+        """Copy the instance bot."""
         return self.__class__.objects.create(
             name=f"Copy of {self.name}",
             strategy=self.strategy.copy(),
         )
 
-    def value(self, space=None):
+    def value(self, space=None) -> float:  # noqa: ANN001
+        """Return value market of the bot, depending of space containerization."""
         if space is None:
             return sum([connection.wallet.value_market() for connection in self.connections.all()])
         connection = Connection.objects.get(owner=space.wallet, bot=self)
         return connection.wallet.value_market()
 
-    def get_stats(self, space=None):
+    def get_stats(self, space=None) -> dict[str, str | int | float]:  # noqa: ANN001
+        """Some bot's statistics used for KPI dashboards."""
         return {
             "value": self.value(space),
             "profit": 0,
