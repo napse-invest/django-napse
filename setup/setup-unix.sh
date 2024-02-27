@@ -18,4 +18,5 @@ pip install pip-tools
 printf "Compiling requirements... This may take a few minutes.\n"
 pip-compile ./requirements/development.txt --output-file ./full-requirements.txt --resolver=backtracking --strip-extras
 pip install -r ./full-requirements.txt
+pre-commit install
 printf "Done installing requirements for local .venv!\nHave fun coding!\n"
