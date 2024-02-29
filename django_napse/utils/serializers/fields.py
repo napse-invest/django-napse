@@ -50,36 +50,48 @@ class StrField(Field):
 
 
 class IntField(Field):
+    """Represent a integer."""
+
     to_value: callable = staticmethod(int)
     validate: callable = staticmethod(instance_check(int))
 
 
 class FloatField(Field):
+    """Represent a float."""
+
     to_value: callable = staticmethod(float)
     validate: callable = staticmethod(instance_check(float))
 
 
 class BoolField(Field):
+    """Represent a boolean."""
+
     to_value: callable = staticmethod(bool)
     validate: callable = staticmethod(instance_check(bool))
 
 
 class UUIDField(Field):
+    """Represent a uuid."""
+
     to_value: callable = staticmethod(uuid.UUID)
     validate: callable = staticmethod(instance_check(uuid.UUID))
 
     @staticmethod
-    def to_value(value):
+    def to_value(value: uuid.UUID | str) -> str:
+        """Format & return the value."""
         if not isinstance(value, uuid.UUID):
             return str(uuid.UUID(value))
         return str(value)
 
 
 class DatetimeField(Field):
+    """Represent a date."""
+
     validate: callable = instance_check(datetime)
 
     @staticmethod
-    def to_value(value):
+    def to_value(value: datetime) -> str:
+        """Format & return the value."""
         return value.strftime("%Y-%m-%d %H:%M:%S")
 
 
