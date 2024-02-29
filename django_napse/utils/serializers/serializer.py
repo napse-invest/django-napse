@@ -36,7 +36,7 @@ class MetaSerializer(type):
         def _compile_field(field: dict[str, Field], name: str, serializer_cls: Serializer) -> tuple:
             """Compile field's elements to tuple."""
             if field.source is not None and "." in field.source:
-                getter: set = {operator.attrgetter(attr) for attr in field.source.split(".")}
+                getter: set = [operator.attrgetter(attr) for attr in field.source.split(".")]
                 getter_is_generator = True
             else:
                 getter = field.as_getter(name, serializer_cls) or operator.attrgetter(name)
