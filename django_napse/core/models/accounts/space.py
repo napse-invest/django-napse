@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django.db import models
 from django.utils.timezone import get_default_timezone
 
-from django_napse.core.models.accounts.managers import NapseSpaceManager
+from django_napse.core.models.accounts.managers import SpaceManager
 from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.fleets.fleet import Fleet
 from django_napse.core.models.orders.order import Order
@@ -16,7 +16,7 @@ from django_napse.utils.errors.exchange import ExchangeError
 from django_napse.utils.errors.wallets import WalletError
 
 
-class NapseSpace(models.Model):
+class Space(models.Model):
     """Categorize and manage money.
 
     Attributes:
@@ -30,10 +30,10 @@ class NapseSpace(models.Model):
     Examples:
         Create a space:
         ```python
-        import django_napse.core.models import NapseSpace, ExchangeAccount
+        import django_napse.core.models import Space, ExchangeAccount
 
         exchange_account: ExchangeAccount = ...
-        space = NapseSpace.objects.create(
+        space = Space.objects.create(
             name="Space",
             description="Space description",
             exchange_account=exchange_account,
@@ -51,7 +51,7 @@ class NapseSpace(models.Model):
     exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="spaces")
     created_at = models.DateTimeField(auto_now_add=True)
 
-    objects = NapseSpaceManager()
+    objects = SpaceManager()
 
     class Meta:
         unique_together = ("name", "exchange_account")

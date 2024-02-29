@@ -11,7 +11,7 @@ class ExchangeAccountManager(models.Manager):
         description: str = "",
         **kwargs,
     ):
-        NapseSpace = apps.get_model("django_napse_core", "NapseSpace")
+        Space = apps.get_model("django_napse_core", "Space")
         exchange_account = self.model(
             exchange=exchange,
             name=name,
@@ -20,7 +20,7 @@ class ExchangeAccountManager(models.Manager):
             **kwargs,
         )
         exchange_account.save()
-        NapseSpace.objects.create(
+        Space.objects.create(
             name=exchange_account.name,
             description=f"This is the main space for the {exchange_account.name} exchange account.",
             exchange_account=exchange_account,

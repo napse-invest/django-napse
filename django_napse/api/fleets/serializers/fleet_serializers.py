@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from django_napse.api.bots.serializers import BotSerializer
 from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
-from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, NapseSpace, SpaceWallet
+from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, Space, SpaceWallet
 
 
 class FleetSerializer(serializers.ModelSerializer):
@@ -63,9 +63,9 @@ class FleetSerializer(serializers.ModelSerializer):
         data = super().validate(attrs)
 
         try:
-            self.space = NapseSpace.objects.get(uuid=attrs.pop("space"))
+            self.space = Space.objects.get(uuid=attrs.pop("space"))
             print("get space", self.space)
-        except NapseSpace.DoesNotExist:
+        except Space.DoesNotExist:
             error_msg: str = "Space does not exist."
             raise serializers.ValidationError(error_msg) from None
 

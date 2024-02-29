@@ -6,7 +6,7 @@ from rest_framework_api_key.permissions import HasAPIKey
 from django_napse.api.custom_permissions import HasFullAccessPermission, HasMasterKey, HasReadPermission
 from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceMoneyFlowSerializer, SpaceSerializer
-from django_napse.core.models import NapseSpace
+from django_napse.core.models import Space
 from django_napse.utils.constants import EXCHANGE_TICKERS
 from django_napse.utils.errors import SpaceError
 
@@ -19,7 +19,7 @@ class SpaceView(CustomViewSet):
         return self.get_queryset().get(uuid=self.kwargs["pk"])
 
     def get_queryset(self):
-        return NapseSpace.objects.all()
+        return Space.objects.all()
 
     def get_serializer_class(self, *args, **kwargs):
         actions: dict = {
@@ -48,7 +48,7 @@ class SpaceView(CustomViewSet):
 
     def list(self, request):
         api_key = self.get_api_key(request)
-        spaces = NapseSpace.objects.all() if api_key.is_master_key else NapseSpace.objects.filter(permissions__in=api_key.permissions.all())
+        spaces = Space.objects.all() if api_key.is_master_key else Space.objects.filter(permissions__in=api_key.permissions.all())
         serializer = self.get_serializer(spaces, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -92,7 +92,7 @@ class SpaceView(CustomViewSet):
         GET: Return all {ticker: amount} which can be invested in the space.
         POST: Invest in the space.
         """
-        space: NapseSpace = self.get_object()
+        space: Space = self.get_object()
         if not space.testing:
             return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
@@ -124,7 +124,7 @@ class SpaceView(CustomViewSet):
         GET: Return all {ticker: amount} which can be withdrawn in the space.
         POST: Withdraw from the space.
         """
-        space: NapseSpace = self.get_object()
+        space: Space = self.get_object()
         if not space.testing:
             return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 

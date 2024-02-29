@@ -1,7 +1,7 @@
 from rest_framework.viewsets import GenericViewSet
 
 from django_napse.auth.models import NapseAPIKey
-from django_napse.core.models import NapseSpace
+from django_napse.core.models import Space
 from django_napse.utils.errors import APIError
 
 
@@ -14,8 +14,8 @@ class CustomViewSet(GenericViewSet):
         except KeyError as e:
             raise APIError.NoAPIKey() from e
 
-    def get_space(self, request) -> NapseSpace | None:
+    def get_space(self, request) -> Space | None:
         try:
-            return NapseSpace.objects.get(uuid=request.query_params["space"])
-        except NapseSpace.DoesNotExist:
+            return Space.objects.get(uuid=request.query_params["space"])
+        except Space.DoesNotExist:
             return None
