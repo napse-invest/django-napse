@@ -24,8 +24,8 @@ lint.ignore = [
     "ANN102",
     # Other
     "D105",
-    # "N802",         # Function name `...` should be lowercase
-    "D100",         # Module documentation
+    # "N802",           # Function name `...` should be lowercase
+    "D100",             # Module documentation
     ]
 
 # Allow autofix for all enabled rules (when `--fix`) is provided
