@@ -1,22 +1,14 @@
-from rest_framework import serializers
-
 from django_napse.core.models import ExchangeAccount
+from django_napse.utils.serializers import BoolField, Serializer, StrField, UUIDField
 
 
-class ExchangeAccountSerializer(serializers.ModelSerializer):
-    exchange = serializers.CharField(source="exchange.name")
+class ExchangeAccountSerializer(Serializer):
+    """Serializer for ExchangeAccount."""
 
-    class Meta:
-        model = ExchangeAccount
-        fields = [
-            "uuid",
-            "exchange",
-            "name",
-            "description",
-            "testing",
-        ]
-        read_only_fields = [
-            "uuid",
-            "exchange",
-            "testing",
-        ]
+    Model = ExchangeAccount
+
+    uuid = UUIDField()
+    exchange = StrField(source="exchange.name", required=True)
+    name = StrField(required=True)
+    description = StrField(required=True)
+    testing = BoolField(required=True)

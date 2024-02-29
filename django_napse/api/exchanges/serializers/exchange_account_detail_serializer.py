@@ -1,28 +1,18 @@
-from rest_framework import serializers
-
 from django_napse.api.spaces.serializers.space_serializers import SpaceSerializer
 from django_napse.core.models import ExchangeAccount
+from django_napse.utils.serializers import BoolField, Serializer, StrField, UUIDField
 
 
-class ExchangeAccountDetailSerializer(serializers.ModelSerializer):
-    exchange = serializers.CharField(source="exchange.name")
+class ExchangeAccountDetailSerializer(Serializer):
+    """Serializer for ExchangeAccount detail."""
+
+    Model = ExchangeAccount
+    is_read_only_serializer = True
+
+    uuid = UUIDField()
+    exchange = StrField(source="exchange.name")
+    name = StrField()
+    description = StrField()
+    testing = BoolField()
+    created_at = StrField()
     spaces = SpaceSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = ExchangeAccount
-        fields = [
-            "uuid",
-            "exchange",
-            "name",
-            "testing",
-            "description",
-            "created_at",
-            "spaces",
-        ]
-        read_only_fields = [
-            "uuid",
-            "exchange",
-            "testing",
-            "created_at",
-            "spaces",
-        ]
