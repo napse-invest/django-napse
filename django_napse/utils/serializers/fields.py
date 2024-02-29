@@ -18,7 +18,7 @@ class Field:
     # Define if the getter method takes the serializer as argument.
     getter_takes_serializer = False
 
-    def __init__(self, required: bool = False, source: str | None = None) -> None:  # noqa: FBT001, FBT002
+    def __init__(self, source: str | None = None, *, required: bool = False, **kwargs: dict[str, any]) -> None:  # noqa: ARG002 (for DRF compatibility)
         """Define basic parameters of the field.
 
         Parameters:
