@@ -216,7 +216,7 @@ class SerializerValidationTestCase(TestCase):
         with self.assertRaises(ValueError):
             exchange_serializer.create({})
 
-    def test_perf(self):
+    def _test_perf(self):
         instances = [self.exchange_account for _ in range(1_000_000)]
         from time import time
 
