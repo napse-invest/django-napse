@@ -91,6 +91,7 @@ class MetaSerializer(type):
 
 class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
     Model = None
+    is_read_only_serializer = False
 
     def __init__(self, instance=None, data=None, many=False, **kwargs):  # noqa
         self._instance = instance
@@ -173,12 +174,20 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
 
         Please to not use this method.
         """
+        if self.is_read_only_serializer:
+            error_msg: str = "This serializer is read only."
+            raise ValueError(error_msg)
+
         if isinstance(data, (str, int, uuid.UUID)):
             return self.get(uuid_or_id=data)
 
         return self.validate_data(data)
 
     def _model_checks(self, validated_data):  # noqa
+        if self.is_read_only_serializer:
+            error_msg: str = "This serializer is read only."
+            raise ValueError(error_msg)
+
         if not self.Model:
             error_msg: str = "Model is not defined."
             raise ValueError(error_msg)
