@@ -3,6 +3,7 @@ from typing import Optional
 from django.db import models
 
 from django_napse.core.models.bots.managers import ArchitectureManager
+from django_napse.core.models.wallets.currency import CurrencyPydantic
 from django_napse.utils.constants import ORDER_LEEWAY_PERCENTAGE, PLUGIN_CATEGORIES, SIDES
 from django_napse.utils.errors.orders import OrderError
 from django_napse.utils.findable_class import FindableClass
@@ -131,12 +132,14 @@ class Architecture(models.Model, FindableClass):
                     error_msg = f"Order on {order['pair']} has a side of {order['side']} but an amount of 0."
                     raise OrderError.ProcessError(error_msg)
             for ticker, amount in required_amount.items():
-                if amount > no_db_data["connection_data"][connection]["wallet"]["currencies"].get(ticker, {"amount": 0})["amount"] / (
-                    1 + (ORDER_LEEWAY_PERCENTAGE + 1) / 100
-                ):
-                    available = no_db_data["connection_data"][connection]["wallet"]["currencies"].get(ticker, {"amount": 0})["amount"] / (
-                        1 + (ORDER_LEEWAY_PERCENTAGE + 1) / 100
-                    )
+                if amount > no_db_data["connection_data"][connection]["wallet"].currencies.get(
+                    ticker,
+                    CurrencyPydantic(ticker=ticker, amount=0, mbp=0),
+                ).amount / (1 + (ORDER_LEEWAY_PERCENTAGE + 1) / 100):
+                    available = no_db_data["connection_data"][connection]["wallet"].currencies.get(
+                        ticker,
+                        CurrencyPydantic(ticker=ticker, amount=0, mbp=0),
+                    ).amount / (1 + (ORDER_LEEWAY_PERCENTAGE + 1) / 100)
                     for order in [_order for _order in orders if _order["asked_for_ticker"] == ticker]:
                         order["asked_for_amount"] *= available / amount
             all_orders += orders

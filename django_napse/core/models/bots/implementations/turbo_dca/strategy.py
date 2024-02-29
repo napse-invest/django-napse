@@ -6,6 +6,7 @@ from django_napse.core.models.bots.architectures.single_pair import SinglePairAr
 from django_napse.core.models.bots.implementations.turbo_dca.config import TurboDCABotConfig
 from django_napse.core.models.bots.plugins import LBOPlugin, MBPPlugin, SBVPlugin
 from django_napse.core.models.bots.strategy import Strategy
+from django_napse.core.models.wallets.currency import CurrencyPydantic
 from django_napse.utils.constants import SIDES
 
 
@@ -46,8 +47,16 @@ class TurboDCAStrategy(Strategy):
             mbp = data["connection_data"][data["connection"]]["connection_specific_args"]["mbp"].get_value()
             lbo = data["connection_data"][data["connection"]]["connection_specific_args"]["lbo"].get_value()
             sbv = data["connection_data"][data["connection"]]["connection_specific_args"]["sbv"].get_value()
-            available_base = data["connection_data"][data["connection"]]["wallet"]["currencies"].get(controller.base, {"amount": 0})["amount"]
-            available_quote = data["connection_data"][data["connection"]]["wallet"]["currencies"].get(controller.quote, {"amount": 0})["amount"]
+            available_base = (
+                data["connection_data"][data["connection"]]["wallet"]
+                .currencies.get(controller.base, CurrencyPydantic(ticker=controller.base, amount=0, mbp=0))
+                .amount
+            )
+            available_quote = (
+                data["connection_data"][data["connection"]]["wallet"]
+                .currencies.get(controller.quote, CurrencyPydantic(ticker=controller.quote, amount=0, mbp=0))
+                .amount
+            )
             mbp = mbp if mbp is not None else math.inf
             sbv = sbv if sbv is not None else available_quote
             current_price = data["candles"][controller]["latest"]["close"]

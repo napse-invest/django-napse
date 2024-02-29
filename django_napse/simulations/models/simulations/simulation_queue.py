@@ -11,6 +11,7 @@ from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.core.models.transactions.credit import Credit
+from django_napse.core.models.wallets.currency import CurrencyPydantic
 from django_napse.simulations.models.datasets.dataset import Candle, DataSet
 from django_napse.simulations.models.simulations.managers import SimulationQueueManager
 from django_napse.utils.constants import EXCHANGE_INTERVALS, ORDER_LEEWAY_PERCENTAGE, ORDER_STATUS, SIDES, SIMULATION_STATUS
@@ -93,7 +94,7 @@ class SimulationQueue(models.Model):
                 min_interval = interval
                 break
 
-        currencies = next(iter(no_db_data["connection_data"].values()))["wallet"]["currencies"]
+        currencies = next(iter(no_db_data["connection_data"].values()))["wallet"].currencies
 
         exchange_controllers = {controller: controller.exchange_controller for controller in bot.controllers.values()}
 
@@ -179,18 +180,25 @@ class SimulationQueue(models.Model):
     ):
         current_amounts = {}
         for controller in candle_data:
-            current_amounts[f"{controller.base}_amount"] = currencies.get(controller.base, {"amount": 0})["amount"]
-            current_amounts[f"{controller.quote}_amount"] = currencies.get(controller.quote, {"amount": 0})["amount"]
+            current_amounts[f"{controller.base}_amount"] = currencies.get(
+                controller.base,
+                CurrencyPydantic(ticker=controller.base, amount=0, mbp=0),
+            ).amount
+
+            current_amounts[f"{controller.quote}_amount"] = currencies.get(
+                controller.quote,
+                CurrencyPydantic(ticker=controller.quote, amount=0, mbp=0),
+            ).amount
 
         wallet_value = 0
         for ticker, currency in currencies.items():
-            amount = currency["amount"]
+            amount = currency.amount
             price = 1 if ticker == "USDT" else current_prices[f"{ticker}_price"]
             wallet_value += amount * price
 
         wallet_value_before = 0
         for ticker, currency in currencies_before.items():
-            amount = currency["amount"]
+            amount = currency.amount
             price = 1 if ticker == "USDT" else current_prices[f"{ticker}_price"]
             wallet_value_before += amount * price
 
@@ -232,7 +240,7 @@ class SimulationQueue(models.Model):
             for order in orders:
                 debited_amount = order["asked_for_amount"] * (1 + ORDER_LEEWAY_PERCENTAGE / 100)
                 if debited_amount > 0:
-                    currencies[order["asked_for_ticker"]]["amount"] -= debited_amount
+                    currencies[order["asked_for_ticker"]].amount -= debited_amount
                 order["debited_amount"] = debited_amount
 
                 controller = order["controller"]
@@ -281,10 +289,10 @@ class SimulationQueue(models.Model):
                         currencies=currencies,
                     )
 
-                    currencies[controller.base] = currencies.get(controller.base, {"amount": 0, "mbp": 0})
-                    currencies[controller.quote] = currencies.get(controller.quote, {"amount": 0, "mbp": 0})
-                    currencies[controller.base]["amount"] += order.exit_amount_base
-                    currencies[controller.quote]["amount"] += order.exit_amount_quote
+                    currencies[controller.base] = currencies.get(controller.base, CurrencyPydantic(ticker=controller.base, amount=0, mbp=0))
+                    currencies[controller.quote] = currencies.get(controller.quote, CurrencyPydantic(ticker=controller.quote, amount=0, mbp=0))
+                    currencies[controller.base].amount += order.exit_amount_base
+                    currencies[controller.quote].amount += order.exit_amount_quote
 
                 all_orders += orders
 
@@ -344,7 +352,7 @@ class SimulationQueue(models.Model):
         amounts = []
         tickers = []
         extras = {csa.key: [] for csa in next(iter(no_db_data["connection_data"].values()))["connection_specific_args"].values()}
-        currencies = bot.connections.all()[0].wallet.to_dict()["currencies"]
+        currencies = bot.connections.all()[0].wallet.to_dict().currencies
         for date, candle_data in data.items():
             currencies_before = deepcopy(currencies)
             processed_data, current_prices = self.process_candle_data(
@@ -375,7 +383,7 @@ class SimulationQueue(models.Model):
                     order.process_payout()
                 all_orders += orders
 
-            currencies = bot.connections.all()[0].wallet.to_dict()["currencies"]
+            currencies = bot.connections.all()[0].wallet.to_dict().currencies
             self.append_data(
                 connection_specific_args=bot.connections.all()[0].to_dict()["connection_specific_args"],
                 candle_data=candle_data,

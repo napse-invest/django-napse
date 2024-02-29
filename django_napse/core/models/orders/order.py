@@ -68,7 +68,7 @@ class Order(models.Model):
 
     objects = OrderManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"ORDER: {self.pk=}"
 
     def info(self, verbose=True, beacon=""):
@@ -156,8 +156,8 @@ class Order(models.Model):
 
     def passed(self, batch: Optional[OrderBatch] = None):
         batch = batch or self.batch
-        if (self.side == SIDES.BUY and (batch.status == ORDER_STATUS.PASSED or batch.status == ORDER_STATUS.ONLY_BUY_PASSED)) or (
-            self.side == SIDES.SELL and (batch.status == ORDER_STATUS.PASSED or batch.status == ORDER_STATUS.ONLY_SELL_PASSED)
+        if (self.side == SIDES.BUY and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_BUY_PASSED))) or (
+            self.side == SIDES.SELL and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_SELL_PASSED))
         ):
             return True
         return False
@@ -186,7 +186,7 @@ class Order(models.Model):
             modifications=[modification.find() for modification in self.modifications.all()],
             strategy=self.connection.bot.strategy.find(),
             architecture=self.connection.bot.architecture.find(),
-            currencies=self.connection.wallet.to_dict()["currencies"],
+            currencies=self.connection.wallet.to_dict().currencies,
         )
         for modification in modifications:
             modification.save()
