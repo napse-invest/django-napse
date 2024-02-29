@@ -184,7 +184,6 @@ class SimulationQueue(models.Model):
                 controller.base,
                 CurrencyPydantic(ticker=controller.base, amount=0, mbp=0),
             ).amount
-
             current_amounts[f"{controller.quote}_amount"] = currencies.get(
                 controller.quote,
                 CurrencyPydantic(ticker=controller.quote, amount=0, mbp=0),
