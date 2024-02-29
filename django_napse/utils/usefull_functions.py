@@ -5,10 +5,12 @@ from pytz import UTC
 
 
 def calculate_mbp(value: str, current_value: float, order, currencies: dict) -> float:
+    from django_napse.core.models.wallets.currency import CurrencyPydantic
+
     ticker, price = value.split("|")
     price = float(price)
 
-    current_amount = currencies.get(ticker, {"amount": 0})["amount"]
+    current_amount = currencies.get(ticker, CurrencyPydantic(ticker=ticker, amount=0, mbp=0)).amount
     current_value = current_value if current_value is not None else 0
     received_quote = order.debited_amount - order.exit_amount_quote
     return (current_amount * current_value + received_quote) / (received_quote / price + current_amount)

@@ -1,15 +1,18 @@
 from __future__ import annotations
 
 import uuid
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from django.db import models
 
 from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
-from django_napse.core.models.wallets.wallet import SpaceSimulationWallet, SpaceWallet
 from django_napse.utils.errors import BotError
+
+if TYPE_CHECKING:
+    from django_napse.core.models.wallets.space_simulation_wallet import SpaceSimulationWallet
+    from django_napse.core.models.wallets.space_wallet import SpaceWallet
 
 
 class Bot(models.Model):

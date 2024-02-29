@@ -2,7 +2,7 @@ import requests
 from django.core.exceptions import ValidationError
 
 from django_napse.core.models.bots.controller import Controller
-from django_napse.core.tasks.base_tasks import BaseTask
+from django_napse.core.tasks.base_task import BaseTask
 
 
 class CandleCollectorTask(BaseTask):
