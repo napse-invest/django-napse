@@ -39,13 +39,13 @@ class Plugin(models.Model, FindableClass):
         self = self.find()
         return self._connect(connection)
 
-    def _apply(self, data: dict) -> dict:
+    def apply__no_db(self, data: dict) -> dict:
         if self.__class__ == Plugin:
-            error_msg = "_apply not implemented for the Plugin base class, please implement it in a subclass."
+            error_msg = "apply__no_db not implemented for the Plugin base class, please implement it in a subclass."
         else:
-            error_msg = f"_apply not implemented for the Plugin base class, please implement it in the {self.__class__} class."
+            error_msg = f"apply__no_db not implemented for the Plugin base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
 
     def apply(self, data: dict) -> dict:
         self = self.find()
-        return self._apply(data)
+        return self.apply__no_db(data)

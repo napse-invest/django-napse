@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Optional
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
 
+from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.bots.managers.controller import ControllerManager
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, ORDER_STATUS, SIDES, STABLECOINS
@@ -195,10 +196,10 @@ class Controller(models.Model):
 
         if aggregated_order["buy_amount"] > 0:
             for order in no_db_data["buy_orders"]:
-                order._calculate_batch_share(total=aggregated_order["buy_amount"])
+                order.calculate_batch_share(total=aggregated_order["buy_amount"])
         if aggregated_order["sell_amount"] > 0:
             for order in no_db_data["sell_orders"]:
-                order._calculate_batch_share(total=aggregated_order["sell_amount"])
+                order.calculate_batch_share(total=aggregated_order["sell_amount"])
         for order in no_db_data["keep_orders"]:
             order.batch_share = 0
 
@@ -209,21 +210,21 @@ class Controller(models.Model):
         )
         all_orders = []
         for order in no_db_data["buy_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts=executed_amounts_buy,
                 fees=fees_buy,
             )
             all_orders.append(order)
         for order in no_db_data["sell_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts=executed_amounts_sell,
                 fees=fees_sell,
             )
             all_orders.append(order)
         for order in no_db_data["keep_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts={},
                 fees={},
@@ -254,8 +255,8 @@ class Controller(models.Model):
         """
         orders = []
         for bot in self.bots.all().filter(is_simulation=False, fleet__running=True, can_trade=True):
-            bot = bot.find()
-            orders.append(bot.give_order(closed_candle, current_candle))
+            bot: "Bot"
+            orders = [*orders, bot.give_order(closed_candle, current_candle)]
         return orders
 
     @staticmethod
@@ -289,8 +290,6 @@ class Controller(models.Model):
                 print("SSLError in get_price_always")
             except ConnectionError:
                 print("ConnectionError in get_price_always")
-            except Exception as e:
-                print(f"Exception in get_price_always: {e}, {type(e)}")
         else:
             error_msg = f"Exchange controller not supported: {exchange_controller.__class__}"
             raise NotImplementedError(error_msg)

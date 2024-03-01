@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from django.db import models
 
@@ -8,6 +8,11 @@ from django_napse.core.models.transactions.debit import Debit
 from django_napse.core.models.transactions.transaction import Transaction
 from django_napse.utils.constants import EXCHANGE_PAIRS, MODIFICATION_STATUS, ORDER_STATUS, SIDES, TRANSACTION_TYPES
 from django_napse.utils.errors import OrderError
+
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.exchange import ExchangeAccount
+    from django_napse.core.models.bots.controller import Controller
+    from django_napse.core.models.modifications.modification import Modification
 
 
 class OrderBatch(models.Model):
@@ -71,7 +76,16 @@ class Order(models.Model):
     def __str__(self) -> str:
         return f"ORDER: {self.pk=}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Order ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
@@ -111,14 +125,36 @@ class Order(models.Model):
         return string
 
     @property
-    def testing(self):
+    def testing(self) -> bool:
+        """Whether the order is in testing mode.
+
+        Returns:
+            bool: Whether the order is in testing mode.
+        """
         return self.connection.testing
 
     @property
-    def exchange_account(self):
+    def exchange_account(self) -> "ExchangeAccount":
+        """Return the exchange account of the order.
+
+        Returns:
+            ExchangeAccount: The exchange account of the order.
+        """
         return self.connection.wallet.exchange_account
 
-    def _calculate_exit_amounts(self, controller, executed_amounts: dict, fees: dict) -> None:
+    def calculate_exit_amounts(self, controller: "Controller", executed_amounts: dict, fees: dict) -> None:
+        """Calculate the exit amounts of the order.
+
+        Exit amounts are the amounts that will be received by the user after the order is completed.
+
+        Args:
+            controller (Controller): The controller associated with the order.
+            executed_amounts (dict): The amounts executed by the order.
+            fees (dict): The fees paid by the user.
+
+        Raises:
+            OrderError.ProcessError: If the side of the order is not SELL or BUY.
+        """
         if self.batch_share != 0:
             if self.side == SIDES.BUY:
                 if executed_amounts == {}:
@@ -151,10 +187,22 @@ class Order(models.Model):
             self.fees = 0
             self.fee_ticker = controller.base
 
-    def _calculate_batch_share(self, total: float):
+    def calculate_batch_share(self, total: float) -> None:
+        """Set the batch share of the order.
+
+        The batch share is the share of the total amount of the batch that the order represents.
+        """
         self.batch_share = self.asked_for_amount / total
 
-    def passed(self, batch: Optional[OrderBatch] = None):
+    def passed(self, batch: Optional[OrderBatch] = None) -> bool:
+        """Whether the order passed or not.
+
+        Args:
+            batch (Optional[OrderBatch], optional): The batch to check. Defaults to None.
+
+        Returns:
+            bool: Whether the order passed or not.
+        """
         batch = batch or self.batch
         if (self.side == SIDES.BUY and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_BUY_PASSED))) or (
             self.side == SIDES.SELL and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_SELL_PASSED))
@@ -162,17 +210,28 @@ class Order(models.Model):
             return True
         return False
 
-    def _apply_modifications(self, batch, modifications, **kwargs):
+    def apply_modifications__no_db(
+        self,
+        batch: "OrderBatch",
+        modifications: list["Modification"],
+        **kwargs: dict,
+    ) -> tuple[list["models.Model"], list["Modification"]]:
+        """Apply the modifications to the order.
+
+        Returns:
+            all_modifications (list[Modification]): The modifications applied to the order.
+
+        """
         all_modifications = []
         all_modified_objects = []
         if self.passed(batch):
             for modification in modifications:
-                modified_object, modification_object = modification._apply(order=self, **kwargs)
+                modified_object, modification_object = modification.apply__no_db(order=self, **kwargs)
                 all_modifications.append(modification_object)
                 all_modified_objects.append(modified_object)
         else:
             for modification in [modification for modification in modifications if modification.ignore_failed_order]:
-                modified_object, modification_object = modification._apply(order=self, **kwargs)
+                modified_object, modification_object = modification.apply__no_db(order=self, **kwargs)
                 all_modifications.append(modification_object)
                 all_modified_objects.append(modified_object)
             for modification in [modification for modification in modifications if not modification.ignore_failed_order]:
@@ -180,8 +239,13 @@ class Order(models.Model):
                 all_modifications.append(modification)
         return all_modifications, all_modified_objects
 
-    def apply_modifications(self):
-        modifications, modified_objects = self._apply_modifications(
+    def apply_modifications(self) -> list["Modification"]:
+        """Apply the modifications to the order, and save them to the database.
+
+        Returns:
+            list[Modification]: The modifications applied to the order.
+        """
+        modifications, modified_objects = self.apply_modifications__no_db(
             batch=self.batch,
             modifications=[modification.find() for modification in self.modifications.all()],
             strategy=self.connection.bot.strategy.find(),
