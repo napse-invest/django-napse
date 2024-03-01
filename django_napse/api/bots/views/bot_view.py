@@ -6,7 +6,7 @@ from rest_framework_api_key.permissions import HasAPIKey
 from django_napse.api.bots.serializers.bot_serializers import BotDetailSerializer, BotSerializer
 from django_napse.api.custom_permissions import HasSpace
 from django_napse.api.custom_viewset import CustomViewSet
-from django_napse.core.models import Bot, NapseSpace
+from django_napse.core.models import Bot, Space
 from django_napse.utils.errors import APIError
 
 
@@ -28,7 +28,7 @@ class BotView(CustomViewSet):
             ValueError: Space not found.
         """
         api_key = self.get_api_key(self.request)
-        spaces = NapseSpace.objects.all() if api_key.is_master_key else [permission.space for permission in api_key.permissions.all()]
+        spaces = Space.objects.all() if api_key.is_master_key else [permission.space for permission in api_key.permissions.all()]
 
         # Free bots across all available spaces
         if self.request.query_params.get("free", False):

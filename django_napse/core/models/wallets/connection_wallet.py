@@ -6,7 +6,7 @@ from django_napse.core.models.wallets.wallet import Wallet
 
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.exchange import ExchangeAccount
-    from django_napse.core.models.accounts.space import NapseSpace
+    from django_napse.core.models.accounts.space import Space
 
 
 class ConnectionWallet(Wallet):
@@ -18,7 +18,7 @@ class ConnectionWallet(Wallet):
         return f"WALLET: {self.pk=}. OWNER: {self.owner=}"
 
     @property
-    def space(self) -> "NapseSpace":
+    def space(self) -> "Space":
         """Return the space that owns the wallet."""
         return self.owner.space
 

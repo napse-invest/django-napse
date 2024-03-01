@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from django_napse.api.fleets.serializers import FleetSerializer
 from django_napse.api.wallets.serializers.wallet_serializers import WalletSerializer
-from django_napse.core.models import ExchangeAccount, NapseSpace, SpaceHistory
+from django_napse.core.models import ExchangeAccount, Space, SpaceHistory
 
 
 class SpaceSerializer(serializers.ModelSerializer):
@@ -13,7 +13,7 @@ class SpaceSerializer(serializers.ModelSerializer):
     delta = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = NapseSpace
+        model = Space
         fields = [
             "name",
             "description",
@@ -51,7 +51,7 @@ class SpaceSerializer(serializers.ModelSerializer):
             error_msg: str = "Exchange Account does not exist"
             raise serializers.ValidationError(error_msg) from None
 
-        return NapseSpace.objects.create(
+        return Space.objects.create(
             name=validated_data["name"],
             description=validated_data["description"],
             exchange_account=exchange_account,
@@ -66,7 +66,7 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
     history = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
-        model = NapseSpace
+        model = Space
         fields = [
             "name",
             "description",

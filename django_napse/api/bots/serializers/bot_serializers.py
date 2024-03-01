@@ -6,7 +6,7 @@ from rest_framework.fields import empty
 
 from django_napse.api.orders.serializers import OrderSerializer
 from django_napse.api.wallets.serializers import WalletSerializer
-from django_napse.core.models import Bot, BotHistory, ConnectionWallet, NapseSpace, Order
+from django_napse.core.models import Bot, BotHistory, ConnectionWallet, Order, Space
 
 
 class BotSerializer(serializers.ModelSerializer):
@@ -39,7 +39,7 @@ class BotSerializer(serializers.ModelSerializer):
         self,
         instance: Bot = None,
         data: dict[str, any] = empty,
-        space: NapseSpace = None,
+        space: Space = None,
         **kwargs: dict[str, any],
     ) -> None:
         """Add space to the serializer and run the default constructor."""
@@ -108,7 +108,7 @@ class BotDetailSerializer(serializers.ModelSerializer):
         self,
         instance: Bot = None,
         data: dict[str, any] = empty,
-        space: NapseSpace = None,
+        space: Space = None,
         **kwargs: dict[str, any],
     ) -> None:
         """Add space to the serializer and run the default constructor."""

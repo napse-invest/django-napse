@@ -6,7 +6,7 @@ from rest_framework_api_key.permissions import HasAPIKey
 from django_napse.api.custom_permissions import HasSpace
 from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.api.fleets.serializers import FleetDetailSerializer, FleetMoneyFlowSerializer, FleetSerializer
-from django_napse.core.models import Fleet, NapseSpace
+from django_napse.core.models import Fleet, Space
 
 
 class FleetView(CustomViewSet):
@@ -24,7 +24,7 @@ class FleetView(CustomViewSet):
         space_uuid = self.request.query_params.get("space", None)
         if space_uuid is None:
             return Fleet.objects.all()
-        self.get_space = NapseSpace.objects.get(uuid=space_uuid)
+        self.get_space = Space.objects.get(uuid=space_uuid)
         return self.get_space.fleets
 
     def get_serializer_class(self, *args, **kwargs):
@@ -78,10 +78,10 @@ class FleetView(CustomViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         # Get spaces from API key
-        spaces = NapseSpace.objects.all() if api_key.is_master_key else [permission.space for permission in api_key.permissions.all()]
+        spaces = Space.objects.all() if api_key.is_master_key else [permission.space for permission in api_key.permissions.all()]
         # Filter by specific space
         if space_uuid is not None:
-            space = NapseSpace.objects.get(uuid=space_uuid)
+            space = Space.objects.get(uuid=space_uuid)
             if space not in spaces:
                 return Response(status=status.HTTP_403_FORBIDDEN)
             spaces = [space]
