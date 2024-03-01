@@ -6,6 +6,8 @@ from django_napse.core.tasks.base_task import BaseTask
 
 
 class CandleCollectorTask(BaseTask):
+    """Task to collect candles from binance's api and send it to controllers."""
+
     name = "candle_collector"
     interval_time = 30
 
@@ -35,7 +37,7 @@ class CandleCollectorTask(BaseTask):
             error_msg = f"request_json is not a list ({type(request_json)})"
             raise ValidationError(error_msg)
 
-        if len(request_json) != 2:
+        if len(request_json) != 2:  # noqa
             error_msg = f"request_json must have 2 elements ({len(request_json)})"
             raise ValidationError(error_msg)
 
@@ -107,7 +109,8 @@ class CandleCollectorTask(BaseTask):
         for api in apis:
             request = self.request_get(pair, interval, api=api)
             # Valid request
-            if request.status_code == 200:
+            success_code = 200
+            if request.status_code == success_code:
                 return self.build_candle(request.json())
         # All requests failed
         error_msg = f"Impossible to get candles from binance's api (pair: {pair}, interval: {interval})"
@@ -119,18 +122,19 @@ class CandleCollectorTask(BaseTask):
         Try to get the results of request of binance's api and send it to controller(s).
         If the request failed, the controller(s) is add to a list and controller(s) is this list try again (on all binance's backup api) at the end.
         """
-        print("CandleCollectorTask")
-        if not self.avoid_overlap(verbose=True):
-            print("skipped")
+        if not self.avoid_overlap(verbose=False):
             return
+        self.info("Running CandleCollectorTask")
 
-        failed_controllers = []
-        failed_controllers_second_attempt = []
+        failed_controllers: list["Controller"] = []
+        failed_controllers_second_attempt: list["Controller"] = []
         all_orders = []
         for controller in Controller.objects.all():
             request = self.request_get(controller.pair, controller.interval, "api")
-            if request is None or request.status_code != 200:
-                self.logger.warn(f"Controller {controller.pk} failed on 'api'")
+            success_code = 200
+            if request is None or request.status_code != success_code:
+                warning = f"Controller {controller.pk} failed on 'api'"
+                self.warning(warning)
                 failed_controllers.append(controller)
                 continue
             closed_candle, current_candle = self.build_candle(request.json())
@@ -141,9 +145,11 @@ class CandleCollectorTask(BaseTask):
             success = False
             for api in backup_apis:
                 request = self.request_get(controller.pair, controller.interval, api)
-                if request is not None and request.status_code == 200:
+                success_code = 200
+                if request is not None and request.status_code == success_code:
                     closed_candle, current_candle = self.build_candle(request.json())
-                    self.logger.info(f"{controller} succeeded on '{api}'")
+                    info = f"{controller} succeeded on '{api}'"
+                    self.info(info)
                     success = True
                     break
             if success:
@@ -152,7 +158,8 @@ class CandleCollectorTask(BaseTask):
                 failed_controllers_second_attempt.append(controller)
 
         for controller in failed_controllers_second_attempt:
-            self.logger.error(f"{controller} failed on all apis")
+            error = f"{controller} failed on all apis"
+            self.error(error)
 
 
 CandleCollectorTask().delete_task()

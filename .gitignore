@@ -168,3 +168,4 @@ secrets.json
 full-requirements.txt
 .ruff_cache/
 *.sqlite3
+dump.rdb

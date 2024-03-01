@@ -6,7 +6,7 @@ from django_napse.core.models.accounts.managers.exchange import ExchangeAccountM
 from django_napse.utils.constants import EXCHANGE_TICKERS
 from django_napse.utils.errors import ExchangeAccountError
 from django_napse.utils.findable_class import FindableClass
-from django_napse.utils.trading.binance_controller import BinanceController
+from django_napse.utils.trading.binance_controller import BinanceController, ExchangeController
 
 
 class Exchange(models.Model):
@@ -78,7 +78,7 @@ class ExchangeAccount(models.Model, FindableClass):
         error_msg = f"create_client() not implemented for {self.__class__.__name__}"
         raise NotImplementedError(error_msg)
 
-    def exchange_controller(self):  # pragma: no cover # noqa
+    def exchange_controller(self) -> "ExchangeController":  # pragma: no cover # noqa
         error_msg = f"exchange_controller() not implemented for {self.__class__.__name__}"
         raise NotImplementedError(error_msg)
 

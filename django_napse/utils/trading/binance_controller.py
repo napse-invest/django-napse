@@ -16,7 +16,11 @@ from django_napse.utils.constants import DEFAULT_TAX, DOWNLOAD_STATUS, SIDES
 from django_napse.utils.usefull_functions import round_down, round_up
 
 
-class BinanceController:
+class ExchangeController:
+    pass
+
+
+class BinanceController(ExchangeController):
     """Commmunication interface with binance account."""
 
     def __init__(self, public_key, private_key):
@@ -325,8 +329,9 @@ class BinanceController:
         controller,
         start_date: datetime,
         end_date: datetime,
-        squash: bool = False,
         verbose: int = 0,
+        *,
+        squash: bool = False,
     ):
         """Download all the missing data to complete the dataset."""
         DataSet = apps.get_model("django_napse_simulations", "DataSet")

@@ -39,7 +39,7 @@ class Wallet(models.Model, FindableClass):
         return f"WALLET: {self.pk=}"
 
     def info(self, beacon: str = "", *, verbose: bool = True) -> str:
-        """Return a string with the history information.
+        """Return a string with the model information.
 
         Args:
             beacon (str, optional): The prefix for each line. Defaults to "".
@@ -211,10 +211,10 @@ class Wallet(models.Model, FindableClass):
         return curr.amount
 
     def value_mbp(self) -> float:
-        """Return the value of the wallet in USD.
+        """Return the value of the wallet in USDT.
 
         Returns:
-            float: The value of the wallet in USD.
+            float: The value of the wallet in USDT.
         """
         value = 0
         for currency in self.currencies.all():
@@ -224,10 +224,10 @@ class Wallet(models.Model, FindableClass):
         return value
 
     def value_market(self) -> float:
-        """Return the value of the wallet in USD.
+        """Return the value of the wallet in USDT.
 
         Returns:
-            float: The value of the wallet in USD.
+            float: The value of the wallet in USDT.
         """
         value = 0
         for currency in self.currencies.all():
