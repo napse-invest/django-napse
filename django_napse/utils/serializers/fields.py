@@ -23,7 +23,7 @@ class Field:
 
         Parameters:
             required: bool
-                Define if the field is required.
+                Define if the field is required. Only used for validation.
             source: str
                 Define the source of the field in the model (ex: `exchange.name`).
         """
