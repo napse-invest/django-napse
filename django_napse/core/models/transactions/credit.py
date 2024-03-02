@@ -4,6 +4,8 @@ from django_napse.core.models.transactions.managers import CreditManager
 
 
 class Credit(models.Model):
+    """Credit action on a wallet."""
+
     wallet = models.ForeignKey("Wallet", on_delete=models.CASCADE, related_name="credits")
     amount = models.FloatField()
     ticker = models.CharField(max_length=10)
@@ -12,10 +14,19 @@ class Credit(models.Model):
 
     objects = CreditManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"DEBIT: {self.pk})"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Credit {self.pk=}\n"
         string += f"{beacon}Args:\n"
