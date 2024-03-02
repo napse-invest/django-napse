@@ -18,7 +18,14 @@ class Field:
     # Define if the getter method takes the serializer as argument.
     getter_takes_serializer = False
 
-    def __init__(self, source: str | None = None, *, required: bool = False, **kwargs: dict[str, any]) -> None:  # noqa: ARG002 (for DRF compatibility)
+    def __init__(
+        self,
+        *,
+        default: any | None = None,
+        source: str | None = None,
+        required: bool = False,
+        **kwargs: dict[str, any],  # noqa: ARG002 (for DRF compatibility)
+    ) -> None:
         """Define basic parameters of the field.
 
         Parameters:
@@ -29,6 +36,7 @@ class Field:
         """
         self.required = required
         self.source = source
+        self.default = default
 
     def to_value(self, value: any) -> any:
         """Overwrite this method for custom transformation on the serialized value."""

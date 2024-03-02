@@ -43,6 +43,7 @@ class MetaSerializer(type):
                 getter_is_generator = False
             return (
                 name,
+                field.default,
                 field.to_value,
                 getter,
                 field.getter_takes_serializer,
@@ -126,14 +127,35 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
         return self._serialize(instance, self.compiled_fields)
 
     def _serialize(self, instance, fields):  # noqa
-        serialized_instance = {}
-        for name, to_value, getter, getter_takes_serializer, getter_is_generator in fields:
+        def _get_value(instance, getter, getter_takes_serializer, getter_is_generator):  # noqa
             if getter_is_generator:
                 value = instance
                 for get in getter:
                     value = get(value)
             else:
                 value = getter(self, instance) if getter_takes_serializer else getter(instance)
+            return value
+
+        serialized_instance = {}
+        for name, default, to_value, getter, getter_takes_serializer, getter_is_generator in fields:
+            # Default wrapper around getter for optimization
+            if default is None:
+                value = _get_value(
+                    instance,
+                    getter,
+                    getter_takes_serializer,
+                    getter_is_generator,
+                )
+            else:
+                try:
+                    value = _get_value(
+                        instance,
+                        getter,
+                        getter_takes_serializer,
+                        getter_is_generator,
+                    )
+                except AttributeError:
+                    value = default
 
             if to_value:
                 value = to_value(value)
