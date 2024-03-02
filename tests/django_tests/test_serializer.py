@@ -108,6 +108,25 @@ class SerializerSerializationTestCase(TestCase):
             serializer_cls=exchange_account_serializer,
         )
 
+    def test_many_source_serialization(self):
+        exchange_account_serializer = ExchangeAccountSerializer
+        exchange_account_serializer.fields_map["exchange"] = StrField(source="exchange.name")
+        exchange_account_serializer.compiled_fields = MetaSerializer._compile_fields(  # noqa: SLF001
+            fields=exchange_account_serializer.fields_map,
+            serializer_cls=exchange_account_serializer,
+        )
+        exchange_account_serializer = exchange_account_serializer(instance=[self.exchange_account for _ in range(10)], many=True)
+        data = exchange_account_serializer.data
+        self.assertEqual(len(data), 10)
+
+        # reset
+        exchange_account_serializer = ExchangeAccountSerializer
+        exchange_account_serializer.fields_map["exchange"] = ExchangeSerializer()
+        exchange_account_serializer.compiled_fields = MetaSerializer._compile_fields(  # noqa: SLF001
+            fields=exchange_account_serializer.fields_map,
+            serializer_cls=exchange_account_serializer,
+        )
+
 
 class SerializerValidationTestCase(TestCase):
     def setUp(self):
