@@ -1,24 +1,40 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from django.db import models
 
 from django_napse.core.models.bots.managers.strategy import StrategyManager
 from django_napse.utils.findable_class import FindableClass
 
+if TYPE_CHECKING:
+    from django_napse.core.models.bots.architecture import Architecture
+    from django_napse.core.models.bots.bot import Bot
+    from django_napse.core.models.bots.config import BotConfig
+
 
 class Strategy(models.Model, FindableClass):
     """Define the bot's buying and selling logic."""
 
-    config = models.OneToOneField("BotConfig", on_delete=models.CASCADE, related_name="strategy")
-    architecture = models.OneToOneField("Architecture", on_delete=models.CASCADE, related_name="strategy")
+    config: "BotConfig" = models.OneToOneField("BotConfig", on_delete=models.CASCADE, related_name="strategy")
+    architecture: "Architecture" = models.OneToOneField("Architecture", on_delete=models.CASCADE, related_name="strategy")
+    bot: "Bot"
 
     objects = StrategyManager()
 
     def __str__(self) -> str:  # pragma: no cover
         return f"STRATEGY {self.pk}"
 
-    def info(self, verbose: bool = True, beacon: str = "") -> str:  # noqa: FBT001, FBT002
-        """Return info on the Strategy."""
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Strategy {self.pk}:\n"
         string += f"{beacon}Args:\n"
@@ -58,7 +74,7 @@ class Strategy(models.Model, FindableClass):
         raise NotImplementedError(error_msg)
 
     @classmethod
-    def architecture_class(cls) -> "Architecture":  # noqa: F821
+    def architecture_class(cls) -> "Architecture":
         """Return the class of the associated architecture."""
         return cls._meta.get_field("architecture").related_model
 

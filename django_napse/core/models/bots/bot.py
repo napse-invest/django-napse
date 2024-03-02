@@ -13,6 +13,7 @@ from django_napse.utils.errors import BotError
 if TYPE_CHECKING:
     from django_napse.core.models.wallets.space_simulation_wallet import SpaceSimulationWallet
     from django_napse.core.models.wallets.space_wallet import SpaceWallet
+    from django_napse.core.pydantic.connection import ConnectionPyanctic
 
 
 class Bot(models.Model):
@@ -134,10 +135,10 @@ class Bot(models.Model):
         self.active = False
         self.save()
 
-    def get_connections(self):
+    def get_connections(self) -> list["Connection"]:
         return list(self.connections.all())
 
-    def get_connection_data(self):
+    def get_connection_data(self) -> dict["Connection", "ConnectionPyanctic"]:
         return {connection: connection.to_dict() for connection in self.get_connections()}
 
     def get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):

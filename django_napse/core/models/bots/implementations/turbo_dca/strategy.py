@@ -6,7 +6,7 @@ from django_napse.core.models.bots.architectures.single_pair import SinglePairAr
 from django_napse.core.models.bots.implementations.turbo_dca.config import TurboDCABotConfig
 from django_napse.core.models.bots.plugins import LBOPlugin, MBPPlugin, SBVPlugin
 from django_napse.core.models.bots.strategy import Strategy
-from django_napse.core.models.wallets.currency import CurrencyPydantic
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.utils.constants import SIDES
 
 
@@ -16,7 +16,16 @@ class TurboDCAStrategy(Strategy):
     def __str__(self) -> str:
         return f"TURBO DCA BOT STRATEGY: {self.pk=}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Strategy ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
@@ -44,17 +53,17 @@ class TurboDCAStrategy(Strategy):
             self.variable_last_buy_date is None
             or data["candles"][controller]["current"]["open_time"] - self.variable_last_buy_date >= data["config"]["timeframe"]
         ):
-            mbp = data["connection_data"][data["connection"]]["connection_specific_args"]["mbp"].get_value()
-            lbo = data["connection_data"][data["connection"]]["connection_specific_args"]["lbo"].get_value()
-            sbv = data["connection_data"][data["connection"]]["connection_specific_args"]["sbv"].get_value()
+            mbp = data.connection_data[data["connection"]].connection_specific_args["mbp"].get_value()
+            lbo = data.connection_data[data["connection"]].connection_specific_args["lbo"].get_value()
+            sbv = data.connection_data[data["connection"]].connection_specific_args["sbv"].get_value()
             available_base = (
-                data["connection_data"][data["connection"]]["wallet"]
-                .currencies.get(controller.base, CurrencyPydantic(ticker=controller.base, amount=0, mbp=0))
+                data.connection_data[data["connection"]]
+                .wallet.currencies.get(controller.base, CurrencyPydantic(ticker=controller.base, amount=0, mbp=0))
                 .amount
             )
             available_quote = (
-                data["connection_data"][data["connection"]]["wallet"]
-                .currencies.get(controller.quote, CurrencyPydantic(ticker=controller.quote, amount=0, mbp=0))
+                data.connection_data[data["connection"]]
+                .wallet.currencies.get(controller.quote, CurrencyPydantic(ticker=controller.quote, amount=0, mbp=0))
                 .amount
             )
             mbp = mbp if mbp is not None else math.inf

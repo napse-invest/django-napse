@@ -17,7 +17,16 @@ class BotConfig(models.Model, FindableClass):
     def __str__(self) -> str:  # pragma: no cover
         return f"BOT CONFIG: {self.pk}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}BotConfig: ({self.pk=})\n"
         string += f"{beacon}Args:\n"

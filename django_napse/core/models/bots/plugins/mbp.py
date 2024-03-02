@@ -18,7 +18,7 @@ class MBPPlugin(Plugin):
                     "value": new_mbp,
                     "target_type": "plugin_mbp",
                     "ignore_failed_order": False,
-                    "connection_specific_arg": data["connection_data"][data["connection"]]["connection_specific_args"]["mbp"],
+                    "connection_specific_arg": data.connection_data[data["connection"]].connection_specific_args["mbp"],
                 },
             ]
         return data

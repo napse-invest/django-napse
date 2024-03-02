@@ -1,36 +1,29 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Literal, Optional, TypeVar, Union
 
-import pydantic
 from django.db import models
 
 from django_napse.core.models.bots.managers import ArchitectureManager
-from django_napse.core.models.wallets.currency import CurrencyPydantic
+from django_napse.core.models.bots.plugin import Plugin
+from django_napse.core.models.connections.connection import Connection
+from django_napse.core.pydantic.currency import CurrencyPydantic
+from django_napse.core.pydantic.trading_data import TradingDataclass
 from django_napse.utils.constants import ORDER_LEEWAY_PERCENTAGE, PLUGIN_CATEGORIES, SIDES
 from django_napse.utils.errors.orders import OrderError
 from django_napse.utils.findable_class import FindableClass
 
 if TYPE_CHECKING:
-    # from django_napse.core.models.bots.config import BotConfig
     from django_napse.core.models.bots.controller import Controller
-    from django_napse.core.models.bots.plugin import Plugin
     from django_napse.core.models.bots.strategy import Strategy
-    from django_napse.core.models.connections.connection import Connection
 
 
-class DBDataPydantic(pydantic.BaseModel):
-    strategy: "Strategy"
-    config: dict[str, any]
-    architecture: "Architecture"
-    controllers: dict[str, "Controller"]
-    connections: list["Connection"]
-    connection_data: dict["Connection", dict[str, any]]
-    plugins: dict[str, list["Plugin"]]
+T = TypeVar("T", bound="Architecture")
 
 
 class Architecture(models.Model, FindableClass):
     """Define how the bot will get data."""
 
     objects = ArchitectureManager()
+    strategy: "Strategy"
 
     def __str__(self) -> str:
         return f"ARCHITECHTURE {self.pk}"
@@ -52,14 +45,16 @@ class Architecture(models.Model, FindableClass):
             error_msg = f"get_candles not implemented for the Architecture base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
 
-    def copy(self):  # pragma: no cover # noqa: ANN201, D102
+    def copy(self: T) -> T:  # pragma: no cover
+        """Return a copy of the architecture."""
         if self.__class__ == Architecture:
             error_msg = "copy not implemented for the Architecture base class, please implement it in a subclass."
         else:
             error_msg = f"copy not implemented for the Architecture base class, please implement it in the {self.__class__} class."
         raise NotImplementedError(error_msg)
 
-    def controllers_dict(self):  # pragma: no cover # noqa: ANN201, D102
+    def controllers_dict(self) -> dict[str, "Controller"]:  # pragma: no cover
+        """Return a dictionary containing all the controllers used by the architecture."""
         if self.__class__ == Architecture:
             error_msg = "controllers_dict not implemented for the Architecture base class, please implement it in a subclass."
         else:
@@ -107,33 +102,45 @@ class Architecture(models.Model, FindableClass):
             "extras": self.get_extras(),
         }
 
-    def prepare_db_data(self) -> dict[str, any]:
+    def prepare_db_data(
+        self,
+    ) -> dict[
+        Literal[
+            "strategy",
+            "config",
+            "architecture",
+            "controllers",
+            "connections",
+            "connection_data",
+            "plugins",
+        ],
+        Union[
+            "Strategy",
+            dict[str, any],
+            "Architecture",
+            dict[str, "Controller"],
+            list["Connection"],
+            dict["Connection", dict[str, any]],
+            dict[str, list["Plugin"]],
+        ],
+    ]:
         """Return the data that is needed to give orders."""
-        # return DBDataPydantic(
+        # return TradingDataclass(
         #     strategy=self.strategy.find(),
-        #     config=self.strategy.find().config.find(),
+        #     config=self.strategy.find().config.find().settings,
         #     architecture=self.find(),
         #     controllers=self.controllers_dict(),
         #     connections=self.strategy.bot.get_connections(),
         #     connection_data=self.strategy.bot.get_connection_data(),
         #     plugins={category: self.strategy.plugins.filter(category=category) for category in PLUGIN_CATEGORIES},
         # )
-        return {
-            "strategy": self.strategy.find(),
-            "config": self.strategy.find().config.find().settings,
-            "architecture": self.find(),
-            "controllers": self.controllers_dict(),
-            "connections": self.strategy.bot.get_connections(),
-            "connection_data": self.strategy.bot.get_connection_data(),
-            "plugins": {category: self.strategy.plugins.filter(category=category) for category in PLUGIN_CATEGORIES},
-        }
 
-    def _get_orders(self, data: dict, no_db_data: Optional[dict] = None) -> list[dict]:
+    def _get_orders(self, data: dict, no_db_data: Optional[TradingDataclass] = None) -> list[dict]:
         data = data or self.prepare_data()
         no_db_data = no_db_data or self.prepare_db_data()
-        strategy = no_db_data["strategy"]
-        connections = no_db_data["connections"]
-        architecture = no_db_data["architecture"]
+        strategy = no_db_data.strategy
+        connections = no_db_data.connections
+        architecture = no_db_data.architecture
         all_orders = []
         for connection in connections:
             new_data = {**data, **no_db_data, "connection": connection}
@@ -159,11 +166,11 @@ class Architecture(models.Model, FindableClass):
                     error_msg = f"Order on {order['pair']} has a side of {order['side']} but an amount of 0."
                     raise OrderError.ProcessError(error_msg)
             for ticker, amount in required_amount.items():
-                if amount > no_db_data["connection_data"][connection]["wallet"].currencies.get(
+                if amount > no_db_data.connection_data[connection].wallet.currencies.get(
                     ticker,
                     CurrencyPydantic(ticker=ticker, amount=0, mbp=0),
                 ).amount / (1 + (ORDER_LEEWAY_PERCENTAGE + 1) / 100):
-                    available = no_db_data["connection_data"][connection]["wallet"].currencies.get(
+                    available = no_db_data.connection_data[connection].wallet.currencies.get(
                         ticker,
                         CurrencyPydantic(ticker=ticker, amount=0, mbp=0),
                     ).amount / (1 + (ORDER_LEEWAY_PERCENTAGE + 1) / 100)

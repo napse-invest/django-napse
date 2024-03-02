@@ -4,11 +4,13 @@ from django.db import models
 
 from django_napse.core.models.connections.managers import ConnectionManager
 from django_napse.core.models.transactions.transaction import Transaction
+from django_napse.core.pydantic.connection import ConnectionDataclass
 from django_napse.utils.constants import TRANSACTION_TYPES
 from django_napse.utils.usefull_functions import process_value_from_type
 
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.space import NapseSpace
+    from django_napse.core.pydantic.connection import ConnectionPyanctic
 
 
 class Connection(models.Model):
@@ -82,13 +84,19 @@ class Connection(models.Model):
             transaction_type=TRANSACTION_TYPES.CONNECTION_WITHDRAW,
         )
 
-    def to_dict(self) -> dict[str, any]:
+    def to_dict(self) -> "ConnectionPyanctic":
         """Return a connection to a dictionary."""
-        return {
-            "connection": self,
-            "wallet": self.wallet.find().to_dict(),
-            "connection_specific_args": {arg.key: arg for arg in self.specific_args.all()},
-        }
+        # return {
+        #     "connection": self,
+        #     "wallet": self.wallet.find().to_dict(),
+        #     "connection_specific_args": {arg.key: arg for arg in self.specific_args.all()},
+        # }
+
+        return ConnectionDataclass(
+            connection=self,
+            wallet=self.wallet.find().to_dict(),
+            connection_specific_args={arg.key: arg for arg in self.specific_args.all()},
+        )
 
 
 class ConnectionSpecificArgs(models.Model):

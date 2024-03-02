@@ -1,29 +1,19 @@
 import time
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 from django.db import models
-from pydantic import BaseModel
 
 from django_napse.core.models.bots.controller import Controller
-from django_napse.core.models.wallets.currency import Currency, CurrencyPydantic
+from django_napse.core.models.wallets.currency import Currency
 from django_napse.core.models.wallets.managers import WalletManager
+from django_napse.core.pydantic.currency import CurrencyPydantic
+from django_napse.core.pydantic.wallet import WalletPydantic
 from django_napse.utils.errors import WalletError
 from django_napse.utils.findable_class import FindableClass
 
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.exchange import ExchangeAccount
     from django_napse.core.models.accounts.space import NapseSpace
-
-
-class WalletPydantic(BaseModel):
-    """A Pydantic model for the Wallet class."""
-
-    title: str
-    testing: bool
-    locked: bool
-    created_at: datetime
-    currencies: dict[str, CurrencyPydantic]
 
 
 class Wallet(models.Model, FindableClass):

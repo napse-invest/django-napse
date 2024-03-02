@@ -14,10 +14,10 @@ class LBOPlugin(Plugin):
             order["ConnectionModifications"] += [
                 {
                     "key": "lbo",
-                    "value": data["connection_data"][data["connection"]]["connection_specific_args"]["lbo"].get_value() + 1,
+                    "value": data.connection_data[data["connection"]].connection_specific_args["lbo"].get_value() + 1,
                     "target_type": "int",
                     "ignore_failed_order": False,
-                    "connection_specific_arg": data["connection_data"][data["connection"]]["connection_specific_args"]["lbo"],
+                    "connection_specific_arg": data.connection_data[data["connection"]].connection_specific_args["lbo"],
                 },
             ]
         if order["side"] == SIDES.SELL:
@@ -27,7 +27,7 @@ class LBOPlugin(Plugin):
                     "value": 0,
                     "target_type": "int",
                     "ignore_failed_order": False,
-                    "connection_specific_arg": data["connection_data"][data["connection"]]["connection_specific_args"]["lbo"],
+                    "connection_specific_arg": data.connection_data[data["connection"]].connection_specific_args["lbo"],
                 },
             ]
         return data

@@ -1,16 +1,21 @@
 from datetime import timedelta
+from typing import TYPE_CHECKING
 
 import pandas as pd
 from binance.helpers import interval_to_milliseconds
 from django.db import models
 
+from django_napse.core.pydantic.trading_data import CandleDataclass
 from django_napse.simulations.models.datasets.managers.dataset import DataSetManager
 from django_napse.utils.constants import DOWNLOAD_STATUS
 from django_napse.utils.errors import DataSetError
 
+if TYPE_CHECKING:
+    from django_napse.core.models.bots.controller import Controller
+
 
 class DataSet(models.Model):
-    controller = models.OneToOneField("django_napse_core.Controller", on_delete=models.CASCADE, related_name="dataset")
+    controller: "Controller" = models.OneToOneField("django_napse_core.Controller", on_delete=models.CASCADE, related_name="dataset")
     start_date = models.DateTimeField(null=True, blank=True)
     end_date = models.DateTimeField(null=True, blank=True)
 
@@ -114,7 +119,7 @@ class DataSet(models.Model):
 
 
 class Candle(models.Model):
-    dataset = models.ForeignKey("DataSet", on_delete=models.CASCADE, related_name="candles")
+    dataset: "DataSet" = models.ForeignKey("DataSet", on_delete=models.CASCADE, related_name="candles")
     open_time = models.DateTimeField()
     open = models.FloatField()
     high = models.FloatField()
@@ -144,16 +149,16 @@ class Candle(models.Model):
         return string
 
     def to_dict(self):
-        return {
-            "controller": self.dataset.controller,
-            "open_time": self.open_time,
-            "open": self.open,
-            "high": self.high,
-            "low": self.low,
-            "close": self.close,
-            "volume": self.volume,
-            "extra": {},
-        }
+        return CandleDataclass(
+            controller=self.dataset.controller,
+            open_time=self.open_time,
+            open=self.open,
+            high=self.high,
+            low=self.low,
+            close=self.close,
+            volume=self.volume,
+            extra={},
+        )
 
 
 class DataSetQueue(models.Model):

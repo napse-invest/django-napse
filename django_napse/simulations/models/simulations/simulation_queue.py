@@ -11,7 +11,7 @@ from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.core.models.transactions.credit import Credit
-from django_napse.core.models.wallets.currency import CurrencyPydantic
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.simulations.models.datasets.dataset import Candle, DataSet
 from django_napse.simulations.models.simulations.managers import SimulationQueueManager
 from django_napse.utils.constants import EXCHANGE_INTERVALS, ORDER_LEEWAY_PERCENTAGE, ORDER_STATUS, SIDES, SIMULATION_STATUS
@@ -44,8 +44,16 @@ class SimulationQueue(models.Model):
     def __str__(self) -> str:
         return f"BOT SIM QUEUE {self.pk}"
 
-    def info(self, verbose: bool = True, beacon: str = "") -> str:  # noqa: FBT002, FBT001
-        """Return info on SimulationQueue."""
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}SimulationQueue {self.pk}:\n"
         string += f"{beacon}\t{self.bot=}\n"
@@ -94,7 +102,7 @@ class SimulationQueue(models.Model):
                 min_interval = interval
                 break
 
-        currencies = next(iter(no_db_data["connection_data"].values()))["wallet"].currencies
+        currencies = next(iter(no_db_data.connection_data.values())).wallet.currencies
 
         exchange_controllers = {controller: controller.exchange_controller for controller in bot.controllers.values()}
 
@@ -227,7 +235,7 @@ class SimulationQueue(models.Model):
         taxes = []
         amounts = []
         tickers = []
-        extras = {csa.key: [] for csa in next(iter(no_db_data["connection_data"].values()))["connection_specific_args"].values()}
+        extras = {csa.key: [] for csa in next(iter(no_db_data.connection_data.values())).connection_specific_args.values()}
         for date, candle_data in data.items():
             currencies_before = deepcopy(currencies)
             processed_data, current_prices = self.process_candle_data(
@@ -283,8 +291,8 @@ class SimulationQueue(models.Model):
                     order.apply_modifications__no_db(
                         batch=batch,
                         modifications=[modification for modification in all_modifications if modification.order == order],
-                        strategy=no_db_data["strategy"],
-                        architecture=no_db_data["architecture"],
+                        strategy=no_db_data.strategy,
+                        architecture=no_db_data.architecture,
                         currencies=currencies,
                     )
 
@@ -296,7 +304,7 @@ class SimulationQueue(models.Model):
                 all_orders += orders
 
             self.append_data(
-                connection_specific_args=next(iter(no_db_data["connection_data"].values()))["connection_specific_args"],
+                connection_specific_args=next(iter(no_db_data.connection_data.values())).connection_specific_args,
                 candle_data=candle_data,
                 current_prices=current_prices,
                 currencies=currencies,
@@ -350,7 +358,7 @@ class SimulationQueue(models.Model):
         taxes = []
         amounts = []
         tickers = []
-        extras = {csa.key: [] for csa in next(iter(no_db_data["connection_data"].values()))["connection_specific_args"].values()}
+        extras = {csa.key: [] for csa in next(iter(no_db_data.connection_data.values())).connection_specific_args.values()}
         currencies = bot.connections.all()[0].wallet.to_dict().currencies
         for date, candle_data in data.items():
             currencies_before = deepcopy(currencies)
@@ -384,7 +392,7 @@ class SimulationQueue(models.Model):
 
             currencies = bot.connections.all()[0].wallet.to_dict().currencies
             self.append_data(
-                connection_specific_args=bot.connections.all()[0].to_dict()["connection_specific_args"],
+                connection_specific_args=bot.connections.all()[0].to_dict().connection_specific_args,
                 candle_data=candle_data,
                 current_prices=current_prices,
                 currencies_before=currencies_before,
