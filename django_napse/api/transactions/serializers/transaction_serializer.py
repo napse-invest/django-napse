@@ -1,17 +1,14 @@
-from rest_framework import serializers
-
 from django_napse.core.models import Transaction
+from django_napse.utils.serializers import DatetimeField, FloatField, Serializer, StrField
 
 
-class TransactionSerializer(serializers.ModelSerializer):
-    operation_type = serializers.CharField(default="TRANSACTION")
+class TransactionSerializer(Serializer):
+    """Serialize a transaction instance."""
 
-    class Meta:
-        model = Transaction
-        fields = [
-            "amount",
-            "ticker",
-            "operation_type",
-            "created_at",
-        ]
-        read_only_fields = fields
+    Model = Transaction
+    read_only = True
+
+    amount = FloatField()
+    ticker = StrField()
+    operation_type = StrField(default="TRANSACTION")
+    created_at = DatetimeField()

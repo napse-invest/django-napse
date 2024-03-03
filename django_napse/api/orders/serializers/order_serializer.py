@@ -1,6 +1,6 @@
 from django_napse.core.models import Order
 from django_napse.utils.constants import SIDES
-from django_napse.utils.serializers import BooleanField, DateTimeField, IntField, MethodField, Serializer, StrField
+from django_napse.utils.serializers import BoolField, DatetimeField, IntField, MethodField, Serializer, StrField
 
 
 class OrderSerializer(Serializer):
@@ -36,11 +36,11 @@ class OrderSerializer(Serializer):
 
     id = IntField()
     side = StrField()
-    completed = BooleanField()
+    completed = BoolField()
     spent = MethodField()
     received = MethodField()
     fees = MethodField()
-    created_at = DateTimeField()
+    created_at = DatetimeField()
 
     def get_spent(self, instance: Order) -> dict[str, str | float]:
         """Return spend informations."""

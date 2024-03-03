@@ -6,32 +6,24 @@ from rest_framework import serializers
 from django_napse.api.fleets.serializers import FleetSerializer
 from django_napse.api.wallets.serializers.wallet_serializers import WalletSerializer
 from django_napse.core.models import ExchangeAccount, Space, SpaceHistory
+from django_napse.utils.serializers import BoolField, DatetimeField, FloatField, MethodField, Serializer, StrField, UUIDField
 
 
-class SpaceSerializer(serializers.ModelSerializer):
-    exchange_account = serializers.CharField(source="exchange_account.uuid")
-    delta = serializers.SerializerMethodField(read_only=True)
+class SpaceSerializer(Serializer):
+    """To serialize & create a space instance."""
 
-    class Meta:
-        model = Space
-        fields = [
-            "name",
-            "description",
-            "exchange_account",
-            # read-only
-            "uuid",
-            "testing",
-            "value",
-            "delta",
-        ]
-        read_only_fields = [
-            "uuid",
-            "testing",
-            "value",
-            "delta",
-        ]
+    Model = Space
 
-    def get_delta(self, instance) -> float:
+    uuid = UUIDField()
+    name = StrField()
+    description = StrField()
+    testing = BoolField()
+    value = FloatField()
+    exchange_account = UUIDField(source="exchange_account.uuid")
+
+    delta = MethodField()
+
+    def get_delta(self, instance: Space) -> float:
         """Delta on the last 30 days."""
         try:
             history = SpaceHistory.objects.get(owner=instance)
@@ -39,7 +31,8 @@ class SpaceSerializer(serializers.ModelSerializer):
             return 0
         return history.get_delta()
 
-    def create(self, validated_data):
+    def create(self, validated_data: dict[str, any]) -> Space:
+        """Create a space if data are validated."""
         try:
             uuid.UUID(str(validated_data["exchange_account"]["uuid"]))
         except ValueError:
@@ -58,43 +51,28 @@ class SpaceSerializer(serializers.ModelSerializer):
         )
 
 
-class SpaceDetailSerializer(serializers.ModelSerializer):
-    fleets = FleetSerializer(many=True, read_only=True)
-    exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
-    statistics = serializers.SerializerMethodField(read_only=True)
-    wallet = WalletSerializer(read_only=True)
-    history = serializers.SerializerMethodField(read_only=True)
+class SpaceDetailSerializer(Serializer):
+    """Deep serialization of a space instance."""
 
-    class Meta:
-        model = Space
-        fields = [
-            "name",
-            "description",
-            # read-only
-            "uuid",
-            "testing",
-            "exchange_account",
-            "created_at",
-            "statistics",
-            "wallet",
-            "history",
-            "fleets",
-        ]
-        read_only_fields = [
-            "uuid",
-            "testing",
-            "exchange_account",
-            "created_at",
-            "statistics",
-            "wallet",
-            "history",
-            "fleet",
-        ]
+    Model = Space
 
-    def get_statistics(self, instance) -> dict:
+    uuid = UUIDField()
+    name = StrField()
+    description = StrField()
+    testing = BoolField()
+    exchange_account = StrField(source="exchange_account.uuid")
+    fleets = FleetSerializer(many=True)
+    statistics = MethodField()
+    wallet = WalletSerializer()
+    history = MethodField()
+    created_at = DatetimeField()
+
+    def get_statistics(self, instance: Space) -> dict:
+        """Return statistics of the given space."""
         return instance.get_stats()
 
-    def get_history(self, instance) -> list:
+    def get_history(self, instance: Space) -> list:
+        """Return history of the given space."""
         try:
             history = SpaceHistory.objects.get(owner=instance)
         except SpaceHistory.DoesNotExist:
@@ -103,15 +81,24 @@ class SpaceDetailSerializer(serializers.ModelSerializer):
         return loads(history.to_dataframe().to_json(orient="records"))
 
 
-class SpaceMoneyFlowSerializer(serializers.Serializer):
-    amount = serializers.FloatField(write_only=True, required=True)
-    ticker = serializers.CharField(write_only=True, required=True)
+class SpaceMoneyFlowSerializer(Serializer):
+    """Serialization for money actions on the given space."""
 
-    def __init__(self, side, instance=None, data=serializers.empty, **kwargs):
+    amount = FloatField(required=True)
+    ticker = StrField(required=True)
+
+    def __init__(
+        self,
+        side: str,
+        instance: Space | None = None,
+        data: dict[str, any] | None = None,
+        **kwargs: dict[str, any],
+    ) -> None:
+        """Definie side & initilize the serializer."""
         self.side = side
         super().__init__(instance=instance, data=data, **kwargs)
 
-    def _invest_validate(self, attrs):
+    def _invest_validate(self, attrs: dict[str, any]) -> dict[str, any]:
         if not self.instance.testing:
             error_msg: str = "Not implemented yet."
             raise NotImplementedError(error_msg)
@@ -119,7 +106,7 @@ class SpaceMoneyFlowSerializer(serializers.Serializer):
         # Test invest
         return attrs
 
-    def _withdraw_validate(self, attrs):
+    def _withdraw_validate(self, attrs: dict[str, any]) -> dict[str, any]:
         if self.instance.testing:
             error_msg: str = "Not implemented yet."
             raise NotImplementedError(error_msg)
@@ -127,7 +114,8 @@ class SpaceMoneyFlowSerializer(serializers.Serializer):
         # Test withdraw
         return attrs
 
-    def validate(self, attrs):
+    def validate(self, attrs: dict[str, any]) -> dict[str, any]:
+        """Make validation."""
         if attrs.get("amount") <= 0:
             error_msg: str = "Invalid amount."
             raise serializers.ValidationError(error_msg)
@@ -145,7 +133,8 @@ class SpaceMoneyFlowSerializer(serializers.Serializer):
                 error_msg: str = "Invalid side."
                 raise ValueError(error_msg)
 
-    def save(self, **kwargs):
+    def save(self) -> None:
+        """Make validated action on the space."""
         if self.side.upper() == "INVEST":
             self.instance.invest(
                 self.validated_data.get("amount"),

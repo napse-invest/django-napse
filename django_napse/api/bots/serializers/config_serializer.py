@@ -1,13 +1,13 @@
-from rest_framework import serializers
-
 from django_napse.core.models.bots.config import BotConfig
+from django_napse.utils.serializers import BoolField, Serializer, UUIDField
 
 
-class ConfigSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BotConfig
-        fields = "__all__"
-        read_only_fields = [
-            "uuid",
-            "immutable",
-        ]
+class ConfigSerializer(Serializer):
+    """Serialize a BotConfig instance."""
+
+    Model = BotConfig
+    read_only = True
+
+    uuid = UUIDField()
+    space = UUIDField(source="space.uuid")
+    immutable = BoolField()

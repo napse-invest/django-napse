@@ -2,8 +2,8 @@ from django.test import TestCase
 from rest_framework.serializers import ValidationError
 
 from django_napse.core.models import Exchange, ExchangeAccount
+from django_napse.utils.serializers import MetaSerializer, Serializer
 from django_napse.utils.serializers.fields import BoolField, DatetimeField, IntField, MethodField, StrField, UUIDField
-from django_napse.utils.serializers.serializer import MetaSerializer, Serializer
 
 """
 python tests/test_app/manage.py test tests.django_tests.test_serializer -v2 --keepdb --parallel
