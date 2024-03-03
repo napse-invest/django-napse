@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 
 
 def instance_check(target_type: any) -> callable:
@@ -21,7 +22,7 @@ class Field:
     def __init__(
         self,
         *,
-        default: any | None = None,
+        default: Optional[any] = None,
         source: str | None = None,
         required: bool = False,
         **kwargs: dict[str, any],  # noqa: ARG002 (for DRF compatibility)

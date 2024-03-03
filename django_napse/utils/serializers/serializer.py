@@ -106,6 +106,9 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
         # To use serializer in serializer
         super().__init__(**kwargs)
 
+        # Save additionnal kwargs for compatibility
+        self._kwargs = kwargs
+
     @property
     def data(self):  # noqa
         if self._data is not None:
@@ -122,11 +125,16 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
     def to_value(self, instance: object | list[object] | None = None) -> any:
         """Serialize instance."""
         instance = instance or self._instance
+
         if self._many:
+            try:
+                len(instance)
+            except TypeError:
+                instance = instance.all()
             return [self._serialize(ist, self.compiled_fields) for ist in instance]
         return self._serialize(instance, self.compiled_fields)
 
-    def _serialize(self, instance, fields):  # noqa
+    def _serialize(self, instance: object, fields: dict[str, Field]) -> dict[str, any]:
         def _get_value(instance, getter, getter_takes_serializer, getter_is_generator):  # noqa
             if getter_is_generator:
                 value = instance
