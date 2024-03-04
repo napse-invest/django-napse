@@ -92,6 +92,8 @@ class MetaSerializer(type):
 
 class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
     Model = None
+    # If read_only is True, the serializer will not be able to make interaction with the 'Model' class.
+    # But it can still be used to serialize or validate data.
     read_only = False
 
     def __init__(self, instance=None, data=None, many=False, **kwargs):  # noqa
