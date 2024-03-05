@@ -7,7 +7,7 @@ class ExchangeAccountDetailSerializer(Serializer):
     """Serializer for ExchangeAccount detail."""
 
     Model = ExchangeAccount
-    is_read_only_serializer = True
+    read_only = True
 
     uuid = UUIDField()
     exchange = StrField(source="exchange.name")

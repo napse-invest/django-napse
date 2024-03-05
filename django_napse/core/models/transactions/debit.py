@@ -4,6 +4,8 @@ from django_napse.core.models.transactions.managers import DebitManager
 
 
 class Debit(models.Model):
+    """Debit action on a wallet."""
+
     wallet = models.ForeignKey("Wallet", on_delete=models.CASCADE, related_name="debits")
     amount = models.FloatField()
     ticker = models.CharField(max_length=10)
@@ -11,10 +13,19 @@ class Debit(models.Model):
 
     objects = DebitManager()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"DEBIT: {self.pk})"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Debit {self.pk=}\n"
         string += f"{beacon}Args:\n"

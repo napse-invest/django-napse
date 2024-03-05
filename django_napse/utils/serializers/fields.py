@@ -1,5 +1,6 @@
 import uuid
 from datetime import datetime
+from typing import Optional
 
 
 def instance_check(target_type: any) -> callable:
@@ -18,17 +19,25 @@ class Field:
     # Define if the getter method takes the serializer as argument.
     getter_takes_serializer = False
 
-    def __init__(self, source: str | None = None, *, required: bool = False, **kwargs: dict[str, any]) -> None:  # noqa: ARG002 (for DRF compatibility)
+    def __init__(
+        self,
+        *,
+        default: Optional[any] = None,
+        source: str | None = None,
+        required: bool = False,
+        **kwargs: dict[str, any],  # noqa: ARG002 (for DRF compatibility)
+    ) -> None:
         """Define basic parameters of the field.
 
         Parameters:
             required: bool
-                Define if the field is required.
+                Define if the field is required. Only used for validation.
             source: str
                 Define the source of the field in the model (ex: `exchange.name`).
         """
         self.required = required
         self.source = source
+        self.default = default
 
     def to_value(self, value: any) -> any:
         """Overwrite this method for custom transformation on the serialized value."""

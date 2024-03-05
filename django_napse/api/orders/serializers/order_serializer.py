@@ -1,10 +1,9 @@
-from rest_framework import serializers
-
 from django_napse.core.models import Order
 from django_napse.utils.constants import SIDES
+from django_napse.utils.serializers import BoolField, DatetimeField, IntField, MethodField, Serializer, StrField
 
 
-class OrderSerializer(serializers.ModelSerializer):
+class OrderSerializer(Serializer):
     """.
 
     {
@@ -32,23 +31,18 @@ class OrderSerializer(serializers.ModelSerializer):
     }
     """
 
-    spent = serializers.SerializerMethodField()
-    received = serializers.SerializerMethodField()
-    fees = serializers.SerializerMethodField()
+    Model = Order
+    read_only = True
 
-    class Meta:
-        model = Order
-        fields = [
-            "side",
-            "completed",
-            "spent",
-            "received",
-            "fees",
-            "created_at",
-        ]
-        read_only_fields = fields
+    id = IntField()
+    side = StrField()
+    completed = BoolField()
+    spent = MethodField()
+    received = MethodField()
+    fees = MethodField()
+    created_at = DatetimeField()
 
-    def get_spent(self, instance):
+    def get_spent(self, instance: Order) -> dict[str, str | float]:
         """Return spend informations."""
         exit_amount = instance.exit_amount_quote if instance.side == SIDES.BUY else instance.exit_amount_base
         amount = instance.debited_amount - exit_amount
@@ -60,8 +54,8 @@ class OrderSerializer(serializers.ModelSerializer):
             "value": amount,
         }
 
-    def get_received(self, instance):
-        """Rerturn receive informations."""
+    def get_received(self, instance: Order) -> dict[str, str | float]:
+        """Return receive informations."""
         amount = instance.exit_amount_base if instance.side == SIDES.BUY else instance.exit_amount_quote
         ticker = instance.tickers_info().get("received_ticker")
         price = instance.price
@@ -72,13 +66,10 @@ class OrderSerializer(serializers.ModelSerializer):
             "value": amount * price,
         }
 
-    def get_fees(self, instance):
+    def get_fees(self, instance: Order) -> dict[str, str | float]:
+        """Return fees info about the market order."""
         return {
             "ticker": instance.fee_ticker,
             "amount": instance.fees,
             "value": instance.fees * instance.price,
         }
-
-    def save(self, **kwargs):
-        error_msg: str = "It's impossible to create ormodify an order."
-        raise serializers.ValidationError(error_msg)

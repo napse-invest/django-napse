@@ -43,6 +43,7 @@ class MetaSerializer(type):
                 getter_is_generator = False
             return (
                 name,
+                field.default,
                 field.to_value,
                 getter,
                 field.getter_takes_serializer,
@@ -91,7 +92,9 @@ class MetaSerializer(type):
 
 class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
     Model = None
-    is_read_only_serializer = False
+    # If read_only is True, the serializer will not be able to make interaction with the 'Model' class.
+    # But it can still be used to serialize or validate data.
+    read_only = False
 
     def __init__(self, instance=None, data=None, many=False, **kwargs):  # noqa
         self._instance = instance
@@ -105,11 +108,14 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
         # To use serializer in serializer
         super().__init__(**kwargs)
 
+        # Save additionnal kwargs for compatibility
+        self._kwargs = kwargs
+
     @property
     def data(self):  # noqa
         if self._data is not None:
             return self._data
-        return self.to_value()
+        return self.to_value(instance=self._instance)
 
     @property
     def validated_data(self):  # noqa
@@ -120,20 +126,50 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
 
     def to_value(self, instance: object | list[object] | None = None) -> any:
         """Serialize instance."""
+        # TODO: make a try & except TypeError | AttributeError (log + return 400) # noqa
         instance = instance or self._instance
+
+        if instance is None:
+            return None
+
         if self._many:
+            try:
+                len(instance)
+            except TypeError:
+                instance = instance.all()
             return [self._serialize(ist, self.compiled_fields) for ist in instance]
         return self._serialize(instance, self.compiled_fields)
 
-    def _serialize(self, instance, fields):  # noqa
-        serialized_instance = {}
-        for name, to_value, getter, getter_takes_serializer, getter_is_generator in fields:
+    def _serialize(self, instance: object, fields: dict[str, Field]) -> dict[str, any]:
+        def _get_value(instance, getter, getter_takes_serializer, getter_is_generator):  # noqa
             if getter_is_generator:
                 value = instance
                 for get in getter:
                     value = get(value)
             else:
                 value = getter(self, instance) if getter_takes_serializer else getter(instance)
+            return value
+
+        serialized_instance = {}
+        for name, default, to_value, getter, getter_takes_serializer, getter_is_generator in fields:
+            # Default wrapper around getter for optimization
+            if default is None:
+                value = _get_value(
+                    instance,
+                    getter,
+                    getter_takes_serializer,
+                    getter_is_generator,
+                )
+            else:
+                try:
+                    value = _get_value(
+                        instance,
+                        getter,
+                        getter_takes_serializer,
+                        getter_is_generator,
+                    )
+                except AttributeError:
+                    value = default
 
             if to_value:
                 value = to_value(value)
@@ -174,7 +210,7 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
 
         Please to not use this method.
         """
-        if self.is_read_only_serializer:
+        if self.read_only:
             error_msg: str = "This serializer is read only."
             raise ValueError(error_msg)
 
@@ -184,7 +220,7 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
         return self.validate_data(data)
 
     def _model_checks(self, validated_data):  # noqa
-        if self.is_read_only_serializer:
+        if self.read_only:
             error_msg: str = "This serializer is read only."
             raise ValueError(error_msg)
 

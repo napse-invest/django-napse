@@ -1,17 +1,14 @@
-from rest_framework import serializers
-
 from django_napse.core.models import Credit
+from django_napse.utils.serializers import DatetimeField, FloatField, Serializer, StrField
 
 
-class CreditSerializer(serializers.ModelSerializer):
-    operation_type = serializers.CharField(default="CREDIT")
+class CreditSerializer(Serializer):
+    """Serializer for Credit instance."""
 
-    class Meta:
-        model = Credit
-        fields = [
-            "amount",
-            "ticker",
-            "operation_type",
-            "created_at",
-        ]
-        read_only_fields = fields
+    Model = Credit
+    read_only = True
+
+    amount = FloatField()
+    ticker = StrField()
+    operation_type = StrField(default="CREDIT")
+    created_at = DatetimeField()

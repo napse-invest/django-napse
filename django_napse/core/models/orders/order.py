@@ -1,4 +1,6 @@
-from typing import Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
 
 from django.db import models
 
@@ -9,15 +11,23 @@ from django_napse.core.models.transactions.transaction import Transaction
 from django_napse.utils.constants import EXCHANGE_PAIRS, MODIFICATION_STATUS, ORDER_STATUS, SIDES, TRANSACTION_TYPES
 from django_napse.utils.errors import OrderError
 
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.exchange_account import ExchangeAccount
+    from django_napse.core.models.bots.controller import Controller
+    from django_napse.core.models.modifications.modification import Modification
+
 
 class OrderBatch(models.Model):
+    """Represent a batch of bots' orders."""
+
     status = models.CharField(default=ORDER_STATUS.PENDING, max_length=15)
     controller = models.ForeignKey("Controller", on_delete=models.CASCADE, related_name="order_batches")
 
     def __str__(self) -> str:
         return f"ORDER BATCH {self.pk}"
 
-    def set_status_ready(self):
+    def set_status_ready(self) -> None:
+        """Change status of the batch from PENDING to READY."""
         if self.status == ORDER_STATUS.PENDING:
             self.status = ORDER_STATUS.READY
             self.save()
@@ -46,6 +56,8 @@ class OrderBatch(models.Model):
 
 
 class Order(models.Model):
+    """An order market created by bots."""
+
     batch = models.ForeignKey("OrderBatch", on_delete=models.CASCADE, related_name="orders")
     connection = models.ForeignKey("Connection", on_delete=models.CASCADE, related_name="orders")
     price = models.FloatField()
@@ -71,7 +83,16 @@ class Order(models.Model):
     def __str__(self) -> str:
         return f"ORDER: {self.pk=}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Order ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
@@ -111,14 +132,16 @@ class Order(models.Model):
         return string
 
     @property
-    def testing(self):
+    def testing(self) -> bool:
+        """Testing status of the order."""
         return self.connection.testing
 
     @property
-    def exchange_account(self):
+    def exchange_account(self) -> ExchangeAccount:
+        """Exchange account of the order."""
         return self.connection.wallet.exchange_account
 
-    def _calculate_exit_amounts(self, controller, executed_amounts: dict, fees: dict) -> None:
+    def _calculate_exit_amounts(self, controller: Controller, executed_amounts: dict, fees: dict) -> None:
         if self.batch_share != 0:
             if self.side == SIDES.BUY:
                 if executed_amounts == {}:
@@ -151,18 +174,22 @@ class Order(models.Model):
             self.fees = 0
             self.fee_ticker = controller.base
 
-    def _calculate_batch_share(self, total: float):
+    def _calculate_batch_share(self, total: float) -> None:
         self.batch_share = self.asked_for_amount / total
 
-    def passed(self, batch: Optional[OrderBatch] = None):
+    def passed(self, batch: Optional[OrderBatch] = None) -> bool:
+        """Return True if the order has passed."""
         batch = batch or self.batch
-        if (self.side == SIDES.BUY and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_BUY_PASSED))) or (
+        return (self.side == SIDES.BUY and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_BUY_PASSED))) or (
             self.side == SIDES.SELL and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_SELL_PASSED))
-        ):
-            return True
-        return False
+        )
 
-    def _apply_modifications(self, batch, modifications, **kwargs):
+    def _apply_modifications(
+        self,
+        batch: OrderBatch,
+        modifications: list[Modification],
+        **kwargs: dict[str, any],
+    ) -> tuple[list[Modification], list[object]]:
         all_modifications = []
         all_modified_objects = []
         if self.passed(batch):
@@ -180,7 +207,8 @@ class Order(models.Model):
                 all_modifications.append(modification)
         return all_modifications, all_modified_objects
 
-    def apply_modifications(self):
+    def apply_modifications(self) -> list[Modification]:
+        """Apply modifications to the order."""
         modifications, modified_objects = self._apply_modifications(
             batch=self.batch,
             modifications=[modification.find() for modification in self.modifications.all()],
@@ -194,7 +222,8 @@ class Order(models.Model):
             modified_object.save()
         return modifications
 
-    def apply_swap(self):
+    def apply_swap(self) -> None:
+        """Swap quote into base (BUY) or base into quote (SELL)."""
         if self.side == SIDES.BUY:
             Debit.objects.create(
                 wallet=self.wallet,
@@ -218,7 +247,8 @@ class Order(models.Model):
                 ticker=self.batch.controller.quote,
             )
 
-    def process_payout(self):
+    def process_payout(self) -> None:
+        """Make a payout or a refund depending on the passed() status."""
         if self.side == SIDES.KEEP:
             return
         if self.passed():
