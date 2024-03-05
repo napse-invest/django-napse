@@ -129,7 +129,9 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
         # TODO: make a try & except TypeError | AttributeError (log + return 400) # noqa
         instance = instance or self._instance
 
-        print("many 2", self._many, self)
+        if instance is None:
+            return None
+
         if self._many:
             try:
                 len(instance)

@@ -61,7 +61,6 @@ class FleetSerializer(Serializer):
 
         try:
             self.space = Space.objects.get(uuid=attrs.pop("space"))
-            print("get space", self.space)
         except Space.DoesNotExist:
             error_msg: str = "Space does not exist."
             raise serializers.ValidationError(error_msg) from None
@@ -152,7 +151,6 @@ class FleetDetailSerializer(Serializer):
 
     def to_value(self, instance: Fleet | None = None) -> dict[str, any]:
         """Return Fleet's serialization."""
-        print(f"{self._many=}", self)
         data = super().to_value(instance)
         if self.space is not None:
             data["space"] = self.space.uuid

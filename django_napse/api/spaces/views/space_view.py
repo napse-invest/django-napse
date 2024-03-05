@@ -75,15 +75,9 @@ class SpaceView(CustomViewSet):
         pk: int | str | UUID | None = None,  # noqa: ARG002
     ) -> None:
         """Return the detail info of the given space."""
-        from time import time
-
-        start = time()
         instance = self.get_object()
-        print(f"Time to get object: {time()-start:0.3f}s")
         serializer = self.get_serializer(instance)
-        print(f"Time to build serializer: {time()-start:0.3f}s")
         data = serializer.data
-        print(f"Time to get data: {time()-start:0.3f}s")
         return Response(data, status=status.HTTP_200_OK)
 
     def create(self, request: Request) -> None:
