@@ -67,7 +67,8 @@ class SpaceView(CustomViewSet):
         api_key = self.get_api_key(request)
         spaces = Space.objects.all() if api_key.is_master_key else Space.objects.filter(permissions__in=api_key.permissions.all())
         serializer = self.get_serializer(spaces, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        data = serializer.data
+        return Response(data, status=status.HTTP_200_OK)
 
     def retrieve(
         self,

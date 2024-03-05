@@ -3,7 +3,7 @@ from uuid import UUID
 from django_napse.api.orders.serializers import OrderSerializer
 from django_napse.api.wallets.serializers import WalletSerializer
 from django_napse.core.models import Bot, BotHistory, ConnectionWallet, Order, Space
-from django_napse.utils.serializers import FloatField, MethodField, Serializer, StrField, UUIDField
+from django_napse.utils.serializers import MethodField, Serializer, StrField, UUIDField
 
 
 class BotSerializer(Serializer):
@@ -62,7 +62,7 @@ class BotDetailSerializer(Serializer):
 
     uuid = UUIDField()
     name = StrField(required=True)
-    value = FloatField()
+    value = MethodField()
     delta = MethodField()
     statistics = MethodField()
     fleet = StrField(source="fleet.uuid")
@@ -83,6 +83,10 @@ class BotDetailSerializer(Serializer):
         except BotHistory.DoesNotExist:
             return 0
         return history.get_delta()
+
+    def get_value(self, instance: Bot) -> float:
+        """Return bot's value."""
+        return instance.value(space=self.space)
 
     def get_space(self, instance: Bot) -> UUID | None:  # noqa: ARG002
         """Return the space used for the space containerization."""

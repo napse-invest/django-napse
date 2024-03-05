@@ -1,19 +1,26 @@
+from __future__ import annotations
+
 import uuid
 from datetime import datetime, timedelta
+from typing import TYPE_CHECKING
 
 from django.db import models
 from django.utils.timezone import get_default_timezone
 
 from django_napse.core.models.accounts.managers import SpaceManager
 from django_napse.core.models.bots.bot import Bot
+from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.fleets.fleet import Fleet
 from django_napse.core.models.orders.order import Order
 from django_napse.core.models.transactions.credit import Credit
 from django_napse.core.models.transactions.debit import Debit
-from django_napse.utils.constants import EXCHANGE_TICKERS
+from django_napse.utils.constants import EXCHANGE_TICKERS, STABLECOINS
 from django_napse.utils.errors import SpaceError
 from django_napse.utils.errors.exchange import ExchangeError
 from django_napse.utils.errors.wallets import WalletError
+
+if TYPE_CHECKING:
+    from django_napse.core.models.wallets.currency import Currency
 
 
 class Space(models.Model):
@@ -53,18 +60,21 @@ class Space(models.Model):
 
     objects = SpaceManager()
 
-    class Meta:
+    class Meta:  # noqa: D106
         unique_together = ("name", "exchange_account")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"SPACE: {self.name}"
 
-    def info(self, verbose: bool = True, beacon: str = "") -> str:
-        """Info documentation.
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
 
-        Params:
-            verbose: Print to console.
-            beacon: Indentation for printing.
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
         """
         string = ""
         string += f"{beacon}Space ({self.pk=}):\n"
@@ -86,9 +96,29 @@ class Space(models.Model):
 
     @property
     def value(self) -> float:
-        """Value market of space's wallet."""
+        """Return quick value of space's wallet."""
+        stablecoins = STABLECOINS.get(self.exchange_account.exchange.name)
+
+        def _add_currency_value(currency: Currency) -> float:
+            if currency.ticker in stablecoins:
+                return currency.amount
+            # controller = Controller.objects.filter(pair=f"{currency.ticker}USDT").first()  # noqa
+            controller = Controller.get(exchange_account=self.exchange_account, base=currency.ticker, quote="USDT")
+            return controller.get_price() * currency.amount
+            # return controller.price * currency.amount
+
+        value = 0
+
+        # Connections values
         connections = self.wallet.connections.all()
-        return sum([connection.wallet.value_market() for connection in connections])
+        for connection in connections:
+            for currency in connection.wallet.currencies.all():
+                value += _add_currency_value(currency)
+
+        # Wallet value
+        for currency in self.wallet.currencies.all():
+            value += _add_currency_value(currency)
+        return value
 
     @property
     def fleets(self) -> models.QuerySet:
@@ -123,7 +153,7 @@ class Space(models.Model):
             raise SpaceError.DeleteError
         return super().delete()
 
-    def invest(self, amount: float, ticker: str):
+    def invest(self, amount: float, ticker: str) -> Credit:
         """Invest in space."""
         if ticker not in EXCHANGE_TICKERS.get("BINANCE"):
             error_msg: str = f"{ticker} is not available on {self.exchange_account.name} exchange."
@@ -137,7 +167,7 @@ class Space(models.Model):
         # Testing invest
         Credit.objects.create(wallet=self.wallet, amount=amount, ticker=ticker)
 
-    def withdraw(self, amount: float, ticker: str):
+    def withdraw(self, amount: float, ticker: str) -> Debit:
         """Withdraw from space."""
         if ticker not in [currency.ticker for currency in self.wallet.currencies.all()]:
             error_msg: str = f"{ticker} is not on your {self.name}(space)'s wallet."
