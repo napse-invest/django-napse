@@ -115,7 +115,7 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
     def data(self):  # noqa
         if self._data is not None:
             return self._data
-        return self.to_value()
+        return self.to_value(instance=self._instance)
 
     @property
     def validated_data(self):  # noqa
@@ -126,8 +126,10 @@ class Serializer(BaseSerializer, Field, metaclass=MetaSerializer):  # noqa
 
     def to_value(self, instance: object | list[object] | None = None) -> any:
         """Serialize instance."""
+        # TODO: make a try & except TypeError | AttributeError (log + return 400) # noqa
         instance = instance or self._instance
 
+        print("many 2", self._many, self)
         if self._many:
             try:
                 len(instance)

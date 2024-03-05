@@ -12,7 +12,7 @@ class BotSerializer(Serializer):
     Model = Bot
     uuid = UUIDField()
     name = StrField(required=True)
-    value = FloatField()
+    value = MethodField()
     delta = MethodField()
     fleet = StrField(source="fleet.uuid")
     space = MethodField()
@@ -44,6 +44,10 @@ class BotSerializer(Serializer):
             return None
         return instance.exchange_account.uuid
 
+    def get_value(self, instance: Bot) -> float:
+        """Return bot's value."""
+        return instance.value(space=self.space)
+
     def create(self, validated_data: dict[str, any]) -> Bot:  # noqa: ARG002
         """Create a bot instance."""
         error_msg: str = "You don't have to create a bot from an endpoint"
@@ -54,6 +58,8 @@ class BotDetailSerializer(Serializer):
     """Deep dive in bot's data for serialization."""
 
     Model = Bot
+    read_only = True
+
     uuid = UUIDField()
     name = StrField(required=True)
     value = FloatField()
