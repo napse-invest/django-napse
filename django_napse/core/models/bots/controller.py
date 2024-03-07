@@ -13,6 +13,8 @@ from django_napse.utils.trading.binance_controller import BinanceController
 
 
 class Controller(models.Model):
+    """Manage data from exchange platform."""
+
     exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="controller")
 
     pair = models.CharField(max_length=10)
@@ -29,13 +31,14 @@ class Controller(models.Model):
 
     objects = ControllerManager()
 
-    class Meta:
+    class Meta:  # noqa: D106
         unique_together = ("pair", "interval", "exchange_account")
 
-    def __str__(self):
-        return f"Controller {self.pk=}"
+    def __str__(self) -> str:
+        return f"Controller {self.pair} (id: {self.pk})"
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: list[any], **kwargs: dict[str, any]) -> None:
+        """Save the instance."""
         if not self.pk:
             self.base = self.base.upper()
             self.quote = self.quote.upper()
@@ -49,7 +52,16 @@ class Controller(models.Model):
                 raise ControllerError.InvalidSetting(error_msg)
         return super().save(*args, **kwargs)
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Controller {self.pk}:\n"
         string += f"{beacon}Args:\n"
@@ -282,6 +294,7 @@ class Controller(models.Model):
         """Retreive the price of the pair.
 
         Only updates the price if it is older than 1 minute.
+        The ControllerUpdate task automaticaly refreshes price data.
 
         Returns:
             price: The price of the pair.

@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, ClassVar
+
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -8,6 +12,14 @@ from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.api.fleets.serializers import FleetDetailSerializer, FleetMoneyFlowSerializer, FleetSerializer
 from django_napse.core.models import Fleet, Space
 
+if TYPE_CHECKING:
+    from uuid import UUID
+
+    from django.db.models import QuerySet
+    from rest_framework.request import Request
+
+    from django_napse.utils.serializers import Serializer
+
 
 class FleetView(CustomViewSet):
     """View of a fleet.
@@ -17,17 +29,19 @@ class FleetView(CustomViewSet):
         space_containers (bool): If True, list endpoint returns fleets for each space (default = True).
     """
 
-    permission_classes = [HasAPIKey, HasSpace]
+    permission_classes: ClassVar[list] = [HasAPIKey, HasSpace]
     serializer_class = FleetSerializer
 
-    def get_queryset(self):
+    def get_queryset(self) -> QuerySet[Fleet]:
+        """Return all fleets or only the ones from a space."""
         space_uuid = self.request.query_params.get("space", None)
         if space_uuid is None:
             return Fleet.objects.all()
         self.get_space = Space.objects.get(uuid=space_uuid)
         return self.get_space.fleets
 
-    def get_serializer_class(self, *args, **kwargs):
+    def get_serializer_class(self) -> Serializer:
+        """Return the serializer class for each action."""
         actions: dict = {
             "list": FleetSerializer,
             "retrieve": FleetDetailSerializer,
@@ -38,14 +52,16 @@ class FleetView(CustomViewSet):
         result = actions.get(self.action)
         return result if result else super().get_serializer_class()
 
-    def get_permissions(self):
+    def get_permissions(self) -> list:
+        """Return permissions for each action."""
         match self.action:
             case "list" | "create":
                 return [HasAPIKey()]
             case _:
                 return super().get_permissions()
 
-    def get_object(self):
+    def get_object(self) -> Fleet:
+        """Return the fleet instance for detail endpoint."""
         uuid = self.kwargs.get("pk", None)
         if uuid is None:
             return super().get_object()
@@ -67,7 +83,8 @@ class FleetView(CustomViewSet):
             case _:
                 return None
 
-    def list(self, request):
+    def list(self, request: Request) -> None:
+        """Return all available fleets (depending of the keys permissions & space containerization)."""
         space_containers = self._get_boolean_query_param(request.query_params.get("space_containers", True))
         space_uuid = request.query_params.get("space", None)
         api_key = self.get_api_key(request)
@@ -94,13 +111,15 @@ class FleetView(CustomViewSet):
                 fleets += serializer.data
         return Response(fleets, status=status.HTTP_200_OK)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request: Request, pk: str | int | UUID | None = None) -> None:  # noqa: ARG002
+        """Return the detail info of the given fleet."""
         instance = self.get_object()
         space = self.get_space(request)
         serializer = self.get_serializer(instance, space=space)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request) -> None:
+        """Create a new fleet."""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         fleet = serializer.save()
@@ -108,11 +127,13 @@ class FleetView(CustomViewSet):
         fleet.invest(space, 0, "USDT")
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def delete(self):
+    def delete(self, request: Request, pk: str | int | UUID | None = None) -> None:  # noqa: ARG002
+        """Delete a fleet."""
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
     @action(detail=True, methods=["post"])
-    def invest(self, request, pk=None):
+    def invest(self, request: Request, pk: str | int | UUID | None = None) -> None:  # noqa: ARG002
+        """Invest in a fleet."""
         fleet = self.get_object()
         space = self.get_space(request)
 
@@ -132,5 +153,6 @@ class FleetView(CustomViewSet):
         return Response(status=status.HTTP_200_OK)
 
     @action(detail=True, methods=["post"])
-    def withdraw(self, request, pk=None):
+    def withdraw(self, request: Request, pk: str | int | UUID | None = None) -> None:  # noqa: ARG002
+        """Withdraw from a fleet."""
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)

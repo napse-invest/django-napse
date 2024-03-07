@@ -1,9 +1,12 @@
+from typing import ClassVar
+
+from rest_framework import serializers
+
 from django_napse.core.models import Order
 from django_napse.utils.constants import SIDES
-from django_napse.utils.serializers import BoolField, DatetimeField, IntField, MethodField, Serializer, StrField
 
 
-class OrderSerializer(Serializer):
+class OrderSerializer(serializers.ModelSerializer):
     """.
 
     {
@@ -31,16 +34,21 @@ class OrderSerializer(Serializer):
     }
     """
 
-    Model = Order
-    read_only = True
+    spent = serializers.SerializerMethodField()
+    received = serializers.SerializerMethodField()
+    fees = serializers.SerializerMethodField()
 
-    id = IntField()
-    side = StrField()
-    completed = BoolField()
-    spent = MethodField()
-    received = MethodField()
-    fees = MethodField()
-    created_at = DatetimeField()
+    class Meta:  # noqa: D106
+        model = Order
+        fields: ClassVar[list[str]] = [
+            "side",
+            "completed",
+            "spent",
+            "received",
+            "fees",
+            "created_at",
+        ]
+        read_only_fields = fields
 
     def get_spent(self, instance: Order) -> dict[str, str | float]:
         """Return spend informations."""

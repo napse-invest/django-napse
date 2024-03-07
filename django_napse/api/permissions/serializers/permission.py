@@ -1,14 +1,20 @@
+from typing import ClassVar
+
+from rest_framework import serializers
+
 from django_napse.auth.models import KeyPermission
-from django_napse.utils.serializers import BoolField, Serializer, StrField, UUIDField
 
 
-class PermissionSerializer(Serializer):
+class PermissionSerializer(serializers.ModelSerializer):
     """Serialize a permission instance."""
 
-    Model = KeyPermission
-    read_only = True
+    space = serializers.CharField(source="space.uuid")
 
-    uuid = UUIDField()
-    permission_type = StrField()
-    approved = BoolField()
-    space = StrField(source="space.uuid")
+    class Meta:  # noqa: D106
+        model = KeyPermission
+        fields: ClassVar[list[str]] = [
+            "uuid",
+            "permission_type",
+            "approved",
+            "space",
+        ]

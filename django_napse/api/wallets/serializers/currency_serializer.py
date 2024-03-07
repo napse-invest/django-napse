@@ -1,24 +1,27 @@
-from __future__ import annotations
+from typing import ClassVar
 
-from typing import TYPE_CHECKING
+from rest_framework import serializers
 
+from django_napse.core.models import Currency
 from django_napse.core.models.bots.controller import Controller
-from django_napse.utils.serializers import FloatField, MethodField, Serializer, StrField
-
-if TYPE_CHECKING:
-    from django_napse.core.models import Currency
 
 
-class CurrencySerializer(Serializer):
+class CurrencySerializer(serializers.ModelSerializer):
     """Serialize a currency instance."""
 
-    mbp = StrField()
-    ticker = StrField()
-    amount = FloatField()
-    value = MethodField()
+    value = serializers.SerializerMethodField(read_only=True)
 
-    def get_value(self, instance: Currency) -> float:
-        """Return market value of the currency."""
+    class Meta:  # noqa: D106
+        model = Currency
+        fields: ClassVar[list[str]] = [
+            "mbp",
+            "ticker",
+            "amount",
+            "value",
+        ]
+        read_only_fields = fields
+
+    def get_value(self, instance):
         return instance.amount * Controller.get_asset_price(
             exchange_account=instance.wallet.exchange_account,
             base=instance.ticker,
