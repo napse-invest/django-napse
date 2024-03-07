@@ -1,13 +1,19 @@
+from typing import ClassVar
+
+from rest_framework import serializers
+
 from django_napse.api.bots.serializers.strategy_serializer import StrategySerializer
 from django_napse.core.models.bots.plugin import Plugin
-from django_napse.utils.serializers import Serializer, StrField
 
 
-class PluginSerializer(Serializer):
+class PluginSerializer(serializers.ModelSerializer):
     """Serialize a Plugin instance."""
 
-    Model = Plugin
-    read_only = True
-
     strategy = StrategySerializer()
-    category = StrField()
+
+    class Meta:  # noqa: D106
+        model = Plugin
+        fields = "__all__"
+        read_only_fields: ClassVar[list[str]] = [
+            "id",
+        ]

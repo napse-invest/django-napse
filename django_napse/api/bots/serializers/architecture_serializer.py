@@ -1,11 +1,16 @@
+from typing import ClassVar
+
+from rest_framework import serializers
+
 from django_napse.core.models.bots.architecture import Architecture
-from django_napse.utils.serializers import IntField, Serializer
 
 
-class ArchitectureSerializer(Serializer):
+class ArchitectureSerializer(serializers.ModelSerializer):
     """Serialize an Architecture instance."""
 
-    Model = Architecture
-    read_only = True
-
-    id = IntField()
+    class Meta:  # noqa: D106
+        model = Architecture
+        fields = "__all__"
+        read_only_fields: ClassVar[list[str]] = [
+            "id",
+        ]

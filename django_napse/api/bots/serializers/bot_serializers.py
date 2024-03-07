@@ -1,22 +1,39 @@
+from typing import ClassVar
 from uuid import UUID
+
+from rest_framework import serializers
 
 from django_napse.api.orders.serializers import OrderSerializer
 from django_napse.api.wallets.serializers import WalletSerializer
 from django_napse.core.models import Bot, BotHistory, ConnectionWallet, Order, Space
-from django_napse.utils.serializers import MethodField, Serializer, StrField, UUIDField
 
 
-class BotSerializer(Serializer):
+class BotSerializer(serializers.ModelSerializer):
     """Serialize bot instances."""
 
-    Model = Bot
-    uuid = UUIDField()
-    name = StrField(required=True)
-    value = MethodField()
-    delta = MethodField()
-    fleet = StrField(source="fleet.uuid")
-    space = MethodField()
-    exchange_account = MethodField()
+    delta = serializers.SerializerMethodField(read_only=True)
+    space = serializers.SerializerMethodField(read_only=True)
+    value = serializers.SerializerMethodField(read_only=True)
+    exchange_account = serializers.SerializerMethodField(read_only=True)
+    fleet = serializers.CharField(source="fleet.uuid", read_only=True)
+
+    class Meta:  # noqa: D106
+        model = Bot
+        fields: ClassVar = [
+            "name",
+            "uuid",
+            "value",
+            "delta",
+            "fleet",
+            "space",
+            "exchange_account",
+        ]
+        read_only_fields: ClassVar = [
+            "uuid",
+            "value",
+            "delta",
+            "space",
+        ]
 
     def __init__(self, *args: list[any], space: Space | None = None, **kwargs: dict[str, any]) -> None:
         """Add space to the serializer and run the default constructor."""
@@ -54,22 +71,34 @@ class BotSerializer(Serializer):
         raise ValueError(error_msg)
 
 
-class BotDetailSerializer(Serializer):
+class BotDetailSerializer(serializers.ModelSerializer):
     """Deep dive in bot's data for serialization."""
 
-    Model = Bot
-    read_only = True
+    delta = serializers.SerializerMethodField(read_only=True)
+    space = serializers.SerializerMethodField(read_only=True)
+    value = serializers.SerializerMethodField(read_only=True)
+    exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
+    fleet = serializers.CharField(source="fleet.uuid", read_only=True)
 
-    uuid = UUIDField()
-    name = StrField(required=True)
-    value = MethodField()
-    delta = MethodField()
-    statistics = MethodField()
-    fleet = StrField(source="fleet.uuid")
-    space = MethodField()
-    exchange_account = StrField(source="exchange_account.uuid")
-    wallet = MethodField()
-    orders = MethodField()
+    statistics = serializers.SerializerMethodField(read_only=True)
+    wallet = serializers.SerializerMethodField(read_only=True)
+    orders = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:  # noqa: D106
+        model = Bot
+        fields: ClassVar[list[str]] = [
+            "name",
+            "uuid",
+            "value",
+            "delta",
+            "statistics",
+            "fleet",
+            "space",
+            "exchange_account",
+            "wallet",
+            "orders",
+        ]
+        read_only_fields: ClassVar = fields
 
     def __init__(self, *args: list[any], space: Space | None = None, **kwargs: dict[str, any]) -> None:
         """Add space to the serializer and run the default constructor."""
