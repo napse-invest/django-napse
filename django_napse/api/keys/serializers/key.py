@@ -1,34 +1,44 @@
+from typing import ClassVar
+
+from rest_framework import serializers
+
 from django_napse.api.permissions.serializers import PermissionSerializer
 from django_napse.auth.models import NapseAPIKey
-from django_napse.utils.serializers import BoolField, Serializer, StrField
 
 
-class NapseAPIKeySerializer(Serializer):
+class NapseAPIKeySerializer(serializers.ModelSerializer):
     """Serialize a NapseAPIKey instance."""
 
-    Model = NapseAPIKey
+    permissions = PermissionSerializer(many=True, read_only=True)
 
-    name = StrField()
-    prefix = StrField()
-    permissions = PermissionSerializer(many=True)
-    is_master_key = BoolField()
-    revoked = BoolField()
-    description = StrField()
+    class Meta:  # noqa: D106
+        model = NapseAPIKey
+        fields: ClassVar[list[str]] = [
+            "name",
+            "prefix",
+            "permissions",
+            "is_master_key",
+            "revoked",
+            "description",
+        ]
 
 
-class NapseAPIKeySpaceSerializer(Serializer):
+class NapseAPIKeySpaceSerializer(serializers.ModelSerializer):
     """Serialize a NapseAPIKey instance with space permissions."""
 
-    Model = NapseAPIKey
-    name = StrField()
-    prefix = StrField()
-    is_master_key = BoolField()
-    revoked = BoolField()
-    description = StrField()
+    class Meta:  # noqa: D106
+        model = NapseAPIKey
+        fields: ClassVar[list[str]] = [
+            "name",
+            "prefix",
+            "is_master_key",
+            "revoked",
+            "description",
+        ]
 
-    def to_value(self, instance: NapseAPIKey | None = None) -> dict[str, any]:
+    def to_representation(self, instance: NapseAPIKey | None = None) -> dict[str, any]:
         """Convert the instance into a dictionary."""
-        representation = super().to_value(instance)
+        representation = super().to_representation(instance)
         instance = instance or self._instance
         representation["permissions"] = []
         space = self._kwargs.get("space", None)
