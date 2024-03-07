@@ -1,27 +1,38 @@
 import uuid
 from json import loads
+from typing import ClassVar
 
 from rest_framework import serializers
 
 from django_napse.api.fleets.serializers import FleetSerializer
 from django_napse.api.wallets.serializers.wallet_serializers import WalletSerializer
 from django_napse.core.models import ExchangeAccount, Space, SpaceHistory
-from django_napse.utils.serializers import BoolField, DatetimeField, FloatField, MethodField, Serializer, StrField, UUIDField
 
 
-class SpaceSerializer(Serializer):
+class SpaceSerializer(serializers.ModelSerializer):
     """To serialize & create a space instance."""
 
-    Model = Space
+    exchange_account = serializers.CharField(source="exchange_account.uuid")
+    delta = serializers.SerializerMethodField(read_only=True)
 
-    uuid = UUIDField()
-    name = StrField()
-    description = StrField()
-    testing = BoolField()
-    value = FloatField()
-    exchange_account = UUIDField(source="exchange_account.uuid")
-
-    delta = MethodField()
+    class Meta:  # noqa: D106
+        model = Space
+        fields: ClassVar[list[str]] = [
+            "name",
+            "description",
+            "exchange_account",
+            # read-only
+            "uuid",
+            "testing",
+            "value",
+            "delta",
+        ]
+        read_only_fields: ClassVar[list[str]] = [
+            "uuid",
+            "testing",
+            "value",
+            "delta",
+        ]
 
     def get_delta(self, instance: Space) -> float:
         """Delta on the last 30 days."""
@@ -51,21 +62,31 @@ class SpaceSerializer(Serializer):
         )
 
 
-class SpaceDetailSerializer(Serializer):
+class SpaceDetailSerializer(serializers.ModelSerializer):
     """Deep serialization of a space instance."""
 
-    Model = Space
+    fleets = FleetSerializer(many=True, read_only=True)
+    exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
+    statistics = serializers.SerializerMethodField(read_only=True)
+    wallet = WalletSerializer(read_only=True)
+    history = serializers.SerializerMethodField(read_only=True)
 
-    uuid = UUIDField()
-    name = StrField()
-    description = StrField()
-    testing = BoolField()
-    exchange_account = StrField(source="exchange_account.uuid")
-    fleets = FleetSerializer(many=True)
-    statistics = MethodField()
-    wallet = WalletSerializer()
-    history = MethodField()
-    created_at = DatetimeField()
+    class Meta:  # noqa: D106
+        model = Space
+        fields: ClassVar[list[str]] = [
+            "name",
+            "description",
+            # read-only
+            "uuid",
+            "testing",
+            "exchange_account",
+            "created_at",
+            "statistics",
+            "wallet",
+            "history",
+            "fleets",
+        ]
+        read_only_fields: ClassVar[list[str]] = fields
 
     def get_statistics(self, instance: Space) -> dict:
         """Return statistics of the given space."""
@@ -81,22 +102,21 @@ class SpaceDetailSerializer(Serializer):
         return loads(history.to_dataframe().to_json(orient="records"))
 
 
-class SpaceMoneyFlowSerializer(Serializer):
+class SpaceMoneyFlowSerializer(serializers.Serializer):
     """Serialization for money actions on the given space."""
 
-    amount = FloatField(required=True)
-    ticker = StrField(required=True)
+    amount = serializers.FloatField(write_only=True, required=True)
+    ticker = serializers.CharField(write_only=True, required=True)
 
     def __init__(
         self,
         side: str,
-        instance: Space | None = None,
-        data: dict[str, any] | None = None,
+        *args: list[str],
         **kwargs: dict[str, any],
     ) -> None:
         """Definie side & initilize the serializer."""
         self.side = side
-        super().__init__(instance=instance, data=data, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _invest_validate(self, attrs: dict[str, any]) -> dict[str, any]:
         if not self.instance.testing:

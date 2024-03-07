@@ -1,14 +1,21 @@
+from typing import ClassVar
+
+from rest_framework import serializers
+
 from django_napse.core.models import Credit
-from django_napse.utils.serializers import DatetimeField, FloatField, Serializer, StrField
 
 
-class CreditSerializer(Serializer):
+class CreditSerializer(serializers.ModelSerializer):
     """Serializer for Credit instance."""
 
-    Model = Credit
-    read_only = True
+    operation_type = serializers.CharField(default="CREDIT")
 
-    amount = FloatField()
-    ticker = StrField()
-    operation_type = StrField(default="CREDIT")
-    created_at = DatetimeField()
+    class Meta:  # noqa: D106
+        model = Credit
+        fields: ClassVar[list[str]] = [
+            "amount",
+            "ticker",
+            "operation_type",
+            "created_at",
+        ]
+        read_only_fields = fields

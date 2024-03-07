@@ -9,7 +9,7 @@ from rest_framework_api_key.permissions import HasAPIKey
 
 from django_napse.api.custom_permissions import HasFullAccessPermission, HasMasterKey, HasReadPermission
 from django_napse.api.custom_viewset import CustomViewSet
-from django_napse.api.spaces.serializers import Serializer, SpaceDetailSerializer, SpaceMoneyFlowSerializer, SpaceSerializer
+from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceMoneyFlowSerializer, SpaceSerializer, serializers
 from django_napse.core.models import Space
 from django_napse.utils.constants import EXCHANGE_TICKERS
 from django_napse.utils.errors import SpaceError
@@ -35,7 +35,7 @@ class SpaceView(CustomViewSet):
         """Return all spaces instances."""
         return Space.objects.all()
 
-    def get_serializer_class(self) -> Serializer:
+    def get_serializer_class(self) -> serializers.Serializer:
         """Return the serializer class for each action."""
         actions: dict = {
             "list": SpaceSerializer,

@@ -1,14 +1,21 @@
-from django_napse.core.models import Debit
-from django_napse.utils.serializers import DatetimeField, FloatField, Serializer, StrField
+from typing import ClassVar
+
+from rest_framework import serializers
+
+from django_napse.core.models import debit
 
 
-class DebitSerializer(Serializer):
+class DebitSerializer(serializers.ModelSerializer):
     """Serializer for Debit instance."""
 
-    Model = Debit
-    read_only = True
+    operation_type = serializers.CharField(default="DEBIT")
 
-    amount = FloatField()
-    ticker = StrField()
-    operation_type = StrField(default="DEBIT")
-    created_at = DatetimeField()
+    class Meta:  # noqa: D106
+        model = debit
+        fields: ClassVar[list[str]] = [
+            "amount",
+            "ticker",
+            "operation_type",
+            "created_at",
+        ]
+        read_only_fields = fields

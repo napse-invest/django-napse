@@ -15,9 +15,8 @@ from django_napse.utils.constants import EXCHANGES
 
 if TYPE_CHECKING:
     from django.db.models.query import Queryset
+    from rest_framework import serializers
     from rest_framework.request import Request
-
-    from django_napse.utils.serializers import Serializer
 
 
 class ExchangeAccountView(CustomViewSet):
@@ -34,7 +33,7 @@ class ExchangeAccountView(CustomViewSet):
         """Get all ExchangeAccount instances."""
         return ExchangeAccount.objects.all()
 
-    def get_serializer_class(self) -> Serializer:
+    def get_serializer_class(self) -> serializers.Serializer:
         """Get the correct serializer for the action."""
         actions: dict = {
             "list": ExchangeAccountSerializer,
