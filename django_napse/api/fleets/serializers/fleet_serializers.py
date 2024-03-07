@@ -1,37 +1,57 @@
+from typing import ClassVar
+
 from rest_framework import serializers
 
 from django_napse.api.bots.serializers import BotSerializer
 from django_napse.api.fleets.serializers.cluster_serialisers import ClusterFormatterSerializer
 from django_napse.core.models import ConnectionWallet, Fleet, FleetHistory, Space, SpaceWallet
-from django_napse.utils.serializers import DatetimeField, FloatField, MethodField, Serializer, StrField, UUIDField
 
 
-class FleetSerializer(Serializer):
+class FleetSerializer(serializers.ModelSerializer):
     """Serialize fleet instance.
 
     Can be use with many fleet instances.
     """
 
-    Model = Fleet
+    value = serializers.SerializerMethodField(read_only=True)
+    bot_count = serializers.SerializerMethodField(read_only=True)
+    clusters = ClusterFormatterSerializer(
+        write_only=True,
+        many=True,
+        required=True,
+    )
+    space = serializers.UUIDField(write_only=True, required=True)
+    delta = serializers.SerializerMethodField(read_only=True)
+    exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
 
-    uuid = UUIDField()
-    name = StrField()
-    value = MethodField()
-    bot_count = MethodField()
-    clusters = ClusterFormatterSerializer(many=True, required=True)
-    delta = MethodField()
-    exchange_account = UUIDField(source="exchange_account.uuid")
+    class Meta:  # noqa: D106
+        model = Fleet
+        fields: ClassVar[list[str]] = [
+            "name",
+            # write-only
+            "clusters",
+            "space",
+            # read-only
+            "uuid",
+            "value",
+            "bot_count",
+            "delta",
+            "exchange_account",
+        ]
+        read_only_fields: ClassVar[list[str]] = [
+            "uuid",
+            "exchange_account",
+        ]
 
     def __init__(
         self,
-        instance: Fleet | None = None,
-        data: dict[str, any] | None = None,
+        *args: list[any],
         space: Space | None = None,
         **kwargs: dict[str, any],
     ) -> None:
         """."""
         self.space = space
-        super().__init__(instance=instance, data=data, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_value(self, instance: Fleet) -> float:
         """Return fleet's value, can be space contained if space is given in serializer."""
@@ -68,43 +88,46 @@ class FleetSerializer(Serializer):
         data["exchange_account"] = self.space.exchange_account
         return data
 
-    def to_value(self, instance: Fleet) -> dict[str, any]:
+    def to_representation(self, instance: Fleet) -> dict[str, any]:
         """Serialize Fleet instance."""
-        data = super().to_value(instance)
+        data = super().to_representation(instance)
         if self.space is not None:
-            for data_instane in data:
-                data_instane["space"] = self.space.uuid
-
+            data["space"] = self.space.uuid
         return data
 
 
-class FleetDetailSerializer(Serializer):
+class FleetDetailSerializer(serializers.ModelSerializer):
     """Deep serialization of a fleet instance.
 
     Use this serializer for endpoints details only.
     """
 
-    Model = Fleet
-    read_only = True
+    wallet = serializers.SerializerMethodField(read_only=True)
+    statistics = serializers.SerializerMethodField(read_only=True)
+    bots = BotSerializer(many=True, read_only=True)
 
-    uuid = UUIDField()
-    name = StrField()
-    statistics = MethodField()
-    wallet = MethodField()
-    bots = BotSerializer(many=True)
-    created_at = DatetimeField()
-    exchange_account = UUIDField(source="exchange_account.uuid")
+    class Meta:  # noqa: D106
+        model = Fleet
+        fields: ClassVar[list[str]] = [
+            "uuid",
+            "name",
+            "created_at",
+            "statistics",
+            "wallet",
+            "bots",
+            "exchange_account",
+        ]
+        read_only_fields: ClassVar[list[str]] = fields
 
     def __init__(
         self,
-        instance: Fleet | None = None,
-        data: dict[str, any] | None = None,
+        *args: list[any],
         space: Space | None = None,
         **kwargs: dict[str, any],
     ) -> None:
         """."""
         self.space = space
-        super().__init__(instance=instance, data=data, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_statistics(self, instance: Fleet) -> dict[str, str | int | float]:
         """Return Fleet's stats."""
@@ -149,32 +172,31 @@ class FleetDetailSerializer(Serializer):
 
         return merged_wallet
 
-    def to_value(self, instance: Fleet | None = None) -> dict[str, any]:
+    def to_representation(self, instance: Fleet | None = None) -> dict[str, any]:
         """Return Fleet's serialization."""
-        data = super().to_value(instance)
+        data = super().to_representation(instance)
         if self.space is not None:
             data["space"] = self.space.uuid
         return data
 
 
-class FleetMoneyFlowSerializer(Serializer):
+class FleetMoneyFlowSerializer(serializers.Serializer):
     """."""
 
-    amount = FloatField(required=True)
-    ticker = StrField(required=True)
+    amount = serializers.FloatField(write_only=True, required=True)
+    ticker = serializers.CharField(write_only=True, required=True)
 
     def __init__(
         self,
         side: str,
-        instance: Fleet | None = None,
-        data: dict[str, any] | None = None,
+        *args: list[any],
         space: Space | None = None,
         **kwargs: dict[str, any],
     ) -> None:
         """."""
         self.side = side
         self.space = space
-        super().__init__(instance=instance, data=data, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def _invest_validate(self, attrs: dict[str, any]) -> dict[str, any]:
         if self.space.testing:
