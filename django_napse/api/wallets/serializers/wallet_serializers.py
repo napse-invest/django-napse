@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+from typing import ClassVar
+
 from django.db.models import Q
 from rest_framework import serializers
 
@@ -7,20 +11,22 @@ from django_napse.core.models import Transaction, Wallet
 
 
 class WalletSerializer(serializers.ModelSerializer):
+    """Serialize a wallet instance."""
+
     currencies = CurrencySerializer(many=True, read_only=True)
     value = serializers.SerializerMethodField(read_only=True)
     operations = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Wallet
-        fields = [
+        fields: ClassVar[list[str]] = [
             "title",
             "value",
             "created_at",
             "currencies",
             "operations",
         ]
-        read_only_fields = [
+        read_only_fields: ClassVar[list[str]] = [
             "value",
             "created_at",
             "currencies",
@@ -35,9 +41,4 @@ class WalletSerializer(serializers.ModelSerializer):
         transactions_data = TransactionSerializer(transactions, many=True).data
         credits_data = CreditSerializer(instance.credits.all().order_by("created_at"), many=True).data
         debits_data = DebitSerializer(instance.debits.all().order_by("created_at"), many=True).data
-        # return {
-        #     "credits": CreditSerializer(instance.credits.all().order_by("created_at"), many=True).data,
-        #     "debits": DebitSerializer(instance.debits.all().order_by("created_at"), many=True).data,
-        #     "transactions": TransactionSerializer(transactions, many=True).data,
-        # }
         return credits_data + debits_data + transactions_data

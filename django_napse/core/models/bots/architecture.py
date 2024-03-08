@@ -1,6 +1,5 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Literal, Union
 
-import pydantic
 from django.db import models
 
 from django_napse.core.models.bots.managers import ArchitectureManager
@@ -10,21 +9,31 @@ from django_napse.utils.errors.orders import OrderError
 from django_napse.utils.findable_class import FindableClass
 
 if TYPE_CHECKING:
-    # from django_napse.core.models.bots.config import BotConfig
     from django_napse.core.models.bots.controller import Controller
     from django_napse.core.models.bots.plugin import Plugin
     from django_napse.core.models.bots.strategy import Strategy
     from django_napse.core.models.connections.connection import Connection
 
-
-class DBDataPydantic(pydantic.BaseModel):
-    strategy: "Strategy"
-    config: dict[str, any]
-    architecture: "Architecture"
-    controllers: dict[str, "Controller"]
-    connections: list["Connection"]
-    connection_data: dict["Connection", dict[str, any]]
-    plugins: dict[str, list["Plugin"]]
+DBDataType = dict[
+    Literal[
+        "strategy",
+        "config",
+        "architecture",
+        "controllers",
+        "connections",
+        "connection_data",
+        "plugins",
+    ],
+    Union[
+        "Strategy",
+        dict[str, any],
+        "Architecture",
+        dict[str, "Controller"],
+        list["Connection"],
+        dict["Connection", dict[str, any]],
+        dict[str, list["Plugin"]],
+    ],
+]
 
 
 class Architecture(models.Model, FindableClass):
@@ -107,17 +116,10 @@ class Architecture(models.Model, FindableClass):
             "extras": self.get_extras(),
         }
 
-    def prepare_db_data(self) -> dict[str, any]:
+    def prepare_db_data(
+        self,
+    ) -> DBDataType:
         """Return the data that is needed to give orders."""
-        # return DBDataPydantic(
-        #     strategy=self.strategy.find(),
-        #     config=self.strategy.find().config.find(),
-        #     architecture=self.find(),
-        #     controllers=self.controllers_dict(),
-        #     connections=self.strategy.bot.get_connections(),
-        #     connection_data=self.strategy.bot.get_connection_data(),
-        #     plugins={category: self.strategy.plugins.filter(category=category) for category in PLUGIN_CATEGORIES},
-        # )
         return {
             "strategy": self.strategy.find(),
             "config": self.strategy.find().config.find().settings,
@@ -128,7 +130,7 @@ class Architecture(models.Model, FindableClass):
             "plugins": {category: self.strategy.plugins.filter(category=category) for category in PLUGIN_CATEGORIES},
         }
 
-    def _get_orders(self, data: dict, no_db_data: Optional[dict] = None) -> list[dict]:
+    def _get_orders(self, data: dict, no_db_data: DBDataType = None) -> list[dict]:
         data = data or self.prepare_data()
         no_db_data = no_db_data or self.prepare_db_data()
         strategy = no_db_data["strategy"]

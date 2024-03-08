@@ -8,7 +8,7 @@ from django_napse.utils.constants import TRANSACTION_TYPES
 from django_napse.utils.usefull_functions import process_value_from_type
 
 if TYPE_CHECKING:
-    from django_napse.core.models.accounts.space import NapseSpace
+    from django_napse.core.models.accounts.space import Space
 
 
 class Connection(models.Model):
@@ -58,7 +58,7 @@ class Connection(models.Model):
         return self.space.testing
 
     @property
-    def space(self) -> "NapseSpace":
+    def space(self) -> "Space":
         """Return the space of the connection."""
         return self.owner.find().space
 

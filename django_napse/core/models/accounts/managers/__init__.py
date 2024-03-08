@@ -1,1 +1,1 @@
-from .space import NapseSpaceManager
+from .space import SpaceManager

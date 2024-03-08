@@ -107,7 +107,8 @@ class Fleet(models.Model):
                 result.append(bot)
         return len(result)
 
-    def get_stats(self):
+    def get_stats(self) -> dict[str, str | int | float]:
+        """Return Fleet's stats."""
         order_count = Order.objects.filter(  # noqa: F841
             connection__bot__in=self.bots,
             created_at__gt=datetime.now(tz=get_default_timezone()) - timedelta(days=30),

@@ -6,7 +6,7 @@ from django_napse.utils.usefull_functions import process_value_from_type
 
 class Simulation(models.Model):
     simulation_reference = models.UUIDField(unique=True, editable=False, null=True)
-    space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE, null=True)
+    space = models.ForeignKey("django_napse_core.Space", on_delete=models.CASCADE, null=True)
     bot = models.OneToOneField("django_napse_core.Bot", on_delete=models.CASCADE, null=True, related_name="simulation")
 
     start_date = models.DateTimeField()

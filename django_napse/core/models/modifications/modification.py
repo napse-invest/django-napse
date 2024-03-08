@@ -21,12 +21,8 @@ class Modification(models.Model, FindableClass):
     def __str__(self) -> str:
         return f"MODIFICATION: {self.pk=}"
 
-    def get_value(self, **kwargs: dict) -> any:
-        """Get the value of the modification.
-
-        Returns:
-            any: The value of the modification.
-        """
+    def get_value(self, **kwargs: dict[str, any]) -> any:
+        """Return value into classic python object."""
         return process_value_from_type(self.value, self.target_type, **kwargs)
 
     def apply__no_db(self) -> tuple[models.Model, "Modification"]:

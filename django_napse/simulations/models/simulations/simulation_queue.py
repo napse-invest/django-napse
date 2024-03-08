@@ -24,7 +24,7 @@ class SimulationQueue(models.Model):
     """Queue wrapper for a simulation."""
 
     simulation_reference = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
-    space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE, null=True)
+    space = models.ForeignKey("django_napse_core.Space", on_delete=models.CASCADE, null=True)
     bot = models.OneToOneField("django_napse_core.Bot", on_delete=models.CASCADE, null=True)
 
     start_date = models.DateTimeField()

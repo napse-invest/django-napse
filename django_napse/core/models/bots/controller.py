@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Optional
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
 
-from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.bots.managers.controller import ControllerManager
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, ORDER_STATUS, SIDES, STABLECOINS
@@ -14,6 +13,7 @@ from django_napse.utils.trading.binance_controller import BinanceController, Exc
 
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.exchange import Exchange, ExchangeAccount
+    from django_napse.core.models.bots.bot import Bot
 
 
 class Controller(models.Model):
@@ -35,13 +35,14 @@ class Controller(models.Model):
 
     objects = ControllerManager()
 
-    class Meta:  # noqa
+    class Meta:  # noqa: D106
         unique_together = ("pair", "interval", "exchange_account")
 
     def __str__(self) -> str:
-        return f"Controller {self.pk=}"
+        return f"Controller {self.pair} (id: {self.pk})"
 
-    def save(self, *args, **kwargs):  # noqa
+    def save(self, *args: list[any], **kwargs: dict[str, any]) -> None:
+        """Save the instance."""
         if not self.pk:
             self.base = self.base.upper()
             self.quote = self.quote.upper()
@@ -300,6 +301,7 @@ class Controller(models.Model):
         """Retreive the price of the pair.
 
         Only updates the price if it is older than 1 minute.
+        The ControllerUpdate task automaticaly refreshes price data.
 
         Returns:
             price: The price of the pair.

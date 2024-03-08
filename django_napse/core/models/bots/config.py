@@ -9,7 +9,7 @@ from django_napse.utils.findable_class import FindableClass
 
 class BotConfig(models.Model, FindableClass):
     uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
-    space = models.ForeignKey("NapseSpace", on_delete=models.CASCADE, related_name="bot_configs")
+    space = models.ForeignKey("Space", on_delete=models.CASCADE, related_name="bot_configs")
     immutable = models.BooleanField(default=False)
 
     objects = BotConfigManager()

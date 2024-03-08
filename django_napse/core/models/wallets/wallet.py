@@ -13,7 +13,7 @@ from django_napse.utils.findable_class import FindableClass
 
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.exchange import ExchangeAccount
-    from django_napse.core.models.accounts.space import NapseSpace
+    from django_napse.core.models.accounts.space import Space
 
 
 class WalletPydantic(BaseModel):
@@ -71,7 +71,7 @@ class Wallet(models.Model, FindableClass):
         return self.owner.testing
 
     @property
-    def space(self) -> "NapseSpace":  # pragma: no cover
+    def space(self) -> "Space":  # pragma: no cover
         """Return the space that owns the wallet."""
         error_msg = f"space() not implemented by default. Please implement it in {self.__class__}."
         raise NotImplementedError(error_msg)

@@ -2,11 +2,10 @@ from typing import ClassVar
 from uuid import UUID
 
 from rest_framework import serializers
-from rest_framework.fields import empty
 
 from django_napse.api.orders.serializers import OrderSerializer
 from django_napse.api.wallets.serializers import WalletSerializer
-from django_napse.core.models import Bot, BotHistory, ConnectionWallet, NapseSpace, Order
+from django_napse.core.models import Bot, BotHistory, ConnectionWallet, Order, Space
 
 
 class BotSerializer(serializers.ModelSerializer):
@@ -14,6 +13,7 @@ class BotSerializer(serializers.ModelSerializer):
 
     delta = serializers.SerializerMethodField(read_only=True)
     space = serializers.SerializerMethodField(read_only=True)
+    value = serializers.SerializerMethodField(read_only=True)
     exchange_account = serializers.SerializerMethodField(read_only=True)
     fleet = serializers.CharField(source="fleet.uuid", read_only=True)
 
@@ -35,16 +35,10 @@ class BotSerializer(serializers.ModelSerializer):
             "space",
         ]
 
-    def __init__(
-        self,
-        instance: Bot = None,
-        data: dict[str, any] = empty,
-        space: NapseSpace = None,
-        **kwargs: dict[str, any],
-    ) -> None:
+    def __init__(self, *args: list[any], space: Space | None = None, **kwargs: dict[str, any]) -> None:
         """Add space to the serializer and run the default constructor."""
         self.space = space
-        super().__init__(instance=instance, data=data, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_delta(self, instance: Bot) -> float:
         """Delta on the last 30 days."""
@@ -67,12 +61,22 @@ class BotSerializer(serializers.ModelSerializer):
             return None
         return instance.exchange_account.uuid
 
+    def get_value(self, instance: Bot) -> float:
+        """Return bot's value."""
+        return instance.value(space=self.space)
+
+    def create(self, validated_data: dict[str, any]) -> Bot:  # noqa: ARG002
+        """Create a bot instance."""
+        error_msg: str = "You don't have to create a bot from an endpoint"
+        raise ValueError(error_msg)
+
 
 class BotDetailSerializer(serializers.ModelSerializer):
     """Deep dive in bot's data for serialization."""
 
     delta = serializers.SerializerMethodField(read_only=True)
     space = serializers.SerializerMethodField(read_only=True)
+    value = serializers.SerializerMethodField(read_only=True)
     exchange_account = serializers.CharField(source="exchange_account.uuid", read_only=True)
     fleet = serializers.CharField(source="fleet.uuid", read_only=True)
 
@@ -82,7 +86,7 @@ class BotDetailSerializer(serializers.ModelSerializer):
 
     class Meta:  # noqa: D106
         model = Bot
-        fields: ClassVar = [
+        fields: ClassVar[list[str]] = [
             "name",
             "uuid",
             "value",
@@ -94,26 +98,12 @@ class BotDetailSerializer(serializers.ModelSerializer):
             "wallet",
             "orders",
         ]
-        read_only_fields: ClassVar = [
-            "uuid",
-            "value",
-            "delta",
-            "statistics",
-            "space",
-            "wallet",
-            "orders",
-        ]
+        read_only_fields: ClassVar = fields
 
-    def __init__(
-        self,
-        instance: Bot = None,
-        data: dict[str, any] = empty,
-        space: NapseSpace = None,
-        **kwargs: dict[str, any],
-    ) -> None:
+    def __init__(self, *args: list[any], space: Space | None = None, **kwargs: dict[str, any]) -> None:
         """Add space to the serializer and run the default constructor."""
         self.space = space
-        super().__init__(instance=instance, data=data, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_delta(self, instance: Bot) -> float:
         """Delta on the last 30 days."""
@@ -122,6 +112,10 @@ class BotDetailSerializer(serializers.ModelSerializer):
         except BotHistory.DoesNotExist:
             return 0
         return history.get_delta()
+
+    def get_value(self, instance: Bot) -> float:
+        """Return bot's value."""
+        return instance.value(space=self.space)
 
     def get_space(self, instance: Bot) -> UUID | None:  # noqa: ARG002
         """Return the space used for the space containerization."""
@@ -160,3 +154,13 @@ class BotDetailSerializer(serializers.ModelSerializer):
             ),
             many=True,
         ).data
+
+    def create(self, validated_data: dict[str, any]) -> Bot:  # noqa: ARG002
+        """Create a bot instance."""
+        error_msg: str = "You don't have to create a bot from an endpoint"
+        raise ValueError(error_msg)
+
+    def update(self, instance: Bot, validated_data: dict[str, any]) -> Bot:  # noqa: ARG002
+        """Update a bot instance."""
+        error_msg: str = "You don't have to update a bot from an endpoint"
+        raise ValueError(error_msg)

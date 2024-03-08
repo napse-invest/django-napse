@@ -1,6 +1,6 @@
 from typing import ClassVar
 
-from django_napse.core.models import EmptyBotConfig, NapseSpace
+from django_napse.core.models import EmptyBotConfig, Space
 from django_napse.utils.errors import BotConfigError
 from django_napse.utils.model_test_case import ModelTestCase
 
@@ -31,7 +31,7 @@ class BotConfigDefaultTestCase:
         config = self.simple_create()
         with self.assertRaises(ValueError):
             config.duplicate_other_space(self.space)
-        new_space = NapseSpace.objects.create(name="Test Space 2", exchange_account=self.exchange_account, description="This is a test space")
+        new_space = Space.objects.create(name="Test Space 2", exchange_account=self.exchange_account, description="This is a test space")
         config.duplicate_other_space(new_space)
 
 

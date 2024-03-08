@@ -16,13 +16,16 @@ if TYPE_CHECKING:
 
 
 class OrderBatch(models.Model):
+    """Represent a batch of bots' orders."""
+
     status = models.CharField(default=ORDER_STATUS.PENDING, max_length=15)
-    controller = models.ForeignKey("Controller", on_delete=models.CASCADE, related_name="order_batches")
+    controller: "Controller" = models.ForeignKey("Controller", on_delete=models.CASCADE, related_name="order_batches")
 
     def __str__(self) -> str:
         return f"ORDER BATCH {self.pk}"
 
-    def set_status_ready(self):
+    def set_status_ready(self) -> None:
+        """Change status of the batch from PENDING to READY."""
         if self.status == ORDER_STATUS.PENDING:
             self.status = ORDER_STATUS.READY
             self.save()
@@ -51,6 +54,8 @@ class OrderBatch(models.Model):
 
 
 class Order(models.Model):
+    """An order market created by bots."""
+
     batch = models.ForeignKey("OrderBatch", on_delete=models.CASCADE, related_name="orders")
     connection = models.ForeignKey("Connection", on_delete=models.CASCADE, related_name="orders")
     price = models.FloatField()
@@ -204,18 +209,16 @@ class Order(models.Model):
             bool: Whether the order passed or not.
         """
         batch = batch or self.batch
-        if (self.side == SIDES.BUY and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_BUY_PASSED))) or (
+        return (self.side == SIDES.BUY and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_BUY_PASSED))) or (
             self.side == SIDES.SELL and (batch.status in (ORDER_STATUS.PASSED, ORDER_STATUS.ONLY_SELL_PASSED))
-        ):
-            return True
-        return False
+        )
 
     def apply_modifications__no_db(
         self,
-        batch: "OrderBatch",
+        batch: OrderBatch,
         modifications: list["Modification"],
         **kwargs: dict,
-    ) -> tuple[list["models.Model"], list["Modification"]]:
+    ) -> tuple[list[models.Model], list["Modification"]]:
         """Apply the modifications to the order.
 
         Returns:
@@ -258,7 +261,8 @@ class Order(models.Model):
             modified_object.save()
         return modifications
 
-    def apply_swap(self):
+    def apply_swap(self) -> None:
+        """Swap quote into base (BUY) or base into quote (SELL)."""
         if self.side == SIDES.BUY:
             Debit.objects.create(
                 wallet=self.wallet,
@@ -282,7 +286,8 @@ class Order(models.Model):
                 ticker=self.batch.controller.quote,
             )
 
-    def process_payout(self):
+    def process_payout(self) -> None:
+        """Make a payout or a refund depending on the passed() status."""
         if self.side == SIDES.KEEP:
             return
         if self.passed():

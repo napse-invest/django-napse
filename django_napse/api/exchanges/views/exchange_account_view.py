@@ -15,10 +15,8 @@ from django_napse.utils.constants import EXCHANGES
 
 if TYPE_CHECKING:
     from django.db.models.query import Queryset
+    from rest_framework import serializers
     from rest_framework.request import Request
-    from rest_framework.response import HttpResponse
-
-    from django_napse.utils.serializers import Serializer
 
 
 class ExchangeAccountView(CustomViewSet):
@@ -35,7 +33,7 @@ class ExchangeAccountView(CustomViewSet):
         """Get all ExchangeAccount instances."""
         return ExchangeAccount.objects.all()
 
-    def get_serializer_class(self) -> Serializer:
+    def get_serializer_class(self) -> serializers.Serializer:
         """Get the correct serializer for the action."""
         actions: dict = {
             "list": ExchangeAccountSerializer,
@@ -44,18 +42,18 @@ class ExchangeAccountView(CustomViewSet):
         result = actions.get(self.action)
         return result if result else super().get_serializer_class()
 
-    def list(self, request: Request) -> HttpResponse:  # noqa: ARG002
+    def list(self, request: Request) -> None:  # noqa: ARG002
         """List all ExchangeAccount instances."""
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def retrieve(self, request: Request, pk: int | str | None = None) -> HttpResponse:  # noqa: ARG002
+    def retrieve(self, request: Request, pk: int | str | None = None) -> None:  # noqa: ARG002
         """Return the detail info of the given ExchangeAccount."""
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def create(self, request: Request) -> HttpResponse:
+    def create(self, request: Request) -> None:
         """Create an ExchangeAccount instance."""
         if "name" not in request.data:
             return Response({"error": "Missing name"}, status=status.HTTP_400_BAD_REQUEST)
@@ -74,13 +72,13 @@ class ExchangeAccountView(CustomViewSet):
         serializer = self.get_serializer(exchange_account)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def destroy(self, request: Request, pk: int | str | None = None) -> HttpResponse:  # noqa: ARG002
+    def destroy(self, request: Request, pk: int | str | None = None) -> None:  # noqa: ARG002
         """Destroy an ExchangeAccount instance."""
         instance = self.get_object()
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    def patch(self, request: Request, pk: int | str | None = None) -> HttpResponse:  # noqa: ARG002
+    def patch(self, request: Request, pk: int | str | None = None) -> None:  # noqa: ARG002
         """Patch an ExchangeAccount instance."""
         instance = self.get_object()
         if "name" in request.data:
@@ -92,6 +90,6 @@ class ExchangeAccountView(CustomViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=["GET"])
-    def possible_exchanges(self, request: Request) -> HttpResponse:  # noqa: ARG002
+    def possible_exchanges(self, request: Request) -> None:  # noqa: ARG002
         """Return the list of possible Exchange to build the ExchangeAccount."""
         return Response(list(EXCHANGES), status=status.HTTP_200_OK)

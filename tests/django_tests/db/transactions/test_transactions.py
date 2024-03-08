@@ -1,4 +1,4 @@
-from django_napse.core.models import Credit, ExchangeAccount, NapseSpace, Transaction
+from django_napse.core.models import Credit, ExchangeAccount, Space, Transaction
 from django_napse.utils.constants import TRANSACTION_TYPES
 from django_napse.utils.errors import TransactionError
 from django_napse.utils.model_test_case import ModelTestCase
@@ -13,7 +13,7 @@ class TransactionTestCase:
 
     def setUp(self):
         self.from_wallet = self.space.wallet
-        space = NapseSpace.objects.create(
+        space = Space.objects.create(
             name="Test Space 2",
             exchange_account=self.exchange_account,
             description="This is a test space",
@@ -38,7 +38,7 @@ class TransactionTestCase:
             name="random exchange account 2",
             description="random description",
         )
-        space2 = NapseSpace.objects.create(
+        space2 = Space.objects.create(
             name="Test Space 2",
             exchange_account=exchange_account2,
             description="This is a test space",

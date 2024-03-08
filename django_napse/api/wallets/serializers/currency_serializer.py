@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from rest_framework import serializers
 
 from django_napse.core.models import Currency
@@ -5,11 +7,13 @@ from django_napse.core.models.bots.controller import Controller
 
 
 class CurrencySerializer(serializers.ModelSerializer):
+    """Serialize a currency instance."""
+
     value = serializers.SerializerMethodField(read_only=True)
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Currency
-        fields = [
+        fields: ClassVar[list[str]] = [
             "mbp",
             "ticker",
             "amount",

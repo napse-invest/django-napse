@@ -7,20 +7,20 @@ from django_napse.core.models.wallets.wallet import Wallet
 
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.exchange import ExchangeAccount
-    from django_napse.core.models.accounts.space import NapseSpace
+    from django_napse.core.models.accounts.space import Space
     from django_napse.core.models.bots.bot import Bot
 
 
 class SpaceWallet(Wallet):
     """A Wallet owned by a Space."""
 
-    owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="wallet")
+    owner = models.OneToOneField("Space", on_delete=models.CASCADE, related_name="wallet")
 
     def __str__(self) -> str:  # pragma: no cover
         return f"WALLET: {self.pk=}. OWNER: {self.owner=}"
 
     @property
-    def space(self) -> "NapseSpace":
+    def space(self) -> "Space":
         """Return the space that owns the wallet."""
         return self.owner
 
