@@ -62,6 +62,7 @@ class ExchangeAccountView(CustomViewSet):
         if "testing" not in request.data:
             return Response({"error": "Missing testing"}, status=status.HTTP_400_BAD_REQUEST)
 
+        # TODO (Xénépix) : Rework the following part to use a serializer. # noqa
         exchange = Exchange.objects.get(name=request.data["exchange"])
         exchange_account = ExchangeAccount.objects.create(
             exchange=exchange,
@@ -85,6 +86,8 @@ class ExchangeAccountView(CustomViewSet):
             instance.name = request.data["name"]
         if "description" in request.data:
             instance.description = request.data["description"]
+        # TODO (Xénépix) : Rework the following part to use a serializer. # noqa
+
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data, status=status.HTTP_200_OK)

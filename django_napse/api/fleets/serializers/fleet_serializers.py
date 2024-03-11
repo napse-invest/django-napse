@@ -95,6 +95,10 @@ class FleetSerializer(serializers.ModelSerializer):
             data["space"] = self.space.uuid
         return data
 
+    def create(self, validated_data: dict[str, any]) -> Fleet:
+        """Create a Fleet instance."""
+        return Fleet.objects.create(**validated_data)
+
 
 class FleetDetailSerializer(serializers.ModelSerializer):
     """Deep serialization of a fleet instance.
