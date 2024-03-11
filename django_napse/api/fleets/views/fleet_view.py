@@ -131,7 +131,7 @@ class FleetView(CustomViewSet):
         """Delete a fleet."""
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
 
-    @action(detail=True, methods=["post"])
+    @action(detail=True, methods=["GET", "POST"])
     def invest(self, request: Request, pk: str | int | UUID | None = None) -> None:  # noqa: ARG002
         """Invest in a fleet."""
         fleet = self.get_object()
@@ -141,18 +141,29 @@ class FleetView(CustomViewSet):
             error_msg: str = "Investing in real is not allowed yet."
             return Response(error_msg, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = self.get_serializer(
-            data=request.data,
-            instance=fleet,
-            space=space,
-            side="INVEST",
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        match request.method:
+            case "POST":
+                serializer = self.get_serializer(
+                    data=request.data,
+                    instance=fleet,
+                    space=space,
+                    side="INVEST",
+                )
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+                return Response(status=status.HTTP_200_OK)
 
-        return Response(status=status.HTTP_200_OK)
+            case "GET":
+                from pprint import pprint
 
-    @action(detail=True, methods=["post"])
+                pprint(space.wallet.currencies.all())
+                possible_investments = [{"ticker": currency.ticker, "amout": currency.amount} for currency in space.wallet.currencies.all()]
+                return Response(possible_investments, status=status.HTTP_200_OK)
+
+            case _:
+                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    @action(detail=True, methods=["GET", "POST"])
     def withdraw(self, request: Request, pk: str | int | UUID | None = None) -> None:  # noqa: ARG002
         """Withdraw from a fleet."""
         return Response(status=status.HTTP_501_NOT_IMPLEMENTED)

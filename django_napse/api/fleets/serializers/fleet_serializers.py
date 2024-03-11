@@ -37,10 +37,15 @@ class FleetSerializer(serializers.ModelSerializer):
             "bot_count",
             "delta",
             "exchange_account",
+            "testing",
         ]
         read_only_fields: ClassVar[list[str]] = [
             "uuid",
+            "value",
+            "bot_count",
+            "delta",
             "exchange_account",
+            "testing",
         ]
 
     def __init__(
@@ -95,6 +100,10 @@ class FleetSerializer(serializers.ModelSerializer):
             data["space"] = self.space.uuid
         return data
 
+    def create(self, validated_data: dict[str, any]) -> Fleet:
+        """Create a Fleet instance."""
+        return Fleet.objects.create(**validated_data)
+
 
 class FleetDetailSerializer(serializers.ModelSerializer):
     """Deep serialization of a fleet instance.
@@ -116,6 +125,7 @@ class FleetDetailSerializer(serializers.ModelSerializer):
             "wallet",
             "bots",
             "exchange_account",
+            "testing",
         ]
         read_only_fields: ClassVar[list[str]] = fields
 
