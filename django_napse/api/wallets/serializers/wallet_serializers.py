@@ -5,6 +5,7 @@ from typing import ClassVar
 from django.db.models import Q
 from rest_framework import serializers
 
+from django_napse.api.histories.serializers.history import HistorySerializer
 from django_napse.api.transactions.serializers import CreditSerializer, DebitSerializer, TransactionSerializer
 from django_napse.api.wallets.serializers.currency_serializer import CurrencySerializer
 from django_napse.core.models import Transaction, Wallet
@@ -16,8 +17,9 @@ class WalletSerializer(serializers.ModelSerializer):
     currencies = CurrencySerializer(many=True, read_only=True)
     value = serializers.SerializerMethodField(read_only=True)
     operations = serializers.SerializerMethodField(read_only=True)
+    history = HistorySerializer(many=False, read_only=True)
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Wallet
         fields: ClassVar[list[str]] = [
             "title",
@@ -25,6 +27,7 @@ class WalletSerializer(serializers.ModelSerializer):
             "created_at",
             "currencies",
             "operations",
+            "history",
         ]
         read_only_fields: ClassVar[list[str]] = [
             "value",

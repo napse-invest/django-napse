@@ -25,16 +25,25 @@ class Bot(models.Model):
 
     strategy = models.OneToOneField("Strategy", on_delete=models.CASCADE, related_name="bot")
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"BOT {self.pk=}"
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: list, **kwargs: dict) -> None:  # noqa: D102
         if self.is_in_simulation and self.is_in_fleet:
             error_msg = "Bot is in simulation and fleet."
             raise BotError.InvalidSetting(error_msg)
         return super().save(*args, **kwargs)
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Bot {self.pk}:\n"
         string += f"{beacon}Args:\n"

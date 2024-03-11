@@ -4,7 +4,7 @@ from django_napse.core.models.transactions.managers import DebitManager
 
 
 class Debit(models.Model):
-    """Debit action on a wallet."""
+    """A Debit is a transaction that forcefully removes money from a wallet."""
 
     wallet = models.ForeignKey("Wallet", on_delete=models.CASCADE, related_name="debits")
     amount = models.FloatField()
@@ -13,7 +13,7 @@ class Debit(models.Model):
 
     objects = DebitManager()
 
-    def __str__(self) -> str:
+    def __str__(self) -> str:  # pragma: no cover
         return f"DEBIT: {self.pk})"
 
     def info(self, beacon: str = "", *, verbose: bool = True) -> str:

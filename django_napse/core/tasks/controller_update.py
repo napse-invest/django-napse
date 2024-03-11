@@ -3,23 +3,22 @@ from django_napse.core.tasks.base_task import BaseTask
 
 
 class ControllerUpdateTask(BaseTask):
+    """Task to update all controllers."""
+
     name = "controller_update"
     interval_time = 45
     time_limit = 60
     soft_time_limit = 60
 
-    def run(self):
+    def run(self) -> None:
         """Run a task to update all controllers."""
-        print("ControllerUpdateTask")
-        if not self.avoid_overlap(verbose=True):
-            print("skipped")
+        if not self.avoid_overlap(verbose=False):
             return
+        self.info("Running ControllerUpdateTask")
         for controller in Controller.objects.all():
-            controller._update_variables()
-            controller._get_price()
+            controller.update_variables_always()
+            controller.get_price_always()
 
 
 ControllerUpdateTask().delete_task()
 ControllerUpdateTask().register_task()
-
-print("ControllerUpdateTask registered")

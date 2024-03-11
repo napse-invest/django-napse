@@ -8,7 +8,7 @@ class MBPPlugin(Plugin):
     def plugin_category(cls):
         return PLUGIN_CATEGORIES.POST_ORDER
 
-    def _apply(self, data: dict) -> dict:
+    def apply__no_db(self, data: dict) -> dict:
         order = data["order"]
         if order["side"] == SIDES.BUY:
             new_mbp = f"{order['controller'].base}|{order['price']}"

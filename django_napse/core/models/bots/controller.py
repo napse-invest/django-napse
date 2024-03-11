@@ -1,6 +1,6 @@
 import math
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
@@ -9,13 +9,17 @@ from django_napse.core.models.bots.managers.controller import ControllerManager
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, ORDER_STATUS, SIDES, STABLECOINS
 from django_napse.utils.errors import ControllerError
-from django_napse.utils.trading.binance_controller import BinanceController
+from django_napse.utils.trading.binance_controller import BinanceController, ExchangeController
+
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.exchange import Exchange, ExchangeAccount
+    from django_napse.core.models.bots.bot import Bot
 
 
 class Controller(models.Model):
-    """Manage data from exchange platform."""
+    """Model to control the trading of a pair on an exchange."""
 
-    exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="controller")
+    exchange_account: "ExchangeAccount" = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="controller")
 
     pair = models.CharField(max_length=10)
     base = models.CharField(max_length=10)
@@ -46,7 +50,7 @@ class Controller(models.Model):
                 error_msg = f"Base and quote cannot be the same: {self.base} - {self.quote}"
                 raise ControllerError.InvalidSetting(error_msg)
             self.pair = self.base + self.quote
-            self._update_variables()
+            self.update_variables_always()
             if self.interval not in EXCHANGE_INTERVALS[self.exchange.name]:
                 error_msg = f"Invalid interval: {self.interval}"
                 raise ControllerError.InvalidSetting(error_msg)
@@ -81,7 +85,7 @@ class Controller(models.Model):
         return string
 
     @staticmethod
-    def get(exchange_account, base: str, quote: str, interval: str = "1m") -> "Controller":
+    def get(exchange_account: "ExchangeAccount", base: str, quote: str, interval: str = "1m") -> "Controller":
         """Return a controller object from the database."""
         try:
             controller = Controller.objects.get(
@@ -102,19 +106,25 @@ class Controller(models.Model):
         return controller
 
     @property
-    def exchange_controller(self):
+    def exchange_controller(self) -> "ExchangeController":
+        """Return the exchange controller of the controller.
+
+        Returns:
+            ExchangeController: The exchange controller of the controller.
+        """
         return self.exchange_account.find().exchange_controller()
 
     @property
-    def exchange(self):
+    def exchange(self) -> "Exchange":
+        """Return the exchange of the controller."""
         return self.exchange_account.exchange
 
     def update_variables(self) -> None:
         """If the variables are older than 1 minute, update them."""
         if self.last_settings_update is None or self.last_settings_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
-            self._update_variables()
+            self.update_variables_always()
 
-    def _update_variables(self) -> None:
+    def update_variables_always(self) -> None:
         """Update the variables of the controller."""
         exchange_controller = self.exchange_controller
 
@@ -132,13 +142,11 @@ class Controller(models.Model):
                 self.min_trade = self.min_notional / float(last_price)
                 self.last_settings_update = datetime.now(tz=timezone.utc)
             except ReadTimeout:
-                print("ReadTimeout in _update_variables")
+                print("ReadTimeout in update_variables_always")
             except SSLError:
-                print("SSLError in _update_variables")
+                print("SSLError in update_variables_always")
             except ConnectionError:
-                print("ConnectionError in _update_variables")
-            except Exception as e:
-                print(f"Exception in _update_variables: {e}, {type(e)}")
+                print("ConnectionError in update_variables_always")
         else:
             error_msg = f"Exchange controller not supported: {exchange_controller.__class__}"
             raise NotImplementedError(error_msg)
@@ -146,7 +154,7 @@ class Controller(models.Model):
         if self.pk:
             self.save()
 
-    def process_orders(self, testing: bool, no_db_data: Optional[dict] = None) -> list[Order]:
+    def process_orders(self, no_db_data: Optional[dict] = None, *, testing: bool) -> list[Order]:
         in_simulation = no_db_data is not None
         no_db_data = no_db_data or {
             "buy_orders": Order.objects.filter(
@@ -189,10 +197,10 @@ class Controller(models.Model):
 
         if aggregated_order["buy_amount"] > 0:
             for order in no_db_data["buy_orders"]:
-                order._calculate_batch_share(total=aggregated_order["buy_amount"])
+                order.calculate_batch_share(total=aggregated_order["buy_amount"])
         if aggregated_order["sell_amount"] > 0:
             for order in no_db_data["sell_orders"]:
-                order._calculate_batch_share(total=aggregated_order["sell_amount"])
+                order.calculate_batch_share(total=aggregated_order["sell_amount"])
         for order in no_db_data["keep_orders"]:
             order.batch_share = 0
 
@@ -203,21 +211,21 @@ class Controller(models.Model):
         )
         all_orders = []
         for order in no_db_data["buy_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts=executed_amounts_buy,
                 fees=fees_buy,
             )
             all_orders.append(order)
         for order in no_db_data["sell_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts=executed_amounts_sell,
                 fees=fees_sell,
             )
             all_orders.append(order)
         for order in no_db_data["keep_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts={},
                 fees={},
@@ -248,8 +256,8 @@ class Controller(models.Model):
         """
         orders = []
         for bot in self.bots.all().filter(is_simulation=False, fleet__running=True, can_trade=True):
-            bot = bot.find()
-            orders.append(bot.give_order(closed_candle, current_candle))
+            bot: "Bot"
+            orders = [*orders, bot.give_order(closed_candle, current_candle)]
         return orders
 
     @staticmethod
@@ -264,7 +272,7 @@ class Controller(models.Model):
 
         return float(controller.get_price())
 
-    def _get_price(self) -> float:
+    def get_price_always(self) -> float:
         """Get the price of the pair.
 
         Always calls the exchange API. (Can be costly)
@@ -278,17 +286,16 @@ class Controller(models.Model):
                 self.price = float(exchange_controller.client.get_ticker(symbol=self.pair)["lastPrice"])
                 self.last_price_update = datetime.now(tz=timezone.utc)
             except ReadTimeout:
-                print("ReadTimeout in _get_price")
+                print("ReadTimeout in get_price_always")
             except SSLError:
-                print("SSLError in _get_price")
+                print("SSLError in get_price_always")
             except ConnectionError:
-                print("ConnectionError in _get_price")
-            except Exception as e:
-                print(f"Exception in _get_price: {e}, {type(e)}")
+                print("ConnectionError in get_price_always")
         else:
             error_msg = f"Exchange controller not supported: {exchange_controller.__class__}"
             raise NotImplementedError(error_msg)
         self.save()
+        return self.price
 
     def get_price(self) -> float:
         """Retreive the price of the pair.
@@ -300,15 +307,16 @@ class Controller(models.Model):
             price: The price of the pair.
         """
         if self.last_price_update is None or self.last_price_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
-            self._get_price()
+            self.get_price_always()
         return self.price
 
     def download(
         self,
         start_date: datetime,
         end_date: datetime,
-        squash: bool = False,
         verbose: int = 0,
+        *,
+        squash: bool = False,
     ):
         return self.exchange_controller.download(
             controller=self,
@@ -317,5 +325,3 @@ class Controller(models.Model):
             squash=squash,
             verbose=verbose,
         )
-
-        return f"CANDLE {self.pk}"

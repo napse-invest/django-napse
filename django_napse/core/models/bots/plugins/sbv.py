@@ -9,7 +9,7 @@ class SBVPlugin(Plugin):
     def plugin_category(cls):
         return PLUGIN_CATEGORIES.POST_ORDER
 
-    def _apply(self, data: dict) -> dict:
+    def apply__no_db(self, data: dict) -> dict:
         order = data["order"]
         current_base_amout = (
             data["connection_data"][data["connection"]]["wallet"]

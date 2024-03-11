@@ -14,7 +14,7 @@ class WalletHistoryTestCase:
         wallet = self.space.wallet
         Currency.objects.create(wallet=wallet, ticker="BTC", amount=1, mbp=20000)
         Currency.objects.create(wallet=wallet, ticker="ETH", amount=0, mbp=1000)
-        return WalletHistory.objects.create(owner=wallet)
+        return wallet.history
 
     def test_generate_data_points(self):
         history = self.simple_create()

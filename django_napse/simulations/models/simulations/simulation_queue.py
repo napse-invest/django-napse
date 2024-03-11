@@ -280,7 +280,7 @@ class SimulationQueue(models.Model):
                     testing=True,
                 )
                 for order in orders:
-                    order._apply_modifications(
+                    order.apply_modifications__no_db(
                         batch=batch,
                         modifications=[modification for modification in all_modifications if modification.order == order],
                         strategy=no_db_data["strategy"],

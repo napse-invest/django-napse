@@ -93,7 +93,7 @@ class History(FindableClass, models.Model):
 class HistoryDataPoint(models.Model):
     """A HistoryDataPoint is a collection of fields."""
 
-    history = models.ForeignKey(History, on_delete=models.CASCADE, related_name="data_points")
+    history: "History" = models.ForeignKey(History, on_delete=models.CASCADE, related_name="data_points")
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = HistoryDataPointManager()
@@ -128,7 +128,7 @@ class HistoryDataPoint(models.Model):
 class HistoryDataPointField(models.Model):
     """A HistoryDataPointField is a key-value pair with a target type."""
 
-    history_data_point = models.ForeignKey(HistoryDataPoint, on_delete=models.CASCADE, related_name="fields")
+    history_data_point: "HistoryDataPoint" = models.ForeignKey(HistoryDataPoint, on_delete=models.CASCADE, related_name="fields")
     key = models.CharField(max_length=255)
     value = models.CharField(max_length=255)
     target_type = models.CharField(max_length=255)
