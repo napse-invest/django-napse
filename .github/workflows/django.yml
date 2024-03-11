@@ -94,7 +94,7 @@ jobs:
           label: Coverage
           message: ${{ env.COVERAGE }} %
           valColorRange: ${{ env.COVERAGE }}
-          minColorRange: 70
+          minColorRange: 60
           maxColorRange: 100
 
   stop-runner:
