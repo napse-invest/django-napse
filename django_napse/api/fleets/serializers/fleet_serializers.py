@@ -37,10 +37,15 @@ class FleetSerializer(serializers.ModelSerializer):
             "bot_count",
             "delta",
             "exchange_account",
+            "testing",
         ]
         read_only_fields: ClassVar[list[str]] = [
             "uuid",
+            "value",
+            "bot_count",
+            "delta",
             "exchange_account",
+            "testing",
         ]
 
     def __init__(
@@ -120,6 +125,7 @@ class FleetDetailSerializer(serializers.ModelSerializer):
             "wallet",
             "bots",
             "exchange_account",
+            "testing",
         ]
         read_only_fields: ClassVar[list[str]] = fields
 
