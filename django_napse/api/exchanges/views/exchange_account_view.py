@@ -11,6 +11,7 @@ from django_napse.api.custom_viewset import CustomViewSet
 from django_napse.api.exchanges.serializers.exchange_account_detail_serializer import ExchangeAccountDetailSerializer
 from django_napse.api.exchanges.serializers.exchange_account_serializer import ExchangeAccountSerializer
 from django_napse.core.models import Exchange, ExchangeAccount
+from django_napse.core.models.accounts.exchange import EXCHANGE_ACCOUNT_DICT
 from django_napse.utils.constants import EXCHANGES
 
 if TYPE_CHECKING:
@@ -61,14 +62,13 @@ class ExchangeAccountView(CustomViewSet):
             return Response({"error": "Missing exchange"}, status=status.HTTP_400_BAD_REQUEST)
         if "testing" not in request.data:
             return Response({"error": "Missing testing"}, status=status.HTTP_400_BAD_REQUEST)
-
+        print(request.data)
         # TODO (Xénépix) : Rework the following part to use a serializer. # noqa
-        exchange = Exchange.objects.get(name=request.data["exchange"])
-        exchange_account = ExchangeAccount.objects.create(
+        data = request.data.copy()
+        exchange = Exchange.objects.get(name=data.pop("exchange"))
+        exchange_account = EXCHANGE_ACCOUNT_DICT[request.data["exchange"]].objects.create(
             exchange=exchange,
-            name=request.data["name"],
-            testing=request.data["testing"],
-            description=request.data.get("description", ""),
+            **data,
         )
         serializer = self.get_serializer(exchange_account)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
