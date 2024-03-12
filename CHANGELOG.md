@@ -1,3 +1,10 @@
+## [1.13.2](https://github.com/napse-invest/django-napse/compare/v1.13.1...v1.13.2) (2024-03-12)
+
+
+### Bug Fixes
+
+* **api:** exchange_account creation ([45cb17a](https://github.com/napse-invest/django-napse/commit/45cb17af8a34f0e761748eed78cafbdc43dcdfc0))
+
 ## [1.13.1](https://github.com/napse-invest/django-napse/compare/v1.13.0...v1.13.1) (2024-03-12)
 
 
