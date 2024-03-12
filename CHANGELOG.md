@@ -1,3 +1,17 @@
+# [1.12.0](https://github.com/napse-invest/django-napse/compare/v1.11.0...v1.12.0) (2024-02-27)
+
+
+### Bug Fixes
+
+* **Fields:** instance_check is now a static method ([6f773db](https://github.com/napse-invest/django-napse/commit/6f773dbdc3a9f0f53236e737e8a0596f3dcc54e2))
+* **serializer:** models check works now well with validated data ([dcb249a](https://github.com/napse-invest/django-napse/commit/dcb249a2b8f6912d60fb77e9eeb19948a5382c3c))
+* **serializers:** minor fixes for cleaner code ([f92705b](https://github.com/napse-invest/django-napse/commit/f92705b55ce27eca52dbb492ec027fbafdc3eecd))
+
+
+### Features
+
+* **serializer:** add validations + model manipulation in serializer + UUIDField and DatetimeField ([34317ca](https://github.com/napse-invest/django-napse/commit/34317ca8a5c211d16dde8eddd6befae89049f21b))
+
 # [1.11.0](https://github.com/napse-invest/django-napse/compare/v1.10.4...v1.11.0) (2024-02-21)
 
 
