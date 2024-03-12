@@ -1,3 +1,23 @@
+# [1.13.0](https://github.com/napse-invest/django-napse/compare/v1.12.0...v1.13.0) (2024-03-12)
+
+
+### Bug Fixes
+
+* **naming:** renamed NapseSpace to Space ([9b8a450](https://github.com/napse-invest/django-napse/commit/9b8a450357b6122c2376fd7b946a282bcbef96af))
+* **serializer:** fix functionnal issues & add optimizations ([add79fb](https://github.com/napse-invest/django-napse/commit/add79fbf3105065ab8dd316d1993a4d42799f799))
+* **serializer:** fix Non subinstances in serializers ([42ec3a4](https://github.com/napse-invest/django-napse/commit/42ec3a41773df49edb321ff77df1d3456827884a))
+* **serializer:** replace getter generator by a list ([039809a](https://github.com/napse-invest/django-napse/commit/039809ad5d1c789f26624a2c4cc21dac2fe76cab))
+
+
+### Features
+
+* **celery:** new history task ([e7f74fa](https://github.com/napse-invest/django-napse/commit/e7f74faf7c9a5dbe3b8a6880e3e002b465af2195))
+* **field:** add default ([0704aa1](https://github.com/napse-invest/django-napse/commit/0704aa1f7a144f37ce2aa849f34618962049454e))
+* **histories:** added serializers and updated space view ([a267240](https://github.com/napse-invest/django-napse/commit/a267240c3fd50f4b4590fa435edd6586a8c5c999))
+* **histories:** added WalletHistories ([a659172](https://github.com/napse-invest/django-napse/commit/a659172fd04815d512282235166ed1aa25b2e240))
+* **serializer:** add default to fields & improve drf & django compatibility ([9673316](https://github.com/napse-invest/django-napse/commit/9673316dcac0b694d0bcaf5bae37ceea3a7ddc98))
+* **serializer:** add read-only status ([96466eb](https://github.com/napse-invest/django-napse/commit/96466eb315f189eb05514c11a05bad744aebe79f))
+
 # [1.12.0](https://github.com/napse-invest/django-napse/compare/v1.11.0...v1.12.0) (2024-02-27)
 
 
