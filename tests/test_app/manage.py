@@ -4,10 +4,10 @@ import os
 import sys
 from pathlib import Path
 
-sys.path.append(str(Path(os.path.dirname(__file__)).parent.parent))
+sys.path.append(str(Path(__file__).resolve().parent.parent.parent))
 
 
-def main():
+def main() -> None:
     """Run administrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
     try:

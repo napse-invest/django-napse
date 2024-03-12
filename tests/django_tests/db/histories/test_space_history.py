@@ -6,7 +6,7 @@ python tests/test_app/manage.py test tests.django_tests.db.histories -v2 --keepd
 """
 
 
-class SpecialHistoryTestCase:
+class SpaceHistoryTestCase:
     model = SpaceHistory
 
     def simple_create(self):
@@ -21,5 +21,5 @@ class SpecialHistoryTestCase:
         self.assertEqual(history1, history2)
 
 
-class SpecialHistoryBINANCETestCase(SpecialHistoryTestCase, ModelTestCase):
+class SpaceHistoryBINANCETestCase(SpaceHistoryTestCase, ModelTestCase):
     exchange = "BINANCE"

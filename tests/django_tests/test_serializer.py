@@ -1,9 +1,9 @@
-from django_napse.utils.serializers.fields import Field, IntField, StrField, BoolField, DatetimeField, MethodField, UUIDField
-from django_napse.utils.serializers.serializer import Serializer, MetaSerializer
-
-from django_napse.core.models import Exchange, ExchangeAccount
 from django.test import TestCase
 from rest_framework.serializers import ValidationError
+
+from django_napse.core.models import Exchange, ExchangeAccount
+from django_napse.utils.serializers import MetaSerializer, Serializer
+from django_napse.utils.serializers.fields import BoolField, DatetimeField, IntField, MethodField, StrField, UUIDField
 
 """
 python tests/test_app/manage.py test tests.django_tests.test_serializer -v2 --keepdb --parallel
@@ -39,6 +39,7 @@ class ExchangeAccountSerializer(Serializer):
 class SerializerSerializationTestCase(TestCase):
     def setUp(self):
         self.exchange = Exchange.objects.create(name="Binance", description="Binance exchange")
+        self.exchange.test_int_field = 1  # Just for testing the int field
         self.exchange_account = ExchangeAccount.objects.create(
             exchange=self.exchange,
             name="Binance Account",
@@ -67,7 +68,11 @@ class SerializerSerializationTestCase(TestCase):
             data,
             {
                 "uuid": str(self.exchange_account.uuid),
-                "exchange": {"name": "Binance", "description": "Binance exchange"},
+                "exchange": {
+                    "name": "Binance",
+                    "description": "Binance exchange",
+                    "test_int_field": 1,
+                },
                 "name": "Binance Account",
                 "testing": True,
                 "description": "Binance account description",
@@ -85,41 +90,40 @@ class SerializerSerializationTestCase(TestCase):
 
     def test_source_serialization(self):
         exchange_account_serializer = ExchangeAccountSerializer
-        exchange_account_serializer._fields["exchange"] = StrField(source="exchange.name")
-        exchange_account_serializer._compiled_fields = MetaSerializer._compile_fields(
-            fields=exchange_account_serializer._fields,
+        exchange_account_serializer.fields_map["exchange"] = StrField(source="exchange.name")
+        exchange_account_serializer.compiled_fields = MetaSerializer._compile_fields(  # noqa: SLF001
+            fields=exchange_account_serializer.fields_map,
             serializer_cls=exchange_account_serializer,
         )
 
         exchange_account_serializer = exchange_account_serializer(self.exchange_account)
         data = exchange_account_serializer.data
-        print(data)
         self.assertEqual(data.get("exchange"), self.exchange.name)
 
         # reset
         exchange_account_serializer = ExchangeAccountSerializer
-        exchange_account_serializer._fields["exchange"] = ExchangeSerializer()
-        exchange_account_serializer._compiled_fields = MetaSerializer._compile_fields(
-            fields=exchange_account_serializer._fields,
+        exchange_account_serializer.fields_map["exchange"] = ExchangeSerializer()
+        exchange_account_serializer.compiled_fields = MetaSerializer._compile_fields(  # noqa: SLF001
+            fields=exchange_account_serializer.fields_map,
             serializer_cls=exchange_account_serializer,
         )
 
-    def test_serialization_with_missing_required_field(self):
-        exchange_account_serializer = ExchangeAccountSerializer()
-        exchange_account_serializer._fields["required_field"] = Field(required=True)
-        exchange_account_serializer._compiled_fields = MetaSerializer._compile_fields(
-            fields=exchange_account_serializer._fields,
-            serializer_cls=exchange_account_serializer.__class__,
+    def test_many_source_serialization(self):
+        exchange_account_serializer = ExchangeAccountSerializer
+        exchange_account_serializer.fields_map["exchange"] = StrField(source="exchange.name")
+        exchange_account_serializer.compiled_fields = MetaSerializer._compile_fields(  # noqa: SLF001
+            fields=exchange_account_serializer.fields_map,
+            serializer_cls=exchange_account_serializer,
         )
-
-        with self.assertRaises(ValueError):
-            exchange_account_serializer.data  # noqa: B018
+        exchange_account_serializer = exchange_account_serializer(instance=[self.exchange_account for _ in range(10)], many=True)
+        data = exchange_account_serializer.data
+        self.assertEqual(len(data), 10)
 
         # reset
         exchange_account_serializer = ExchangeAccountSerializer
-        exchange_account_serializer._fields.pop("required_field")
-        exchange_account_serializer._compiled_fields = MetaSerializer._compile_fields(
-            fields=exchange_account_serializer._fields,
+        exchange_account_serializer.fields_map["exchange"] = ExchangeSerializer()
+        exchange_account_serializer.compiled_fields = MetaSerializer._compile_fields(  # noqa: SLF001
+            fields=exchange_account_serializer.fields_map,
             serializer_cls=exchange_account_serializer,
         )
 
@@ -127,6 +131,7 @@ class SerializerSerializationTestCase(TestCase):
 class SerializerValidationTestCase(TestCase):
     def setUp(self):
         self.exchange = Exchange.objects.create(name="Binance", description="Binance exchange")
+        self.exchange.test_int_field = 1  # Just for testing the int field
         self.exchange_account = ExchangeAccount.objects.create(
             exchange=self.exchange,
             name="Binance Account",
@@ -152,6 +157,13 @@ class SerializerValidationTestCase(TestCase):
         exchange_serializer = ExchangeAccountSerializer(data=data)
         instance = exchange_serializer.create()
         self.assertEqual(isinstance(instance, ExchangeAccount), True)
+        self.assertEqual(
+            isinstance(
+                exchange_serializer.validated_data.get("exchange"),
+                Exchange,
+            ),
+            True,
+        )
 
     def test_exchange_validation_and_update(self):
         data = {"name": "TEST", "description": "new description"}
@@ -181,13 +193,6 @@ class SerializerValidationTestCase(TestCase):
         }
         with self.assertRaises(ValidationError):
             ExchangeSerializer(data=data)
-        # with self.assertRaises(ValidationError):
-        #     ExchangeAccountSerializer(data=data)
-        # eas = ExchangeAccountSerializer(data=data)
-        # from pprint import pprint
-
-        # pprint(eas.validated_data)
-        # pprint(eas._validators)
 
     def test_validation_with_invalid_data(self):
         data = 1

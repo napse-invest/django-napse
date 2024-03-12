@@ -40,6 +40,13 @@ Or you can use it as a local backend for the [Napse desktop application](https:/
 
 Find more details for installation in the [documentation](https://napse-invest.github.io/django-napse/#installation).
 
+### Quick start
+
+```shell
+make setup
+make up
+```
+
 ### Documentation
 
 You can find the documentation [here](https://napse-invest.github.io/django-napse/).

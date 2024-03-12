@@ -1,8 +1,14 @@
+from typing import TypeVar
+
 from django.apps import apps
+
+T = TypeVar("T", bound="FindableClass")
 
 
 class FindableClass:
-    def find(self):
+    """Class to find the correct subclass of a django model."""
+
+    def find(self: T) -> T:
         """Find the correct subclass of this django model."""
         instance = self
 

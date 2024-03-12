@@ -44,7 +44,7 @@ class KeyView(CustomViewSet):
             serializer = NapseAPIKeySerializer(key)
             return Response(serializer.data, status=status.HTTP_200_OK)
         serializer = NapseAPIKeySpaceSerializer(
-            key,
+            instance=key,
             context={
                 "space": request.query_params["space"],
             },

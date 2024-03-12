@@ -1,26 +1,53 @@
 import time
+from datetime import datetime
+from typing import TYPE_CHECKING
 
 from django.db import models
+from pydantic import BaseModel
 
 from django_napse.core.models.bots.controller import Controller
-from django_napse.core.models.connections.connection import Connection
-from django_napse.core.models.wallets.currency import Currency
+from django_napse.core.models.wallets.currency import Currency, CurrencyPydantic
 from django_napse.core.models.wallets.managers import WalletManager
 from django_napse.utils.errors import WalletError
 from django_napse.utils.findable_class import FindableClass
 
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.exchange import ExchangeAccount
+    from django_napse.core.models.accounts.space import Space
+
+
+class WalletPydantic(BaseModel):
+    """A Pydantic model for the Wallet class."""
+
+    title: str
+    testing: bool
+    locked: bool
+    created_at: datetime
+    currencies: dict[str, CurrencyPydantic]
+
 
 class Wallet(models.Model, FindableClass):
+    """A Wallet is a collection of currencies."""
+
     title = models.CharField(max_length=255, default="Wallet")
     locked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     objects = WalletManager()
 
-    def __str__(self):
+    def __str__(self) -> str:  # pragma: no cover
         return f"WALLET: {self.pk=}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         self = self.find()
         string = ""
         string += f"{beacon}Wallet ({self.pk=}):\t{type(self)}\n"
@@ -39,20 +66,38 @@ class Wallet(models.Model, FindableClass):
         return string
 
     @property
-    def testing(self):
+    def testing(self) -> bool:
+        """Return whether the wallet is in testing mode."""
         return self.owner.testing
 
     @property
-    def space(self):  # pragma: no cover
+    def space(self) -> "Space":  # pragma: no cover
+        """Return the space that owns the wallet."""
         error_msg = f"space() not implemented by default. Please implement it in {self.__class__}."
         raise NotImplementedError(error_msg)
 
     @property
-    def exchange_account(self):  # pragma: no cover
+    def exchange_account(self) -> "ExchangeAccount":  # pragma: no cover
+        """Return the exchange account that contains the wallet."""
         error_msg = "exchange_account() not implemented by default. Please implement in a subclass of Wallet."
         raise NotImplementedError(error_msg)
 
-    def spend(self, amount: float, ticker: str, recv: int = 3, **kwargs) -> None:
+    def spend(self, amount: float, ticker: str, recv: int = 3, **kwargs: dict) -> None:
+        """Spend an amount of a currency from the wallet.
+
+        Args:
+            amount (float): The amount to spend.
+            ticker (str): The ticker of the currency to spend.
+            recv (int, optional): The time to wait before failing the transaction. Defaults to 3.
+            kwargs (dict): Additional arguments.
+
+        Raises:
+            WalletError.SpendError: If you try to spend money from the wallet without using the Transactions class.
+            ValueError: If the amount is negative.
+            TimeoutError: If the wallet is locked for too long.
+            WalletError.SpendError: If the currency does not exist in the wallet.
+            WalletError.SpendError: If there is not enough money in the wallet.
+        """
         if not kwargs.get("force", False):
             error_msg = "DANGEROUS: You should not use this method outside of select circumstances. Use Transactions instead."
             raise WalletError.SpendError(error_msg)
@@ -89,7 +134,21 @@ class Wallet(models.Model, FindableClass):
         self.locked = False
         self.save()
 
-    def top_up(self, amount: float, ticker: str, mbp: float | None = None, recv: int = 3, **kwargs) -> None:
+    def top_up(self, amount: float, ticker: str, mbp: float | None = None, recv: int = 3, **kwargs: dict) -> None:
+        """Top up the wallet with an amount of a currency.
+
+        Args:
+            amount (float): The amount to top up.
+            ticker (str): The ticker of the currency to top up.
+            mbp (float, optional): The price of the currency. Defaults to None.
+            recv (int, optional): The time to wait before failing the transaction. Defaults to 3.
+            kwargs (dict): Additional arguments.
+
+        Raises:
+            WalletError.TopUpError: If you try to top up the wallet without using the Transactions class.
+            ValueError: If the amount is negative.
+            TimeoutError: If the wallet is locked for too long.
+        """
         if not kwargs.get("force", False):
             error_msg = "DANGEROUS: You should not use this method outside of select circumstances. Use Transactions instead."
             raise WalletError.TopUpError(error_msg)
@@ -121,6 +180,15 @@ class Wallet(models.Model, FindableClass):
         self.save()
 
     def has_funds(self, amount: float, ticker: str) -> bool:
+        """Check if the wallet has enough funds.
+
+        Args:
+            amount (float): The amount the wallet should have.
+            ticker (str): The ticker of the currency.
+
+        Returns:
+            bool: Whether the wallet has enough funds.
+        """
         try:
             currency = self.currencies.get(ticker=ticker)
         except Currency.DoesNotExist:
@@ -128,6 +196,14 @@ class Wallet(models.Model, FindableClass):
         return currency.amount >= amount
 
     def get_amount(self, ticker: str) -> float:
+        """Return the amount of a currency in the wallet.
+
+        Args:
+            ticker (str): The ticker of the currency.
+
+        Returns:
+            float: The amount of the currency in the wallet.
+        """
         try:
             curr = self.currencies.get(ticker=ticker)
         except Currency.DoesNotExist:
@@ -135,6 +211,11 @@ class Wallet(models.Model, FindableClass):
         return curr.amount
 
     def value_mbp(self) -> float:
+        """Return the value of the wallet in USDT.
+
+        Returns:
+            float: The value of the wallet in USDT.
+        """
         value = 0
         for currency in self.currencies.all():
             if currency.amount == 0:
@@ -143,6 +224,11 @@ class Wallet(models.Model, FindableClass):
         return value
 
     def value_market(self) -> float:
+        """Return the value of the wallet in USDT.
+
+        Returns:
+            float: The value of the wallet in USDT.
+        """
         value = 0
         for currency in self.currencies.all():
             if currency.amount == 0:
@@ -150,96 +236,25 @@ class Wallet(models.Model, FindableClass):
             value += currency.amount * Controller.get_asset_price(exchange_account=self.exchange_account, base=currency.ticker)
         return value
 
-    def to_dict(self):
+    def to_dict(self) -> WalletPydantic:
+        """Return a dictionary representation of the wallet.
+
+        Returns:
+            dict: The dictionary representation of the wallet.
+        """
         currencies = self.currencies.all()
-        return {
-            "title": self.title,
-            "testing": self.testing,
-            "locked": self.locked,
-            "created_at": self.created_at,
-            "currencies": {
-                currency.ticker: {
-                    "amount": currency.amount,
-                    "mbp": currency.mbp,
-                }
+
+        return WalletPydantic(
+            title=self.title,
+            testing=self.testing,
+            locked=self.locked,
+            created_at=self.created_at,
+            currencies={
+                currency.ticker: CurrencyPydantic(
+                    ticker=currency.ticker,
+                    amount=currency.amount,
+                    mbp=currency.mbp,
+                )
                 for currency in currencies
             },
-        }
-
-
-class SpaceWallet(Wallet):
-    owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="wallet")
-
-    def __str__(self):
-        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
-
-    @property
-    def space(self):
-        return self.owner
-
-    @property
-    def exchange_account(self):
-        return self.space.exchange_account.find()
-
-    def connect_to_bot(self, bot):
-        try:
-            connection = self.connections.get(owner=self, bot=bot)
-        except Connection.DoesNotExist:
-            connection = Connection.objects.create(owner=self, bot=bot)
-        return connection
-
-
-class SpaceSimulationWallet(Wallet):
-    owner = models.OneToOneField("NapseSpace", on_delete=models.CASCADE, related_name="simulation_wallet")
-
-    def __str__(self):
-        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
-
-    @property
-    def testing(self):
-        return True
-
-    @property
-    def space(self):
-        return self.owner
-
-    @property
-    def exchange_account(self):
-        return self.space.exchange_account.find()
-
-    def reset(self):
-        self.currencies.all().delete()
-
-    def connect_to_bot(self, bot):
-        """Get or create connection to bot."""
-        try:
-            connection = self.connections.get(owner=self, bot=bot)
-        except Connection.DoesNotExist:
-            connection = Connection.objects.create(owner=self, bot=bot)
-        return connection
-
-
-class OrderWallet(Wallet):
-    owner = models.OneToOneField("Order", on_delete=models.CASCADE, related_name="wallet")
-
-    def __str__(self):
-        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
-
-    @property
-    def exchange_account(self):
-        return self.owner.exchange_account.find()
-
-
-class ConnectionWallet(Wallet):
-    owner = models.OneToOneField("Connection", on_delete=models.CASCADE, related_name="wallet")
-
-    def __str__(self):
-        return f"WALLET: {self.pk=}\nOWNER: {self.owner=}"
-
-    @property
-    def space(self):
-        return self.owner.space
-
-    @property
-    def exchange_account(self):
-        return self.space.exchange_account.find()
+        )
