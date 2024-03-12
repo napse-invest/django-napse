@@ -1,0 +1,1159 @@
+openapi: 3.0.3
+info:
+  title: Django Napse API
+  version: 0.0.1
+  description: List and description of all endpoints. This API documentation is essentially
+    generated automatically. It may therefore contain errors. If you see an error,
+    please open an issue, and if you would like to improve it, please make a contribution.
+paths:
+  /api/bot/:
+    get:
+      operationId: bot_list
+      description: |-
+        Return a list of bots.
+
+        Warning: space_containers can lead to undesirable behaviour.
+      tags:
+      - bot
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Bot'
+          description: ''
+  /api/bot/{id}/:
+    get:
+      operationId: bot_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        required: true
+      tags:
+      - bot
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BotDetail'
+          description: ''
+  /api/exchange_account/:
+    get:
+      operationId: exchange_account_list
+      tags:
+      - exchange_account
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ExchangeAccount'
+          description: ''
+    post:
+      operationId: exchange_account_create
+      tags:
+      - exchange_account
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExchangeAccount'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ExchangeAccount'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ExchangeAccount'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeAccount'
+          description: ''
+  /api/exchange_account/{id}/:
+    get:
+      operationId: exchange_account_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this exchange account.
+        required: true
+      tags:
+      - exchange_account
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeAccountDetail'
+          description: ''
+    delete:
+      operationId: exchange_account_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this exchange account.
+        required: true
+      tags:
+      - exchange_account
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/exchange_account/possible_exchanges/:
+    get:
+      operationId: exchange_account_possible_exchanges_retrieve
+      tags:
+      - exchange_account
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExchangeAccount'
+          description: ''
+  /api/fleet/:
+    get:
+      operationId: fleet_list
+      description: |-
+        View of a fleet.
+
+        Query parameters:
+            space: uuid of the space to filter on.
+            space_containers (bool): If True, list endpoint returns fleets for each space (default = True).
+      tags:
+      - fleet
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Fleet'
+          description: ''
+    post:
+      operationId: fleet_create
+      description: |-
+        View of a fleet.
+
+        Query parameters:
+            space: uuid of the space to filter on.
+            space_containers (bool): If True, list endpoint returns fleets for each space (default = True).
+      tags:
+      - fleet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Fleet'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Fleet'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Fleet'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fleet'
+          description: ''
+  /api/fleet/{id}/:
+    get:
+      operationId: fleet_retrieve
+      description: |-
+        View of a fleet.
+
+        Query parameters:
+            space: uuid of the space to filter on.
+            space_containers (bool): If True, list endpoint returns fleets for each space (default = True).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this fleet.
+        required: true
+      tags:
+      - fleet
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FleetDetail'
+          description: ''
+  /api/fleet/{id}/invest/:
+    post:
+      operationId: fleet_invest_create
+      description: |-
+        View of a fleet.
+
+        Query parameters:
+            space: uuid of the space to filter on.
+            space_containers (bool): If True, list endpoint returns fleets for each space (default = True).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this fleet.
+        required: true
+      tags:
+      - fleet
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/fleet/{id}/withdraw/:
+    post:
+      operationId: fleet_withdraw_create
+      description: |-
+        View of a fleet.
+
+        Query parameters:
+            space: uuid of the space to filter on.
+            space_containers (bool): If True, list endpoint returns fleets for each space (default = True).
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this fleet.
+        required: true
+      tags:
+      - fleet
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/key/:
+    get:
+      operationId: key_list
+      tags:
+      - key
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NapseAPIKey'
+          description: ''
+    post:
+      operationId: key_create
+      tags:
+      - key
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NapseAPIKey'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NapseAPIKey'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NapseAPIKey'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NapseAPIKey'
+          description: ''
+  /api/key/{id}/:
+    get:
+      operationId: key_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        description: A unique value identifying this API key.
+        required: true
+      tags:
+      - key
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NapseAPIKey'
+          description: ''
+    delete:
+      operationId: key_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+        description: A unique value identifying this API key.
+        required: true
+      tags:
+      - key
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/key/connect/:
+    get:
+      operationId: key_connect_retrieve
+      tags:
+      - key
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NapseAPIKey'
+          description: ''
+  /api/key/possible_permissions/:
+    get:
+      operationId: key_possible_permissions_retrieve
+      tags:
+      - key
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NapseAPIKey'
+          description: ''
+  /api/order/:
+    get:
+      operationId: order_list
+      description: For test & debug purposes only.
+      tags:
+      - order
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+          description: ''
+  /api/space/:
+    get:
+      operationId: space_list
+      tags:
+      - space
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Space'
+          description: ''
+    post:
+      operationId: space_create
+      tags:
+      - space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Space'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Space'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Space'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+  /api/space/{id}/:
+    get:
+      operationId: space_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this napse space.
+        required: true
+      tags:
+      - space
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SpaceDetail'
+          description: ''
+    put:
+      operationId: space_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this napse space.
+        required: true
+      tags:
+      - space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Space'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Space'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Space'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+    patch:
+      operationId: space_partial_update
+      description: Partial update the connected user.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this napse space.
+        required: true
+      tags:
+      - space
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedSpace'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Space'
+          description: ''
+  /api/space/{id}/invest/:
+    get:
+      operationId: space_invest_retrieve
+      description: |-
+        Endpoint to invest on space.
+
+        GET: Return all {ticker: amount} which can be invested in the space.
+        POST: Invest in the space.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this napse space.
+        required: true
+      tags:
+      - space
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: space_invest_create
+      description: |-
+        Endpoint to invest on space.
+
+        GET: Return all {ticker: amount} which can be invested in the space.
+        POST: Invest in the space.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this napse space.
+        required: true
+      tags:
+      - space
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/space/{id}/withdraw/:
+    get:
+      operationId: space_withdraw_retrieve
+      description: |-
+        Endpoint to withdraw on space.
+
+        GET: Return all {ticker: amount} which can be withdrawn in the space.
+        POST: Withdraw from the space.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this napse space.
+        required: true
+      tags:
+      - space
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+    post:
+      operationId: space_withdraw_create
+      description: |-
+        Endpoint to withdraw on space.
+
+        GET: Return all {ticker: amount} which can be withdrawn in the space.
+        POST: Withdraw from the space.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this napse space.
+        required: true
+      tags:
+      - space
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    Bot:
+      type: object
+      description: Serialize bot instances.
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        value:
+          type: number
+          format: double
+          description: Return value market of the bot, depending of space containerization.
+          readOnly: true
+        delta:
+          type: number
+          format: double
+          description: Delta on the last 30 days.
+          readOnly: true
+        fleet:
+          type: string
+          readOnly: true
+        space:
+          type: string
+          format: uuid
+          nullable: true
+          description: Return the space used for the space containerization.
+          readOnly: true
+        exchange_account:
+          type: string
+          format: uuid
+          nullable: true
+          description: Return the exchange account of the bot if it exists.
+          readOnly: true
+      required:
+      - delta
+      - exchange_account
+      - fleet
+      - space
+      - uuid
+      - value
+    BotDetail:
+      type: object
+      description: Deep dive in bot's data for serialization.
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        value:
+          type: number
+          format: double
+          description: Return value market of the bot, depending of space containerization.
+          readOnly: true
+        delta:
+          type: number
+          format: double
+          description: Delta on the last 30 days.
+          readOnly: true
+        statistics:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: string
+            - type: integer
+            - type: number
+              format: double
+          description: Return Bot's statistics.
+          readOnly: true
+        fleet:
+          type: string
+          readOnly: true
+        space:
+          type: string
+          format: uuid
+          nullable: true
+          description: Return the space used for the space containerization.
+          readOnly: true
+        exchange_account:
+          type: string
+          readOnly: true
+        wallet:
+          type: string
+          readOnly: true
+        orders:
+          type: string
+          readOnly: true
+      required:
+      - delta
+      - exchange_account
+      - fleet
+      - orders
+      - space
+      - statistics
+      - uuid
+      - value
+      - wallet
+    ClusterFormatter:
+      type: object
+      description: Format cluster dictionnary for fleet creation.
+      properties:
+        template_bot:
+          type: string
+          format: uuid
+        share:
+          type: number
+          format: double
+        breakpoint:
+          type: integer
+        autoscale:
+          type: boolean
+      required:
+      - autoscale
+      - breakpoint
+      - share
+      - template_bot
+    Currency:
+      type: object
+      properties:
+        mbp:
+          type: number
+          format: double
+          readOnly: true
+        ticker:
+          type: string
+          readOnly: true
+        amount:
+          type: number
+          format: double
+          readOnly: true
+        value:
+          type: string
+          readOnly: true
+      required:
+      - amount
+      - mbp
+      - ticker
+      - value
+    ExchangeAccount:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        exchange:
+          type: string
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        testing:
+          type: boolean
+          readOnly: true
+      required:
+      - description
+      - exchange
+      - name
+      - testing
+      - uuid
+    ExchangeAccountDetail:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        exchange:
+          type: string
+        name:
+          type: string
+          maxLength: 200
+        testing:
+          type: boolean
+          readOnly: true
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        spaces:
+          type: array
+          items:
+            $ref: '#/components/schemas/Space'
+          readOnly: true
+      required:
+      - created_at
+      - description
+      - exchange
+      - name
+      - spaces
+      - testing
+      - uuid
+    Fleet:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 100
+        clusters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClusterFormatter'
+          writeOnly: true
+        space:
+          type: string
+          format: uuid
+          writeOnly: true
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        value:
+          type: string
+          readOnly: true
+        bot_count:
+          type: string
+          readOnly: true
+        delta:
+          type: number
+          format: double
+          description: Delta on the last 30 days.
+          readOnly: true
+        exchange_account:
+          type: string
+          readOnly: true
+      required:
+      - bot_count
+      - clusters
+      - delta
+      - exchange_account
+      - space
+      - uuid
+      - value
+    FleetDetail:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        statistics:
+          type: string
+          readOnly: true
+        wallet:
+          type: string
+          readOnly: true
+        bots:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bot'
+          readOnly: true
+        exchange_account:
+          type: integer
+      required:
+      - bots
+      - created_at
+      - exchange_account
+      - statistics
+      - uuid
+      - wallet
+    NapseAPIKey:
+      type: object
+      properties:
+        name:
+          type: string
+          description: A free-form name for the API key. Need not be unique. 50 characters
+            max.
+          maxLength: 50
+        prefix:
+          type: string
+          readOnly: true
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+          readOnly: true
+        is_master_key:
+          type: boolean
+        revoked:
+          type: boolean
+          description: If the API key is revoked, clients cannot use it anymore. (This
+            cannot be undone.)
+        description:
+          type: string
+      required:
+      - permissions
+      - prefix
+    Order:
+      type: object
+      description: |-
+        .
+
+        {
+            "side": "BUY",
+            "completed": true,
+            "spent": {
+                "ticker": "BTC",
+                "amount": 0.1,
+                "price": 1,
+                "value": 0.1,
+            },
+            "received": {
+                "ticker": "MATIC",
+                "amount": 995,
+                "price": 0.0001,
+                "value": 0.095,
+            },
+            "fees": {
+                "ticker": "BTC",
+                "amount": 5,
+                "price": 0.0001,
+                "value": 0.05,
+            },
+            "created_at": "2021-09-01T12:00:00Z",
+        }
+      properties:
+        side:
+          type: string
+          readOnly: true
+        completed:
+          type: boolean
+          readOnly: true
+        spent:
+          type: string
+          readOnly: true
+        received:
+          type: string
+          readOnly: true
+        fees:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - completed
+      - created_at
+      - fees
+      - received
+      - side
+      - spent
+    PatchedSpace:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        exchange_account:
+          type: string
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        testing:
+          type: boolean
+          description: Testing property.
+          readOnly: true
+        value:
+          type: number
+          format: double
+          description: Value market of space's wallet.
+          readOnly: true
+        delta:
+          type: number
+          format: double
+          description: Delta on the last 30 days.
+          readOnly: true
+    Permission:
+      type: object
+      properties:
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        permission_type:
+          type: string
+          maxLength: 200
+        approved:
+          type: boolean
+        space:
+          type: string
+      required:
+      - permission_type
+      - space
+      - uuid
+    Space:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        exchange_account:
+          type: string
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        testing:
+          type: boolean
+          description: Testing property.
+          readOnly: true
+        value:
+          type: number
+          format: double
+          description: Value market of space's wallet.
+          readOnly: true
+        delta:
+          type: number
+          format: double
+          description: Delta on the last 30 days.
+          readOnly: true
+      required:
+      - delta
+      - description
+      - exchange_account
+      - name
+      - testing
+      - uuid
+      - value
+    SpaceDetail:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 200
+        description:
+          type: string
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+        testing:
+          type: boolean
+          description: Testing property.
+          readOnly: true
+        exchange_account:
+          type: string
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        statistics:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+        wallet:
+          allOf:
+          - $ref: '#/components/schemas/Wallet'
+          readOnly: true
+        history:
+          type: array
+          items: {}
+          readOnly: true
+        fleets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fleet'
+          readOnly: true
+      required:
+      - created_at
+      - description
+      - exchange_account
+      - fleets
+      - history
+      - name
+      - statistics
+      - testing
+      - uuid
+      - wallet
+    Wallet:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        value:
+          type: number
+          format: double
+          description: |-
+            Given the *incoming* primitive data, return the value for this field
+            that should be validated and transformed to a native value.
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        currencies:
+          type: array
+          items:
+            $ref: '#/components/schemas/Currency'
+          readOnly: true
+        operations:
+          type: object
+          additionalProperties: {}
+          readOnly: true
+      required:
+      - created_at
+      - currencies
+      - operations
+      - value
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
