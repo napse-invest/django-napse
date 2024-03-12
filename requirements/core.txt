@@ -7,7 +7,7 @@ djangorestframework-api-key==3.0.0
 psycopg2-binary==2.9.9  # https://github.com/psycopg/psycopg2
 
 celery==5.3.6
-redis==5.0.2
+redis==5.0.3
 
 python-binance==1.0.19 # https://github.com/sammchardy/python-binance
 pydantic==2.6.3 # https://github.com/pydantic/pydantic
