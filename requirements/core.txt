@@ -10,4 +10,4 @@ celery==5.3.6
 redis==5.0.3
 
 python-binance==1.0.19 # https://github.com/sammchardy/python-binance
-pydantic==2.6.3 # https://github.com/pydantic/pydantic
+pydantic==2.6.4 # https://github.com/pydantic/pydantic
