@@ -49,6 +49,12 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.ref }}
 
+      - name: Linting code with ruff
+        uses: chartboost/ruff-action@v1
+        with:
+          src: "."
+          args: --config .github/pyproject.toml
+
       - name: Set up python
         uses: actions/setup-python@v5
         with:

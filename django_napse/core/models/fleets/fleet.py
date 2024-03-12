@@ -8,15 +8,29 @@ from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.connections.connection import Connection
 from django_napse.core.models.fleets.managers import FleetManager
 from django_napse.core.models.orders.order import Order
+from django_napse.utils.errors import BotError
 
 
 class Fleet(models.Model):
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
-    name = models.CharField(max_length=100, default="Fleet")
-    exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE)
+    uuid = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+    )
+    name = models.CharField(
+        max_length=100,
+        default="Fleet",
+    )
+    exchange_account = models.ForeignKey(
+        "ExchangeAccount",
+        on_delete=models.CASCADE,
+    )
     running = models.BooleanField(default=False)
     setup_finished = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True, blank=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        blank=True,
+    )
 
     objects = FleetManager()
 
@@ -57,6 +71,7 @@ class Fleet(models.Model):
 
     def space_frame_value(self, space) -> float:
         """Sum value of all bots connected to the space."""
+        # TODO: remove property to values and add the following lines to the new `value()` method
         fleet_connections = Connection.objects.filter(bot__in=self.bots)
         space_connections = space.wallet.connections.all()
         commun_connections = space_connections.intersection(fleet_connections)
@@ -68,19 +83,43 @@ class Fleet(models.Model):
             bot_clusters.append(Bot.objects.filter(link__cluster=cluster))
         return bot_clusters
 
+    def connect_to_space(self, space):
+        ...
+
     def invest(self, space, amount, ticker):
         connections = []
         for cluster in self.clusters.all():
             connections += cluster.invest(space, amount * cluster.share, ticker)
         return connections
 
+    def bot_count(self, space=None) -> int:
+        """Count number of bots in fleet, depends on space frame."""
+        query_bot = self.bots.all()
+        if space is None:
+            return len(query_bot)
+        result = []
+        for bot in query_bot:
+            try:
+                bot_space = bot.space
+            except BotError.NoSpace:
+                continue
+            if bot_space == self.space:
+                result.append(bot)
+        return len(result)
+
     def get_stats(self):
-        order_count = Order.objects.filter(
+        order_count = Order.objects.filter(  # noqa: F841
             connection__bot__in=self.bots,
             created_at__gt=datetime.now(tz=get_default_timezone()) - timedelta(days=30),
         ).count()
         return {
             "value": self.value,
-            "order_count_30": order_count,
-            "change_30": None,  # TODO: Need history
+            "bot_count": self.bot_count(),
+            "delta_30": 0,  # TODO: Need history
         }
+
+    def delete(self) -> None:
+        """Delete clusters & relative (template) bots."""
+        self.bots.delete()
+        self.clusters.all().delete()
+        super().delete()

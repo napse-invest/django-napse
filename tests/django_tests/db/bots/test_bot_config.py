@@ -1,3 +1,5 @@
+from typing import ClassVar
+
 from django_napse.core.models import EmptyBotConfig, NapseSpace
 from django_napse.utils.errors import BotConfigError
 from django_napse.utils.model_test_case import ModelTestCase
@@ -35,7 +37,7 @@ class BotConfigDefaultTestCase:
 
 class EmptyBotConfigTestCase(BotConfigDefaultTestCase):
     model = EmptyBotConfig
-    settings = {"empty": True}
+    settings: ClassVar = {"empty": True}
 
 
 class EmptyBotConfigBINANCETestCase(EmptyBotConfigTestCase, ModelTestCase):

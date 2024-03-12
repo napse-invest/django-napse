@@ -3,6 +3,7 @@ import uuid
 from django.db import models
 
 from django_napse.core.models.accounts.managers.exchange import ExchangeAccountManager
+from django_napse.utils.constants import EXCHANGE_TICKERS
 from django_napse.utils.errors import ExchangeAccountError
 from django_napse.utils.findable_class import FindableClass
 from django_napse.utils.trading.binance_controller import BinanceController
@@ -24,11 +25,19 @@ class Exchange(models.Model):
             print(string)
         return string
 
+    def get_tickers(self):
+        """Return a list of available tickers on the exchange."""
+        return EXCHANGE_TICKERS.get(self.name, [])
+
 
 class ExchangeAccount(models.Model, FindableClass):
     uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
 
-    exchange = models.ForeignKey("Exchange", on_delete=models.CASCADE, related_name="accounts")
+    exchange = models.ForeignKey(
+        "Exchange",
+        on_delete=models.CASCADE,
+        related_name="accounts",
+    )
     name = models.CharField(max_length=200)
     testing = models.BooleanField(default=True)
     description = models.TextField()
@@ -66,6 +75,9 @@ class ExchangeAccount(models.Model, FindableClass):
         error_msg = f"exchange_controller() not implemented for {self.__class__.__name__}"
         raise NotImplementedError(error_msg)
 
+    def get_tickers(self):
+        return self.exchange.get_tickers()
+
 
 class BinanceAccount(ExchangeAccount):
     public_key = models.CharField(max_length=200)
@@ -73,6 +85,9 @@ class BinanceAccount(ExchangeAccount):
 
     class Meta:
         unique_together = ("public_key", "private_key")
+
+    def __str__(self):
+        return "BINANCE " + super().__str__()
 
     def ping(self):
         request = self.exchange_controller().get_info()

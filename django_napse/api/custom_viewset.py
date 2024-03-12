@@ -14,5 +14,8 @@ class CustomViewSet(GenericViewSet):
         except KeyError as e:
             raise APIError.NoAPIKey() from e
 
-    def space(self, request):
-        return NapseSpace.objects.get(uuid=request.query_params["space"])
+    def get_space(self, request) -> NapseSpace | None:
+        try:
+            return NapseSpace.objects.get(uuid=request.query_params["space"])
+        except NapseSpace.DoesNotExist:
+            return None

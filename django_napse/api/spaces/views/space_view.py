@@ -5,9 +5,9 @@ from rest_framework_api_key.permissions import HasAPIKey
 
 from django_napse.api.custom_permissions import HasFullAccessPermission, HasMasterKey, HasReadPermission
 from django_napse.api.custom_viewset import CustomViewSet
-from django_napse.api.exchanges.serializers.exchange_account_serializer import ExchangeAccountSerializer
-from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceSerializer
-from django_napse.core.models import ExchangeAccount, NapseSpace
+from django_napse.api.spaces.serializers import SpaceDetailSerializer, SpaceMoneyFlowSerializer, SpaceSerializer
+from django_napse.core.models import NapseSpace
+from django_napse.utils.constants import EXCHANGE_TICKERS
 from django_napse.utils.errors import SpaceError
 
 
@@ -28,6 +28,8 @@ class SpaceView(CustomViewSet):
             "create": SpaceSerializer,
             "update": SpaceSerializer,
             "partial_update": SpaceSerializer,
+            "invest": SpaceMoneyFlowSerializer,
+            "withdraw": SpaceMoneyFlowSerializer,
         }
         result = actions.get(self.action, None)
         return result if result else super().get_serializer_class()
@@ -38,7 +40,7 @@ class SpaceView(CustomViewSet):
                 return [HasReadPermission()]
             case "list":
                 return [HasAPIKey()]
-            case "possible_exchange_accounts" | "create":
+            case "create":
                 return [HasMasterKey()]
 
             case _:
@@ -83,10 +85,53 @@ class SpaceView(CustomViewSet):
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-    @action(detail=False, methods=["GET"])
-    def possible_exchange_accounts(self, request):
-        serialized_exchange_account = ExchangeAccountSerializer(ExchangeAccount.objects.all(), many=True)
-        return Response(
-            serialized_exchange_account.data,
-            status=status.HTTP_200_OK,
-        )
+    @action(detail=True, methods=["GET", "POST"])
+    def invest(self, request, pk=None):
+        """Endpoint to invest on space.
+
+        GET: Return all {ticker: amount} which can be invested in the space.
+        POST: Invest in the space.
+        """
+        space: NapseSpace = self.get_object()
+        if not space.testing:
+            return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        exchange_name: str = space.exchange_account.exchange.name
+
+        match request.method:
+            case "GET":
+                possible_investments = [{"ticker": ticker, "amount": 1_000_000} for ticker in EXCHANGE_TICKERS.get(exchange_name)]
+                return Response(possible_investments, status=status.HTTP_200_OK)
+
+            case "POST":
+                space = self.get_object()
+                if not space.testing:
+                    error_msg: str = "Investing in real is not allowed yet."
+                    return Response(error_msg, status=status.HTTP_403_FORBIDDEN)
+                serializer = self.get_serializer(data=request.data, instance=space, side="INVEST")
+                serializer.is_valid(raise_exception=True)
+                serializer.save()
+
+            case _:
+                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+        return Response(status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=["GET", "POST"])
+    def withdraw(self, request, pk=None):
+        """Endpoint to withdraw on space.
+
+        GET: Return all {ticker: amount} which can be withdrawn in the space.
+        POST: Withdraw from the space.
+        """
+        space: NapseSpace = self.get_object()
+        if not space.testing:
+            return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        match request.method:
+            case "GET":
+                return Response(status=status.HTTP_200_OK)
+            case "POST":
+                return Response(status=status.HTTP_501_NOT_IMPLEMENTED)
+            case _:
+                return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)

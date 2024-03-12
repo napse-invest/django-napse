@@ -13,6 +13,7 @@ from django_napse.utils.constants import PERMISSION_TYPES
 
 class KeyView(CustomViewSet):
     permission_classes = [HasMasterKey]
+    serializer_class = NapseAPIKeySerializer
 
     def get_queryset(self):
         return NapseAPIKey.objects.all()
@@ -42,7 +43,12 @@ class KeyView(CustomViewSet):
         if "space" not in request.query_params:
             serializer = NapseAPIKeySerializer(key)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = NapseAPIKeySpaceSerializer(key, context={"space": request.query_params["space"]})
+        serializer = NapseAPIKeySpaceSerializer(
+            key,
+            context={
+                "space": request.query_params["space"],
+            },
+        )
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def list(self, request):
@@ -51,7 +57,13 @@ class KeyView(CustomViewSet):
             serializer = NapseAPIKeySerializer(keys, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        serializer = NapseAPIKeySpaceSerializer(keys, many=True, context={"space": request.query_params["space"]})
+        serializer = NapseAPIKeySpaceSerializer(
+            keys,
+            many=True,
+            context={
+                "space": request.query_params["space"],
+            },
+        )
         data = {"keys": []}
         for key in serializer.data:
             if key["permissions"]:
@@ -74,10 +86,10 @@ class KeyView(CustomViewSet):
             if "description" in request.data:
                 key.description = request.data["description"]
             if "permissions" in request.data:
-                for permission in key.permissions.filter(space=self.space(request)):
+                for permission in key.permissions.filter(space=self.get_space(request)):
                     permission.delete()
                 for permission in request.data["permissions"]:
-                    key.add_permission(self.space(request), permission)
+                    key.add_permission(self.get_space(request), permission)
             key.save()
             if request.data.get("revoked", False) and not key.is_master_key:
                 key.revoke()

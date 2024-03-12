@@ -6,7 +6,7 @@ from django_napse.core.models.orders.managers import OrderManager
 from django_napse.core.models.transactions.credit import Credit
 from django_napse.core.models.transactions.debit import Debit
 from django_napse.core.models.transactions.transaction import Transaction
-from django_napse.utils.constants import MODIFICATION_STATUS, ORDER_STATUS, SIDES, TRANSACTION_TYPES
+from django_napse.utils.constants import EXCHANGE_PAIRS, MODIFICATION_STATUS, ORDER_STATUS, SIDES, TRANSACTION_TYPES
 from django_napse.utils.errors import OrderError
 
 
@@ -59,8 +59,8 @@ class Order(models.Model):
     debited_amount = models.FloatField(default=0)
 
     batch_share = models.FloatField(default=0)
-    exit_base_amount = models.FloatField(default=0)
-    exit_quote_amount = models.FloatField(default=0)
+    exit_amount_base = models.FloatField(default=0)
+    exit_amount_quote = models.FloatField(default=0)
     fees = models.FloatField(default=0)
     fee_ticker = models.CharField(max_length=10, blank=True)
 
@@ -81,8 +81,8 @@ class Order(models.Model):
         string += f"{beacon}\t{self.asked_for_ticker=}\n"
         string += f"{beacon}\t{self.debited_amount=}\n"
         string += f"{beacon}\t{self.batch_share=}\n"
-        string += f"{beacon}\t{self.exit_base_amount=}\n"
-        string += f"{beacon}\t{self.exit_quote_amount=}\n"
+        string += f"{beacon}\t{self.exit_amount_base=}\n"
+        string += f"{beacon}\t{self.exit_amount_quote=}\n"
         string += f"{beacon}\t{self.fees=}\n"
         string += f"{beacon}\t{self.fee_ticker=}\n"
         string += f"{beacon}\t{self.side=}\n"
@@ -251,3 +251,17 @@ class Order(models.Model):
                 ticker=self.batch.controller.quote,
                 transaction_type=TRANSACTION_TYPES.ORDER_REFUND,
             )
+
+    def tickers_info(self) -> dict[str, str]:
+        """Give informations about received, spent & fee tickers."""
+        spent_ticker = EXCHANGE_PAIRS[self.connection.space.exchange_account.exchange.name][self.pair]["base" if self.side == SIDES.SELL else "quote"]
+        received_ticker = EXCHANGE_PAIRS[self.connection.space.exchange_account.exchange.name][self.pair][
+            "quote" if self.side == SIDES.SELL else "base"
+        ]
+        fee_ticker = self.fee_ticker
+
+        return {
+            "spent_ticker": spent_ticker,
+            "received_ticker": received_ticker,
+            "fee_ticker": fee_ticker,
+        }

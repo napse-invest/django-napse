@@ -96,42 +96,42 @@ class APITestCase(CustomTestCase):
             self.check_auth(name="No permissions", mode=mode, error_list=error_list, divider=100, expected=2)
         else:
             if HasSpace in permissions:
-                self.check_auth(name="HasSpace \w no key", mode=mode, error_list=error_list, expected=400)
+                self.check_auth(name="HasSpace with no key", mode=mode, error_list=error_list, expected=400)
                 self.build_url(kwargs={"space": str("random uuid"), **self.kwargs})
-                self.check_auth(name="HasSpace \w no key", mode=mode, error_list=error_list, expected=400)
+                self.check_auth(name="HasSpace with no key", mode=mode, error_list=error_list, expected=400)
                 self.build_url(kwargs={"space": str("7aafc68d-f619-4874-aaf5-c123a176e303"), **self.kwargs})
-                self.check_auth(name="HasSpace \w no key", mode=mode, error_list=error_list, expected=400)
+                self.check_auth(name="HasSpace with no key", mode=mode, error_list=error_list, expected=400)
                 self.build_url(kwargs={"space": str(self.space.uuid), **self.kwargs})
 
             if HasAPIKey in permissions:
-                self.check_auth(name="HasAPIKey \w no key", mode=mode, error_list=error_list)
+                self.check_auth(name="HasAPIKey with no key", mode=mode, error_list=error_list)
 
             if HasReadPermission in permissions:
-                self.check_auth(name="HasReadPermission \w no key", mode=mode, error_list=error_list)
+                self.check_auth(name="HasReadPermission with no key", mode=mode, error_list=error_list)
                 self.build_key([])
                 self.authenticate()
-                self.check_auth(name="HasReadPermission \w no permissions", mode=mode, error_list=error_list)
+                self.check_auth(name="HasReadPermission with no permissions", mode=mode, error_list=error_list)
 
             if HasFullAccessPermission in permissions:
-                self.check_auth(name="HasFullAccessPermission \w no key", mode=mode, error_list=error_list)
+                self.check_auth(name="HasFullAccessPermission with no key", mode=mode, error_list=error_list)
                 self.build_key([])
                 self.authenticate()
-                self.check_auth(name="HasFullAccessPermission \w no permissions", mode=mode, error_list=error_list)
+                self.check_auth(name="HasFullAccessPermission with no permissions", mode=mode, error_list=error_list)
                 self.build_key([HasReadPermission])
                 self.authenticate()
-                self.check_auth(name="HasFullAccessPermission \w read permissions", mode=mode, error_list=error_list)
+                self.check_auth(name="HasFullAccessPermission with read permissions", mode=mode, error_list=error_list)
 
             if HasAdminPermission in permissions:
-                self.check_auth(name="HasAdminPermission \w no key", mode=mode, error_list=error_list)
+                self.check_auth(name="HasAdminPermission with no key", mode=mode, error_list=error_list)
                 self.build_key([])
                 self.authenticate()
-                self.check_auth(name="HasAdminPermission \w no permissions", mode=mode, error_list=error_list)
+                self.check_auth(name="HasAdminPermission with no permissions", mode=mode, error_list=error_list)
                 self.build_key([HasReadPermission])
                 self.authenticate()
-                self.check_auth(name="HasAdminPermission \w read permissions", mode=mode, error_list=error_list)
+                self.check_auth(name="HasAdminPermission with read permissions", mode=mode, error_list=error_list)
                 self.build_key([HasReadPermission, HasFullAccessPermission])
                 self.authenticate()
-                self.check_auth(name="HasAdminPermission \w read and full access permissions", mode=mode, error_list=error_list)
+                self.check_auth(name="HasAdminPermission with read and full access permissions", mode=mode, error_list=error_list)
 
         self.build_key(permissions)
         self.authenticate()
@@ -164,6 +164,7 @@ class ViewTest:
 
     def setup(self, data: dict | None = None):
         def _setup(data=data):
+            # TODO: Add other methods (post, put, patch, delete)
             return self.testcase_instance.client.get(
                 path=self.testcase_instance.url,
                 data=data,

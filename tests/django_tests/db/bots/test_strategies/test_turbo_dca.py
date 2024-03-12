@@ -1,4 +1,5 @@
 from datetime import timedelta
+from typing import ClassVar
 
 from django_napse.core.models import Controller, TurboDCAStrategy
 from django_napse.utils.model_test_case import ModelTestCase
@@ -11,7 +12,7 @@ python tests/test_app/manage.py test tests.django_tests.bots.test_strategies.tes
 
 class TurboDCATestCase(StrategyDefaultTestCase):
     model = TurboDCAStrategy
-    config_settings = {"timeframe": timedelta(days=1), "percentage": 1}
+    config_settings: ClassVar = {"timeframe": timedelta(days=1), "percentage": 1}
 
     @property
     def architecture_constants(self):

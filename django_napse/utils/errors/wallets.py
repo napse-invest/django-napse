@@ -9,3 +9,6 @@ class WalletError:
 
     class CreateError(Exception):
         """Raised when a wallet cannot be created."""
+
+    class UnavailableTicker(Exception):
+        """Raised when a ticker is the wallet's currencies."""

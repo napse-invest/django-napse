@@ -1,14 +1,7 @@
 
-
+![Napse logo](theme/assets/napse_invest_logo_black.svg#only-light){ width="500" : .center}
+![Napse logo](theme/assets/napse_invest_logo_white.svg#only-dark){ width="500" : .center}
 <h1 align="center">
-<!-- ![test](theme/assets/images/NapseInvestLogoSVGWhite.png#only-light)
-![test](theme/assets/images/NapseInvestLogoSVG.png#only-dark) -->
-
-<picture>
-  <source media="(prefers-color-scheme: light)" srcset="theme/assets/images/NapseInvestLogoSVGWhite.svg">
-  <source media="(prefers-color-scheme: dark)" srcset="theme/assets/images/NapseInvestLogoSVG.svg">
-  <img alt="Test" src="theme/assets/images/NapseInvestLogoSVGWhite.svg">
-</picture>
 
 </h1><br>
 
@@ -29,39 +22,70 @@
 
 # Welcome to django-napse's documentation!
 
-## Useful commands
-Unless otherwise specified, all commands are to be run at the root folder of the project.
+Django napse is a portfolio management module using trading bots.
 
-### Create a new project
-- Unix \
-```source setup-unix.sh```
+## Installation
+---
 
-- Windows \
-```.\setup-windows.ps1```
+This project can be used as a django module, which you can install as follows:
 
-### Run a test version of the project
-
-- Build migrations \
-```make makemigrations```
-- Apply migrations \
-```make migrate``` 
-- Run server \
-```make runserver```
-
-### Run coverage tests
-
-- Run tests \
-```test-napse```
-- Run tests with coverage \
-```coverage```
-- Run tests with coverage and open coverage report \
-```coverage-open```
-
-## Documentation
-
-[Docs](https://napse-invest.github.io/django-napse/)
-
-Run mkdocs server:
-```shell
-make mkdocs
+```bash
+pip install django-napse
 ```
+
+Or you can use it as a local backend for the [Napse desktop application](https://github.com/napse-invest/Napse), by cloning the repo (possibly after forking it).
+
+### Setup initial exchange accounts
+
+To make full use of the project, we recommend that you fill in the API keys of at least one exchange (among the django-napse [compabile exchanges](#compatible-exchanges)).
+
+At the root of your project, build a `secret.json` file. Here is an exemple with Binance:
+```json
+{
+    "Exchange Accounts": {
+        "Binance EA_NAME": {
+            "exchange": "BINANCE",     # Name of your exchange
+            "testing": true,
+            "public_key": "YOUR_PUBLIC_KEY",
+            "private_key": "YOUR_PRIVATE_KEY"
+        }
+    }
+}
+```
+??? note "Note for developers"
+    We **strongly recommend** to add the `secret.json` file to your `.gitignore` file to avoid sharing your API keys.
+
+## Use django-napse
+---
+
+### Local backend
+
+If you want to use django-napse as a local backend for the Napse desktop application, clone the repository and setup the project:
+```bash
+make setup
+```
+  
+Then, you can run the server:
+```bash
+make up
+```
+
+Please check the documentation for more information about [endpoints](https://napse-invest.github.io/django-napse/api/).
+
+### Django module
+
+After the installation step, in a `.py` file you can use django-napse after importing it:
+```python
+from django_napse.core.models import ExchangeAccount
+
+exchange_account_query = ExchangeAccount.objects.all()
+```
+
+## Miscellaneous
+---
+
+### Compatible exchanges
+
+django-napse is compatible with a few exchanges (for now):
+
+- [Binance](https://www.binance.com/en)

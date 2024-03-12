@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import ClassVar
 
 from pytz import UTC
 
@@ -12,7 +13,7 @@ python tests/test_app/manage.py test tests.django_tests.bots.test_plugin -v2 --k
 
 class PluginDefaultTestCase:
     strategy_class = EmptyStrategy
-    config_settings = {"empty": True}
+    config_settings: ClassVar = {"empty": True}
 
     def simple_create(self):
         return self.model.objects.create(strategy=self.strategy)

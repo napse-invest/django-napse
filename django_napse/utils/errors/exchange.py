@@ -1,6 +1,9 @@
 class ExchangeError:
     """Base class for exchange errors."""
 
+    class UnavailableTicker(Exception):
+        """Raised when a ticker is not available on the exchange."""
+
 
 class ExchangeAccountError:
     """Base class for exchange account errors."""
