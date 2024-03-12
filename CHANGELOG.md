@@ -1,3 +1,10 @@
+## [1.13.1](https://github.com/napse-invest/django-napse/compare/v1.13.0...v1.13.1) (2024-03-12)
+
+
+### Bug Fixes
+
+* **requirements:** pydantic ([08e1256](https://github.com/napse-invest/django-napse/commit/08e1256449e5f449bc97ac4d7b1789e901a0f9a7))
+
 # [1.13.0](https://github.com/napse-invest/django-napse/compare/v1.12.0...v1.13.0) (2024-03-12)
 
 
