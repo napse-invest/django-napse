@@ -12,7 +12,7 @@ from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 from django_napse.core.celery_app import celery_app, strategy_log_free
 
-redis_client = redis.Redis(host=settings.CELERY_BROKER_URL.split("//")[1].split(":")[0], port=settings.CELERY_BROKER_URL.split(":")[2])
+redis_client = redis.Redis(host=settings.CELERY_BROKER_URL.split("//")[1].split(":")[0], port=settings.CELERY_BROKER_URL.split(":")[2].split("/")[0])
 
 
 class BaseTask(celery.Task):
