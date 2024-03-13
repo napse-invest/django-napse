@@ -1,3 +1,10 @@
+## [1.13.4](https://github.com/napse-invest/django-napse/compare/v1.13.3...v1.13.4) (2024-03-13)
+
+
+### Bug Fixes
+
+* **redis:** url fixed ([fd9703b](https://github.com/napse-invest/django-napse/commit/fd9703ba2d953843fea3c046b8be1b9f8ff979f2))
+
 ## [1.13.3](https://github.com/napse-invest/django-napse/compare/v1.13.2...v1.13.3) (2024-03-13)
 
 
