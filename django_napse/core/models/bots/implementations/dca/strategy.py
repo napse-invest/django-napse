@@ -34,7 +34,7 @@ class DCAStrategy(Strategy):
         controller = data["controllers"]["main"]
         if (
             self.variable_last_buy_date is None
-            or data["candles"][controller]["current"]["open_time"] - self.variable_last_buy_date >= data["config"]["timeframe"]
+            or data["candles"][controller]["current"].open_time - self.variable_last_buy_date >= data["config"]["timeframe"]
         ):
             return [
                 {
@@ -43,7 +43,7 @@ class DCAStrategy(Strategy):
                     "StrategyModifications": [
                         {
                             "key": "last_buy_date",
-                            "value": str(data["candles"][controller]["current"]["open_time"]),
+                            "value": str(data["candles"][controller]["current"].open_time),
                             "target_type": "datetime",
                             "ignore_failed_order": False,
                         },
@@ -53,7 +53,7 @@ class DCAStrategy(Strategy):
                     "asked_for_amount": 20,
                     "asked_for_ticker": controller.quote,
                     "pair": controller.pair,
-                    "price": data["candles"][controller]["latest"]["close"],
+                    "price": data["candles"][controller]["latest"].close,
                     "side": SIDES.BUY,
                 },
             ]
@@ -67,7 +67,7 @@ class DCAStrategy(Strategy):
                 "asked_for_amount": 0,
                 "asked_for_ticker": controller.quote,
                 "pair": controller.pair,
-                "price": data["candles"][controller]["latest"]["close"],
+                "price": data["candles"][controller]["latest"].close,
                 "side": SIDES.KEEP,
             },
         ]

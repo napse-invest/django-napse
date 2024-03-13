@@ -6,8 +6,9 @@ from django.db import models
 from pydantic import BaseModel
 
 from django_napse.core.models.bots.controller import Controller
-from django_napse.core.models.wallets.currency import Currency, CurrencyPydantic
+from django_napse.core.models.wallets.currency import Currency
 from django_napse.core.models.wallets.managers import WalletManager
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.utils.errors import WalletError
 from django_napse.utils.findable_class import FindableClass
 

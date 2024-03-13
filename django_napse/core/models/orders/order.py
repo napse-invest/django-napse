@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING, Optional
 
 from django.db import models
@@ -12,6 +14,7 @@ from django_napse.utils.errors import OrderError
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.exchange import ExchangeAccount
     from django_napse.core.models.bots.controller import Controller
+    from django_napse.core.models.connections.connection import Connection
     from django_napse.core.models.modifications.modification import Modification
 
 
@@ -33,7 +36,7 @@ class OrderBatch(models.Model):
             error_msg = f"Order {self.pk} is not pending."
             raise OrderError.StatusError(error_msg)
 
-    def _set_status_post_process(self, receipt: dict) -> None:
+    def set_status_post_process__no_db(self, receipt: dict) -> None:
         if self.status != ORDER_STATUS.READY:
             error_msg = f"Order {self.pk} is not ready."
             raise OrderError.StatusError(error_msg)
@@ -43,6 +46,7 @@ class OrderBatch(models.Model):
             buy_failed = True
         if "error" in receipt[SIDES.SELL]:
             sell_failed = True
+        print(receipt, buy_failed, sell_failed)
         if buy_failed and sell_failed:
             self.status = ORDER_STATUS.FAILED
         elif buy_failed:
@@ -56,8 +60,8 @@ class OrderBatch(models.Model):
 class Order(models.Model):
     """An order market created by bots."""
 
-    batch = models.ForeignKey("OrderBatch", on_delete=models.CASCADE, related_name="orders")
-    connection = models.ForeignKey("Connection", on_delete=models.CASCADE, related_name="orders")
+    batch: OrderBatch = models.ForeignKey("OrderBatch", on_delete=models.CASCADE, related_name="orders")
+    connection: Connection = models.ForeignKey("Connection", on_delete=models.CASCADE, related_name="orders")
     price = models.FloatField()
     pair = models.CharField(max_length=10)
     side = models.CharField(max_length=10)
@@ -263,6 +267,7 @@ class Order(models.Model):
 
     def apply_swap(self) -> None:
         """Swap quote into base (BUY) or base into quote (SELL)."""
+        self.info()
         if self.side == SIDES.BUY:
             Debit.objects.create(
                 wallet=self.wallet,
@@ -320,6 +325,8 @@ class Order(models.Model):
                 ticker=self.batch.controller.quote,
                 transaction_type=TRANSACTION_TYPES.ORDER_REFUND,
             )
+        self.completed = True
+        self.save()
 
     def tickers_info(self) -> dict[str, str]:
         """Give informations about received, spent & fee tickers."""

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import TYPE_CHECKING
 
 from django.db import models
@@ -9,13 +11,15 @@ from django_napse.utils.usefull_functions import process_value_from_type
 
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.space import Space
+    from django_napse.core.models.bots.bot import Bot
+    from django_napse.core.models.wallets.wallet import Wallet
 
 
 class Connection(models.Model):
     """Link between a bot & a wallet."""
 
-    owner = models.ForeignKey("Wallet", on_delete=models.CASCADE, related_name="connections")
-    bot = models.ForeignKey("Bot", on_delete=models.CASCADE, related_name="connections")
+    owner: Wallet = models.ForeignKey("Wallet", on_delete=models.CASCADE, related_name="connections")
+    bot: Bot = models.ForeignKey("Bot", on_delete=models.CASCADE, related_name="connections")
 
     created_at = models.DateTimeField(auto_now_add=True, blank=True)
 

@@ -6,7 +6,7 @@ from django_napse.core.models.bots.architectures.single_pair import SinglePairAr
 from django_napse.core.models.bots.implementations.turbo_dca.config import TurboDCABotConfig
 from django_napse.core.models.bots.plugins import LBOPlugin, MBPPlugin, SBVPlugin
 from django_napse.core.models.bots.strategy import Strategy
-from django_napse.core.models.wallets.currency import CurrencyPydantic
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.utils.constants import SIDES
 
 

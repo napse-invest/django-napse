@@ -14,7 +14,7 @@ class Command(BaseCommand):  # noqa
     def handle(self, *args, **options):  # noqa
         exchange_account = ExchangeAccount.objects.first()
         space = Space.objects.first()
-        config = DCABotConfig.objects.create(space=space, settings={"timeframe": timedelta(hours=1)})
+        config = DCABotConfig.objects.create(space=space, settings={"timeframe": timedelta(minutes=5)})
         controller = Controller.get(
             exchange_account=exchange_account,
             base="BTC",

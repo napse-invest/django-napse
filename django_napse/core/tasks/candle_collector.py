@@ -2,6 +2,7 @@ import requests
 from django.core.exceptions import ValidationError
 
 from django_napse.core.models.bots.controller import Controller
+from django_napse.core.pydantic.candle import CandlePydantic
 from django_napse.core.tasks.base_task import BaseTask
 
 
@@ -9,10 +10,10 @@ class CandleCollectorTask(BaseTask):
     """Task to collect candles from binance's api and send it to controllers."""
 
     name = "candle_collector"
-    interval_time = 30
+    interval_time = 15
 
     @staticmethod
-    def build_candle(request_json: list[list[int], list[int]]) -> tuple[dict[str, int | float], dict[str, int | float]]:
+    def build_candle(request_json: list[list[int], list[int]]) -> tuple[CandlePydantic, CandlePydantic]:
         """Structure close_candle & current candle from the request.json().
 
         Candle shape: {"T": 1623000000000, "O": 1.0, "H": 1.0, "L": 1.0, "C": 1.0, "V": 1.0}.
@@ -63,7 +64,21 @@ class CandleCollectorTask(BaseTask):
             else:
                 closed_candle[label] = float(request_json[0][i])
                 current_candle[label] = float(request_json[1][i])
-        return closed_candle, current_candle
+        return CandlePydantic(
+            open_time=closed_candle["T"],
+            open=closed_candle["O"],
+            high=closed_candle["H"],
+            low=closed_candle["L"],
+            close=closed_candle["C"],
+            volume=closed_candle["V"],
+        ), CandlePydantic(
+            open_time=current_candle["T"],
+            open=current_candle["O"],
+            high=current_candle["H"],
+            low=current_candle["L"],
+            close=current_candle["C"],
+            volume=current_candle["V"],
+        )
 
     @staticmethod
     def request_get(pair: str, interval: str, api: str = "api") -> requests.Response:
@@ -116,19 +131,18 @@ class CandleCollectorTask(BaseTask):
         error_msg = f"Impossible to get candles from binance's api (pair: {pair}, interval: {interval})"
         raise ValueError(error_msg)
 
-    def run(self) -> None:
+    def _run(self) -> None:
         """Run the task.
 
         Try to get the results of request of binance's api and send it to controller(s).
         If the request failed, the controller(s) is add to a list and controller(s) is this list try again (on all binance's backup api) at the end.
         """
-        if not self.avoid_overlap(verbose=False):
-            return
         self.info("Running CandleCollectorTask")
 
         failed_controllers: list["Controller"] = []
         failed_controllers_second_attempt: list["Controller"] = []
         all_orders = []
+
         for controller in Controller.objects.all():
             request = self.request_get(controller.pair, controller.interval, "api")
             success_code = 200
@@ -160,6 +174,9 @@ class CandleCollectorTask(BaseTask):
         for controller in failed_controllers_second_attempt:
             error = f"{controller} failed on all apis"
             self.error(error)
+
+        if len(all_orders) > 0:
+            self.info(f"Sent {len(all_orders)} orders")
 
 
 CandleCollectorTask().delete_task()

@@ -1,13 +1,18 @@
 from datetime import datetime, timezone
-from typing import Optional
+from time import sleep, time
 
 import celery
+import redis
+from celery.app.task import ExceptionInfo
 from celery.utils.log import get_task_logger
+from django.conf import settings
 from django.db import IntegrityError
 from django.db.utils import ProgrammingError
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 
 from django_napse.core.celery_app import celery_app, strategy_log_free
+
+redis_client = redis.Redis(host=settings.CELERY_BROKER_URL.split("//")[1].split(":")[0], port=settings.CELERY_BROKER_URL.split(":")[2])
 
 
 class BaseTask(celery.Task):
@@ -15,29 +20,44 @@ class BaseTask(celery.Task):
 
     name = "base_task"
     Strategy = strategy_log_free
-    logger = get_task_logger(name)
+    logger = get_task_logger("django")
     interval_time = 5  # Impossible to make dynamic modification because of celery
+    min_interval_time = 4
 
     def __init__(self) -> None:
         super().__init__()
+        if self.min_interval_time > self.interval_time:
+            error_msg = f"min_interval_time ({self.min_interval_time}) must be lower than interval_time ({self.interval_time})"
+            raise ValueError(error_msg)
         self.logger.setLevel("INFO")
 
     def run(self) -> None:
         """Function called when running the task."""
+        t = time()
+        redis_client.set(self.name, t, nx=True, ex=self.interval_time + 1)
+        lock = redis_client.get(self.name)
+        if lock is None or lock.decode("utf-8") != str(t):
+            return
+        self._run()
+        sleep(self.min_interval_time)  # let all the other tasks fail
+        redis_client.delete(self.name)
+
+    def _run(self) -> None:
+        """Run the task."""
 
     def info(self, msg: str) -> None:
         """Log a message."""
-        info = f"[{self.name} @{datetime.now(tz=timezone.utc)}] : {msg}"
+        info = f"[{datetime.now(tz=timezone.utc)} @{self.name}] : {msg}"
         self.logger.info(info)
 
     def error(self, msg: str) -> None:
         """Log an error."""
-        error = f"[{self.name} @{datetime.now(tz=timezone.utc)}] : {msg}"
+        error = f"[{datetime.now(tz=timezone.utc)} @{self.name}] : {msg}"
         self.logger.error(error)
 
     def warning(self, msg: str) -> None:
         """Log a warning."""
-        warning = f"[{self.name} @{datetime.now(tz=timezone.utc)}] : {msg}"
+        warning = f"[{datetime.now(tz=timezone.utc)} @{self.name}] : {msg}"
         self.logger.warning(warning)
 
     def create_task(self) -> None:
@@ -95,18 +115,22 @@ class BaseTask(celery.Task):
                     count += 1
         return count
 
-    def avoid_overlap(self, *, verbose: Optional[bool] = False) -> bool:
-        """Avoid task overlap.
+    def on_failure(self, exc: Exception, task_id: str, args: tuple, kwargs: dict, einfo: ExceptionInfo) -> None:  # noqa: ARG002
+        """Error handler.
 
-        Args:
-            verbose (bool, optional): Whether to print logs. Defaults to False.
+        This is run by the worker when the task fails.
+
+        Arguments:
+            exc (Exception): The exception raised by the task.
+            task_id (str): Unique id of the failed task.
+            args (Tuple): Original arguments for the task that failed.
+            kwargs (Dict): Original keyword arguments for the task that failed.
+            einfo (~billiard.einfo.ExceptionInfo): Exception information.
 
         Returns:
-            bool: True if task is not running, False otherwise
+            None: The return value of this handler is ignored.
         """
-        if self.num_active_tasks() > 1:
-            if verbose:
-                info = f"Period task {self.name} already running"
-                self.info(info)
-            return False
-        return True
+        """Log error on failure."""
+        error = f"[{self.name} @{datetime.now(tz=timezone.utc)}] : {exc}"
+        self.error(error)
+        self.error(einfo)

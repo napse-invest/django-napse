@@ -1,18 +1,9 @@
 from typing import TYPE_CHECKING
 
 from django.db import models
-from pydantic import BaseModel
 
 if TYPE_CHECKING:
     from django_napse.core.models.wallets.wallet import Wallet
-
-
-class CurrencyPydantic(BaseModel):
-    """A Pydantic model for the Currency class."""
-
-    ticker: str
-    amount: float
-    mbp: float
 
 
 class Currency(models.Model):
