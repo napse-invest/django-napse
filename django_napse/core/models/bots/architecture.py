@@ -2,18 +2,30 @@ from typing import TYPE_CHECKING, Literal, Union
 
 from django.db import models
 
+from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.bots.managers import ArchitectureManager
-from django_napse.core.models.wallets.currency import CurrencyPydantic
+from django_napse.core.pydantic.candle import CandlePydantic
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.utils.constants import ORDER_LEEWAY_PERCENTAGE, PLUGIN_CATEGORIES, SIDES
 from django_napse.utils.errors.orders import OrderError
 from django_napse.utils.findable_class import FindableClass
 
 if TYPE_CHECKING:
-    from django_napse.core.models.bots.controller import Controller
     from django_napse.core.models.bots.plugin import Plugin
     from django_napse.core.models.bots.strategy import Strategy
     from django_napse.core.models.connections.connection import Connection
-
+DataType = dict[
+    Literal[
+        "candles",
+        "extras",
+    ],
+    Union[
+        dict[
+            Controller,
+            dict[Literal["current", "latest"], Union[CandlePydantic]],
+        ]
+    ],
+]
 DBDataType = dict[
     Literal[
         "strategy",
@@ -91,30 +103,30 @@ class Architecture(models.Model, FindableClass):
             )
         raise NotImplementedError(error_msg)
 
-    def get_extras(self):  # noqa
+    def get_extras(self):
         return {}
 
-    def skip(self, data: dict) -> bool:  # noqa
+    def skip(self, data: dict) -> bool:
         return False
 
-    def strategy_modifications(self, order: dict, data) -> list[dict]:  # noqa
+    def strategy_modifications(self, order: dict, data) -> list[dict]:  # noqa: ARG002
         """Return modifications."""
         return []
 
-    def connection_modifications(self, order: dict, data) -> list[dict]:  # noqa
+    def connection_modifications(self, order: dict, data) -> list[dict]:  # noqa: ARG002
         """Return modifications."""
         return []
 
-    def architecture_modifications(self, order: dict, data) -> list[dict]:  # noqa
+    def architecture_modifications(self, order: dict, data) -> list[dict]:  # noqa: ARG002
         """Return modifications."""
         return []
 
-    def prepare_data(self) -> dict[str, dict[str, any]]:
-        """Return candles data."""
-        return {
-            "candles": {controller: self.get_candles(controller) for controller in self.controllers_dict().values()},
-            "extras": self.get_extras(),
-        }
+    # def prepare_data(self) -> dict[str, dict[str, any]]:
+    #     """Return candles data."""
+    #     return {
+    #         "candles": {controller: self.get_candles(controller) for controller in self.controllers_dict().values()},
+    #         "extras": self.get_extras(),
+    #     }
 
     def prepare_db_data(
         self,
@@ -130,13 +142,14 @@ class Architecture(models.Model, FindableClass):
             "plugins": {category: self.strategy.plugins.filter(category=category) for category in PLUGIN_CATEGORIES},
         }
 
-    def _get_orders(self, data: dict, no_db_data: DBDataType = None) -> list[dict]:
-        data = data or self.prepare_data()
+    def get_orders__no_db(self, data: DataType, no_db_data: DBDataType = None) -> list[dict]:
+        # data = data   or self.prepare_data()
         no_db_data = no_db_data or self.prepare_db_data()
         strategy = no_db_data["strategy"]
         connections = no_db_data["connections"]
         architecture = no_db_data["architecture"]
         all_orders = []
+
         for connection in connections:
             new_data = {**data, **no_db_data, "connection": connection}
             if architecture.skip(data=new_data):
@@ -151,6 +164,7 @@ class Architecture(models.Model, FindableClass):
                 order["ConnectionModifications"] += architecture.connection_modifications(order=order, data=new_data)
                 order["ArchitectureModifications"] += architecture.architecture_modifications(order=order, data=new_data)
             required_amount = {}
+
             for order in orders:
                 required_amount[order["asked_for_ticker"]] = required_amount.get(order["asked_for_ticker"], 0) + order["asked_for_amount"]
 

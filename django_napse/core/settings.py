@@ -114,3 +114,16 @@ if settings.configured:
     if {*list(napse_settings.NAPSE_EXCHANGE_CONFIGS.keys())} != set(EXCHANGES):
         error_msg = "NAPSE_EXCHANGE_CONFIGS does not match the list of exchanges. Can't start the server."
         raise NapseError.SettingsError(error_msg)
+
+    if "LOGGING" not in settings.__dir__():
+        settings.LOGGING = {}
+    settings.LOGGING["version"] = 1
+    settings.LOGGING["disable_existing_loggers"] = False
+    settings.LOGGING["handlers"] = {"console": {"class": "logging.StreamHandler"}, **settings.LOGGING.get("handlers", {})}
+    settings.LOGGING["loggers"] = {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+        **settings.LOGGING.get("loggers", {}),
+    }

@@ -3,10 +3,10 @@ from datetime import datetime, timedelta
 
 from pytz import UTC
 
+from django_napse.core.pydantic.currency import CurrencyPydantic
+
 
 def calculate_mbp(value: str, current_value: float, order, currencies: dict) -> float:
-    from django_napse.core.models.wallets.currency import CurrencyPydantic
-
     ticker, price = value.split("|")
     price = float(price)
 

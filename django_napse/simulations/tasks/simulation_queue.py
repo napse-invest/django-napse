@@ -50,4 +50,4 @@ class SimulationQueueTask(BaseTask):
 
 
 SimulationQueueTask().delete_task()
-SimulationQueueTask().register_task()
+# SimulationQueueTask().register_task()

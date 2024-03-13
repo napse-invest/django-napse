@@ -19,7 +19,7 @@ class Command(BaseCommand):  # noqa
             exchange_account=exchange_account,
             base="BTC",
             quote="USDT",
-            interval="1m",
+            interval="15m",
         )
         architecture = SinglePairArchitecture.objects.create(constants={"controller": controller})
         strategy = DCAStrategy.objects.create(config=config, architecture=architecture)

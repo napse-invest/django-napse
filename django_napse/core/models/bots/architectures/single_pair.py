@@ -31,7 +31,7 @@ class SinglePairArchitecture(Architecture):
         return {"main": self.controller}
 
     def skip(self, data: dict) -> bool:
-        if data["candles"][data["controllers"]["main"]]["current"]["open_time"] < self.variable_last_candle_date + timedelta(
+        if data["candles"][data["controllers"]["main"]]["current"].open_time < self.variable_last_candle_date + timedelta(
             milliseconds=interval_to_milliseconds(data["controllers"]["main"].interval),
         ):
             return True
@@ -41,7 +41,7 @@ class SinglePairArchitecture(Architecture):
         return [
             {
                 "key": "last_candle_date",
-                "value": str(data["candles"][data["controllers"]["main"]]["current"]["open_time"]),
+                "value": str(data["candles"][data["controllers"]["main"]]["current"].open_time),
                 "target_type": "datetime",
                 "ignore_failed_order": True,
             },

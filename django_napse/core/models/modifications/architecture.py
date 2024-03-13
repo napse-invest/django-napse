@@ -9,7 +9,7 @@ from .modification import Modification
 class ArchitectureModification(Modification):
     def apply(self):
         architecture = self.order.connection.bot.architecture.find()
-        architectur, self = self.apply__no_db(architecture)
+        _, self = self.apply__no_db(architecture)
         architecture.save()
         self.save()
 
