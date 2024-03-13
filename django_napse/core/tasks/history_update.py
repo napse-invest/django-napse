@@ -10,10 +10,8 @@ class HistoryUpdateTask(BaseTask):
     time_limit = 60
     soft_time_limit = 60
 
-    def run(self) -> None:
+    def _run(self) -> None:
         """Run a task to update all controllers."""
-        if not self.avoid_overlap(verbose=False):
-            return
         self.info("Running HistoryUpdateTask")
         for history in History.objects.all():
             history.find().generate_data_point()

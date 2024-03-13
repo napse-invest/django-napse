@@ -36,4 +36,4 @@ class DataSetQueueTask(BaseTask):
 
 
 DataSetQueueTask().delete_task()
-DataSetQueueTask().register_task()
+# DataSetQueueTask().register_task()

@@ -1,6 +1,6 @@
 from django_napse.core.models.bots.plugin import Plugin
 from django_napse.core.models.connections.connection import ConnectionSpecificArgs
-from django_napse.core.models.wallets.currency import CurrencyPydantic
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.utils.constants import PLUGIN_CATEGORIES, SIDES
 
 

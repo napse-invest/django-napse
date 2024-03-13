@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import math
 from datetime import datetime, timedelta, timezone
 from typing import TYPE_CHECKING, Optional
@@ -5,6 +7,7 @@ from typing import TYPE_CHECKING, Optional
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
 
+from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.bots.managers.controller import ControllerManager
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, ORDER_STATUS, SIDES, STABLECOINS
@@ -13,7 +16,8 @@ from django_napse.utils.trading.binance_controller import BinanceController, Exc
 
 if TYPE_CHECKING:
     from django_napse.core.models.accounts.exchange import Exchange, ExchangeAccount
-    from django_napse.core.models.bots.bot import Bot
+    from django_napse.core.models.bots.architecture import DataType
+    from django_napse.core.pydantic.candle import CandlePydantic
 
 
 class Controller(models.Model):
@@ -119,6 +123,17 @@ class Controller(models.Model):
         """Return the exchange of the controller."""
         return self.exchange_account.exchange
 
+    @property
+    def single_pair_bots(self) -> list["Bot"]:
+        """Return the bots that are allowed to trade on the controller."""
+        bots = []
+
+        for bot in Bot.objects.filter(strategy__architecture__in=self.single_pair_architectures.all()):
+            fleet = bot.fleet
+            if fleet is not None and fleet.running and bot.active and not bot.is_in_simulation:
+                bots.append(bot)
+        return bots
+
     def update_variables(self) -> None:
         """If the variables are older than 1 minute, update them."""
         if self.last_settings_update is None or self.last_settings_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
@@ -154,28 +169,37 @@ class Controller(models.Model):
         if self.pk:
             self.save()
 
-    def process_orders(self, no_db_data: Optional[dict] = None, *, testing: bool) -> list[Order]:
+    def process_orders__no_db(self, no_db_data: Optional[dict] = None, *, testing: bool) -> tuple[list[Order], list[OrderBatch]]:
         in_simulation = no_db_data is not None
         no_db_data = no_db_data or {
-            "buy_orders": Order.objects.filter(
-                order__batch__status=ORDER_STATUS.READY,
-                order__side=SIDES.BUY,
-                order__batch__controller=self,
-                order__testing=testing,
-            ),
-            "sell_orders": Order.objects.filter(
-                order__batch__status=ORDER_STATUS.READY,
-                order__side=SIDES.SELL,
-                order__batch__controller=self,
-                order__testing=testing,
-            ),
-            "keep_orders": Order.objects.filter(
-                order__batch__status=ORDER_STATUS.READY,
-                order__side=SIDES.KEEP,
-                order__batch__controller=self,
-                order__testing=testing,
-            ),
-            "batches": OrderBatch.objects.filter(status=ORDER_STATUS.READY, batch__controller=self),
+            "buy_orders": [
+                order
+                for order in Order.objects.filter(
+                    batch__status=ORDER_STATUS.READY,
+                    side=SIDES.BUY,
+                    batch__controller=self,
+                )
+                if order.testing == testing
+            ],
+            "sell_orders": [
+                order
+                for order in Order.objects.filter(
+                    batch__status=ORDER_STATUS.READY,
+                    side=SIDES.SELL,
+                    batch__controller=self,
+                )
+                if order.testing == testing
+            ],
+            "keep_orders": [
+                order
+                for order in Order.objects.filter(
+                    batch__status=ORDER_STATUS.READY,
+                    side=SIDES.KEEP,
+                    batch__controller=self,
+                )
+                if order.testing == testing
+            ],
+            "batches": OrderBatch.objects.filter(status=ORDER_STATUS.READY, controller=self),
             "exchange_controller": self.exchange_controller,
             "min_trade": self.min_trade,
             "price": self.get_price(),
@@ -203,12 +227,12 @@ class Controller(models.Model):
                 order.calculate_batch_share(total=aggregated_order["sell_amount"])
         for order in no_db_data["keep_orders"]:
             order.batch_share = 0
-
         receipt, executed_amounts_buy, executed_amounts_sell, fees_buy, fees_sell = no_db_data["exchange_controller"].submit_order(
             controller=self,
             aggregated_order=aggregated_order,
             testing=in_simulation or testing,
         )
+
         all_orders = []
         for order in no_db_data["buy_orders"]:
             order.calculate_exit_amounts(
@@ -233,16 +257,23 @@ class Controller(models.Model):
             all_orders.append(order)
 
         for batch in no_db_data["batches"]:
-            batch._set_status_post_process(receipt=receipt)
+            batch.set_status_post_process__no_db(receipt=receipt)
 
-        return all_orders
+        return all_orders, no_db_data["batches"]
 
-    def apply_orders(self, orders):
+    def apply_orders(self, orders: list[Order]) -> None:
         for order in orders:
             order.save()
             order.apply_swap()
 
-    def send_candles_to_bots(self, closed_candle, current_candle) -> list:
+    def apply_batches(self, batches: list[OrderBatch]) -> None:
+        for batch in batches:
+            batch.save()
+
+    def prepare_candles(self, closed_candle: CandlePydantic, current_candle: CandlePydantic) -> DataType:
+        return {"candles": {self: {"current": current_candle, "latest": closed_candle}}, "extras": {}}
+
+    def send_candles_to_bots(self, closed_candle: CandlePydantic, current_candle: CandlePydantic) -> list:
         """Scan all bots (that are allowed to trade) and get their orders.
 
         Args:
@@ -255,9 +286,8 @@ class Controller(models.Model):
         list: A list of orders.
         """
         orders = []
-        for bot in self.bots.all().filter(is_simulation=False, fleet__running=True, can_trade=True):
-            bot: "Bot"
-            orders = [*orders, bot.give_order(closed_candle, current_candle)]
+        for bot in self.single_pair_bots:
+            orders = [*orders, bot.get_orders(data=self.prepare_candles(closed_candle, current_candle))[0]]
         return orders
 
     @staticmethod

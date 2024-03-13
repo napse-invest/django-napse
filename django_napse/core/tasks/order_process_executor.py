@@ -1,18 +1,26 @@
-# from django_napse.core.models import Order
+from django_napse.core.models.bots.controller import Controller
 from django_napse.core.tasks.base_task import BaseTask
 
 
 class OrderProcessExecutorTask(BaseTask):
-    name = "order_process_executor"
-    interval_time = 1  # Impossible to make dynamic modification because of celery
+    """Task to process all pending orders."""
 
-    def run(self) -> None:
+    name = "order_process_executor"
+    interval_time = 5  # Impossible to make dynamic modification because of celery
+
+    def _run(self) -> None:
         """Run a task to process all pending orders."""
-        if not self.avoid_overlap(verbose=False):
-            return
+        self.info("Running OrderProcessExecutorTask")
         processed = 0
-        # for order in Order.objects.filter(status="pending", completed=True):
-        #     processed += 1
+        for controller in Controller.objects.all():
+            orders, batches = controller.process_orders__no_db(testing=True)
+            processed += len(orders)
+            controller.apply_batches(batches)
+            controller.apply_orders(orders)
+            for order in orders:
+                order.apply_modifications()
+                order.process_payout()
+
         if processed > 0:
             self.info(f"Processed {processed} orders")
 

@@ -11,7 +11,8 @@ from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.core.models.transactions.credit import Credit
-from django_napse.core.models.wallets.currency import CurrencyPydantic
+from django_napse.core.pydantic.candle import CandlePydantic
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.simulations.models.datasets.dataset import Candle, DataSet
 from django_napse.simulations.models.simulations.managers import SimulationQueueManager
 from django_napse.utils.constants import EXCHANGE_INTERVALS, ORDER_LEEWAY_PERCENTAGE, ORDER_STATUS, SIDES, SIMULATION_STATUS
@@ -153,7 +154,7 @@ class SimulationQueue(models.Model):
         processed_data = {"candles": {}, "extras": {}}
         current_prices = {}
         for controller, candle in candle_data.items():
-            processed_data["candles"][controller] = {"current": candle, "latest": candle}
+            processed_data["candles"][controller] = {"current": CandlePydantic(**candle), "latest": CandlePydantic(**candle)}
             if controller.quote == "USDT" and controller.interval == min_interval:
                 price = candle["close"]
                 current_prices[f"{controller.base}_price"] = price
@@ -234,7 +235,7 @@ class SimulationQueue(models.Model):
                 candle_data=candle_data,
                 min_interval=min_interval,
             )
-            orders = bot._get_orders(data=processed_data, no_db_data=no_db_data)
+            orders = bot.get_orders__no_db(data=processed_data, no_db_data=no_db_data)
             batches = {}
             for order in orders:
                 debited_amount = order["asked_for_amount"] * (1 + ORDER_LEEWAY_PERCENTAGE / 100)
@@ -267,15 +268,15 @@ class SimulationQueue(models.Model):
                     for modification in architecture_modifications:
                         all_modifications.append(ArchitectureModification(order=order, **modification))
 
-                orders = controller.process_orders(
+                orders, _ = controller.process_orders__no_db(
                     no_db_data={
                         "buy_orders": [order for order in order_objects if order.side == SIDES.BUY],
                         "sell_orders": [order for order in order_objects if order.side == SIDES.SELL],
                         "keep_orders": [order for order in order_objects if order.side == SIDES.KEEP],
                         "batches": [batch],
                         "exchange_controller": exchange_controllers[controller],
-                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"]["close"],
-                        "price": processed_data["candles"][controller]["latest"]["close"],
+                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"].close,
+                        "price": processed_data["candles"][controller]["latest"].close,
                     },
                     testing=True,
                 )
@@ -363,19 +364,20 @@ class SimulationQueue(models.Model):
 
             all_orders = []
             for controller, batch in batches.items():
-                orders = controller.process_orders(
+                orders, batch_list = controller.process_orders__no_db(
                     no_db_data={
                         "buy_orders": [order for order in orders if order.side == SIDES.BUY],
                         "sell_orders": [order for order in orders if order.side == SIDES.SELL],
                         "keep_orders": [order for order in orders if order.side == SIDES.KEEP],
                         "batches": [batch],
                         "exchange_controller": exchange_controllers[controller],
-                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"]["close"],
-                        "price": processed_data["candles"][controller]["latest"]["close"],
+                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"].close,
+                        "price": processed_data["candles"][controller]["latest"].close,
                     },
                     testing=True,
                 )
 
+                controller.apply_batches(batch_list)
                 controller.apply_orders(orders)
                 for order in orders:
                     order.apply_modifications()
