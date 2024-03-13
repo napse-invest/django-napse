@@ -11,6 +11,7 @@ from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.core.models.transactions.credit import Credit
+from django_napse.core.pydantic.candle import CandlePydantic
 from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.simulations.models.datasets.dataset import Candle, DataSet
 from django_napse.simulations.models.simulations.managers import SimulationQueueManager
@@ -153,7 +154,7 @@ class SimulationQueue(models.Model):
         processed_data = {"candles": {}, "extras": {}}
         current_prices = {}
         for controller, candle in candle_data.items():
-            processed_data["candles"][controller] = {"current": candle, "latest": candle}
+            processed_data["candles"][controller] = {"current": CandlePydantic(**candle), "latest": CandlePydantic(**candle)}
             if controller.quote == "USDT" and controller.interval == min_interval:
                 price = candle["close"]
                 current_prices[f"{controller.base}_price"] = price
@@ -274,8 +275,8 @@ class SimulationQueue(models.Model):
                         "keep_orders": [order for order in order_objects if order.side == SIDES.KEEP],
                         "batches": [batch],
                         "exchange_controller": exchange_controllers[controller],
-                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"]["close"],
-                        "price": processed_data["candles"][controller]["latest"]["close"],
+                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"].close,
+                        "price": processed_data["candles"][controller]["latest"].close,
                     },
                     testing=True,
                 )
@@ -370,8 +371,8 @@ class SimulationQueue(models.Model):
                         "keep_orders": [order for order in orders if order.side == SIDES.KEEP],
                         "batches": [batch],
                         "exchange_controller": exchange_controllers[controller],
-                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"]["close"],
-                        "price": processed_data["candles"][controller]["latest"]["close"],
+                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"].close,
+                        "price": processed_data["candles"][controller]["latest"].close,
                     },
                     testing=True,
                 )

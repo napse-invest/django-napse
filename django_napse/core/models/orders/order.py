@@ -46,7 +46,7 @@ class OrderBatch(models.Model):
             buy_failed = True
         if "error" in receipt[SIDES.SELL]:
             sell_failed = True
-        print(receipt, buy_failed, sell_failed)
+
         if buy_failed and sell_failed:
             self.status = ORDER_STATUS.FAILED
         elif buy_failed:
@@ -267,7 +267,6 @@ class Order(models.Model):
 
     def apply_swap(self) -> None:
         """Swap quote into base (BUY) or base into quote (SELL)."""
-        self.info()
         if self.side == SIDES.BUY:
             Debit.objects.create(
                 wallet=self.wallet,

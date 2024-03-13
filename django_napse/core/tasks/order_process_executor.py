@@ -20,7 +20,6 @@ class OrderProcessExecutorTask(BaseTask):
             for order in orders:
                 order.apply_modifications()
                 order.process_payout()
-                order.info()
 
         if processed > 0:
             self.info(f"Processed {processed} orders")

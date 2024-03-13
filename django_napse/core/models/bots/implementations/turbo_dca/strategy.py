@@ -42,7 +42,7 @@ class TurboDCAStrategy(Strategy):
         controller = data["controllers"]["main"]
         if (
             self.variable_last_buy_date is None
-            or data["candles"][controller]["current"]["open_time"] - self.variable_last_buy_date >= data["config"]["timeframe"]
+            or data["candles"][controller]["current"].open_time - self.variable_last_buy_date >= data["config"]["timeframe"]
         ):
             mbp = data["connection_data"][data["connection"]]["connection_specific_args"]["mbp"].get_value()
             lbo = data["connection_data"][data["connection"]]["connection_specific_args"]["lbo"].get_value()
@@ -59,7 +59,7 @@ class TurboDCAStrategy(Strategy):
             )
             mbp = mbp if mbp is not None else math.inf
             sbv = sbv if sbv is not None else available_quote
-            current_price = data["candles"][controller]["latest"]["close"]
+            current_price = data["candles"][controller]["latest"].close
             amount = data["config"]["percentage"] * sbv / 100
             if lbo == 0 or current_price < mbp:
                 return [
@@ -69,7 +69,7 @@ class TurboDCAStrategy(Strategy):
                         "StrategyModifications": [
                             {
                                 "key": "last_buy_date",
-                                "value": str(data["candles"][controller]["current"]["open_time"]),
+                                "value": str(data["candles"][controller]["current"].open_time),
                                 "target_type": "datetime",
                                 "ignore_failed_order": False,
                             },
@@ -79,7 +79,7 @@ class TurboDCAStrategy(Strategy):
                         "asked_for_amount": amount,
                         "asked_for_ticker": controller.quote,
                         "pair": controller.pair,
-                        "price": data["candles"][controller]["latest"]["close"],
+                        "price": data["candles"][controller]["latest"].close,
                         "side": SIDES.BUY,
                     },
                 ]
@@ -91,7 +91,7 @@ class TurboDCAStrategy(Strategy):
                         "StrategyModifications": [
                             {
                                 "key": "last_buy_date",
-                                "value": str(data["candles"][controller]["current"]["open_time"]),
+                                "value": str(data["candles"][controller]["current"].open_time),
                                 "target_type": "datetime",
                                 "ignore_failed_order": False,
                             },
@@ -101,7 +101,7 @@ class TurboDCAStrategy(Strategy):
                         "asked_for_amount": available_base,
                         "asked_for_ticker": controller.base,
                         "pair": controller.pair,
-                        "price": data["candles"][controller]["latest"]["close"],
+                        "price": data["candles"][controller]["latest"].close,
                         "side": SIDES.SELL,
                     },
                 ]
@@ -112,7 +112,7 @@ class TurboDCAStrategy(Strategy):
                     "StrategyModifications": [
                         {
                             "key": "last_buy_date",
-                            "value": str(data["candles"][controller]["current"]["open_time"]),
+                            "value": str(data["candles"][controller]["current"].open_time),
                             "target_type": "datetime",
                             "ignore_failed_order": False,
                         },
@@ -122,7 +122,7 @@ class TurboDCAStrategy(Strategy):
                     "asked_for_amount": 0,
                     "asked_for_ticker": controller.quote,
                     "pair": controller.pair,
-                    "price": data["candles"][controller]["latest"]["close"],
+                    "price": data["candles"][controller]["latest"].close,
                     "side": SIDES.KEEP,
                 },
             ]
@@ -136,7 +136,7 @@ class TurboDCAStrategy(Strategy):
                 "asked_for_amount": 0,
                 "asked_for_ticker": controller.quote,
                 "pair": controller.pair,
-                "price": data["candles"][controller]["latest"]["close"],
+                "price": data["candles"][controller]["latest"].close,
                 "side": SIDES.KEEP,
             },
         ]
