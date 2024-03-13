@@ -1,3 +1,10 @@
+## [1.13.3](https://github.com/napse-invest/django-napse/compare/v1.13.2...v1.13.3) (2024-03-13)
+
+
+### Bug Fixes
+
+* **celery:** now works asynchronously ([0dc86ef](https://github.com/napse-invest/django-napse/commit/0dc86efb931f64153e875f96f4a15c0d721d559c))
+
 ## [1.13.2](https://github.com/napse-invest/django-napse/compare/v1.13.1...v1.13.2) (2024-03-12)
 
 
