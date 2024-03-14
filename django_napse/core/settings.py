@@ -127,3 +127,8 @@ if settings.configured:
         },
         **settings.LOGGING.get("loggers", {}),
     }
+    settings.LOGGING["root"] = {
+        "handlers": ["console"],
+        "level": "INFO",
+        **settings.LOGGING.get("root", {}),
+    }
