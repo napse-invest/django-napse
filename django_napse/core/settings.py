@@ -62,6 +62,7 @@ class DjangoNapseSettings:
 
 
 napse_settings = DjangoNapseSettings()
+hasattr(settings, "LOGGING")  # query setting to make sure it is loaded
 
 if settings.configured:
     for app in [
