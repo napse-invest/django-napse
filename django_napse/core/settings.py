@@ -126,9 +126,3 @@ settings.LOGGING["loggers"] = {
     },
     **settings.LOGGING.get("loggers", {}),
 }
-if not settings.DEBUG:
-    settings.LOGGING["root"] = {
-        "handlers": ["console"],
-        "level": "INFO",
-        **settings.LOGGING.get("root", {}),
-    }
