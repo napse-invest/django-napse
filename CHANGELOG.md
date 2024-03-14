@@ -1,3 +1,11 @@
+## [1.13.6](https://github.com/napse-invest/django-napse/compare/v1.13.5...v1.13.6) (2024-03-14)
+
+
+### Bug Fixes
+
+* **logging:** weird settings import ([5aefd6c](https://github.com/napse-invest/django-napse/commit/5aefd6cbd8c384a27251fade351a6accf0f8fb4d))
+* **redis:** logging ([742e13f](https://github.com/napse-invest/django-napse/commit/742e13f15b1752ed537eaedc4e00e0df5b16f38f))
+
 ## [1.13.5](https://github.com/napse-invest/django-napse/compare/v1.13.4...v1.13.5) (2024-03-14)
 
 
