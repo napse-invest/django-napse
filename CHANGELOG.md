@@ -1,3 +1,10 @@
+## [1.13.5](https://github.com/napse-invest/django-napse/compare/v1.13.4...v1.13.5) (2024-03-14)
+
+
+### Bug Fixes
+
+* **redis:** logging ([a363045](https://github.com/napse-invest/django-napse/commit/a36304578ea9c770fa611f0a01e4e0658c3dcd8b))
+
 ## [1.13.4](https://github.com/napse-invest/django-napse/compare/v1.13.3...v1.13.4) (2024-03-13)
 
 
