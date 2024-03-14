@@ -125,6 +125,8 @@ class FleetView(CustomViewSet):
         fleet = serializer.save()
         space = serializer.space
         fleet.invest(space, 0, "USDT")
+        fleet.running = True
+        fleet.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def delete(self, request: Request, pk: str | int | UUID | None = None) -> None:  # noqa: ARG002
