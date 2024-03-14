@@ -63,54 +63,66 @@ class DjangoNapseSettings:
 
 napse_settings = DjangoNapseSettings()
 
-if settings.configured:
-    for app in [
-        "rest_framework",
-        "rest_framework_api_key",
-        "django_celery_beat",
-        "corsheaders",
-    ]:
-        if app not in settings.INSTALLED_APPS:
-            warning = f"{app} not found in settings.INSTALLED_APPS. Please add it to your settings file."
-            logger.warning(warning)
-            settings.INSTALLED_APPS += (app,)
-
-    if "REST_FRAMEWORK" not in settings.__dir__():
-        warning = "REST_FRAMEWORK not found in settings. Please add it to your settings file."
+for app in [
+    "rest_framework",
+    "rest_framework_api_key",
+    "django_celery_beat",
+    "corsheaders",
+]:
+    if app not in settings.INSTALLED_APPS:
+        warning = f"{app} not found in settings.INSTALLED_APPS. Please add it to your settings file."
         logger.warning(warning)
-        settings.REST_FRAMEWORK = {
-            "DEFAULT_PERMISSION_CLASSES": ["django_napse.api.custom_permissions.HasAdminPermission"],
-        }
-    for permission in ["django_napse.api.custom_permissions.HasAdminPermission"]:
-        if permission not in settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"]:
-            warning = f"{permission} not found in settings. Please add it to your settings file."
-            logger.warning(warning)
+        settings.INSTALLED_APPS += (app,)
 
-    if "NAPSE_SECRETS_FILE_PATH" not in settings.__dir__():
-        warning = "NAPSE_SECRETS_FILE_PATH not found in settings. Please add it to your settings file."
-        logger.warning(warning)
-    if not napse_settings.NAPSE_SECRETS_FILE_PATH.exists():
-        logger.warning(
-            "WARNING: No secrets file found at %s. Creating one now.",
-            napse_settings.NAPSE_SECRETS_FILE_PATH,
-        )
-        secrets_file = napse_settings.NAPSE_SECRETS_FILE_PATH.open("w")
-        json.dump({"Exchange Accounts": {}}, secrets_file)
-        secrets_file.close()
-
-    if "NAPSE_ENV_FILE_PATH" not in settings.__dir__():
-        warning = "NAPSE_ENV_FILE_PATH not found in settings. Please add it to your settings file."
+if "REST_FRAMEWORK" not in settings.__dir__():
+    warning = "REST_FRAMEWORK not found in settings. Please add it to your settings file."
+    logger.warning(warning)
+    settings.REST_FRAMEWORK = {
+        "DEFAULT_PERMISSION_CLASSES": ["django_napse.api.custom_permissions.HasAdminPermission"],
+    }
+for permission in ["django_napse.api.custom_permissions.HasAdminPermission"]:
+    if permission not in settings.REST_FRAMEWORK["DEFAULT_PERMISSION_CLASSES"]:
+        warning = f"{permission} not found in settings. Please add it to your settings file."
         logger.warning(warning)
 
-    if not napse_settings.NAPSE_ENV_FILE_PATH.exists():
-        logger.warning(
-            "WARNING: No env file found at %s. Creating one now.",
-            napse_settings.NAPSE_ENV_FILE_PATH,
-        )
-        env_file = napse_settings.NAPSE_ENV_FILE_PATH.open("w")
-        env_file.write("")
-        env_file.close()
+if "NAPSE_SECRETS_FILE_PATH" not in settings.__dir__():
+    warning = "NAPSE_SECRETS_FILE_PATH not found in settings. Please add it to your settings file."
+    logger.warning(warning)
+if not napse_settings.NAPSE_SECRETS_FILE_PATH.exists():
+    logger.warning(
+        "WARNING: No secrets file found at %s. Creating one now.",
+        napse_settings.NAPSE_SECRETS_FILE_PATH,
+    )
+    secrets_file = napse_settings.NAPSE_SECRETS_FILE_PATH.open("w")
+    json.dump({"Exchange Accounts": {}}, secrets_file)
+    secrets_file.close()
 
-    if {*list(napse_settings.NAPSE_EXCHANGE_CONFIGS.keys())} != set(EXCHANGES):
-        error_msg = "NAPSE_EXCHANGE_CONFIGS does not match the list of exchanges. Can't start the server."
-        raise NapseError.SettingsError(error_msg)
+if "NAPSE_ENV_FILE_PATH" not in settings.__dir__():
+    warning = "NAPSE_ENV_FILE_PATH not found in settings. Please add it to your settings file."
+    logger.warning(warning)
+
+if not napse_settings.NAPSE_ENV_FILE_PATH.exists():
+    logger.warning(
+        "WARNING: No env file found at %s. Creating one now.",
+        napse_settings.NAPSE_ENV_FILE_PATH,
+    )
+    env_file = napse_settings.NAPSE_ENV_FILE_PATH.open("w")
+    env_file.write("")
+    env_file.close()
+
+if {*list(napse_settings.NAPSE_EXCHANGE_CONFIGS.keys())} != set(EXCHANGES):
+    error_msg = "NAPSE_EXCHANGE_CONFIGS does not match the list of exchanges. Can't start the server."
+    raise NapseError.SettingsError(error_msg)
+
+if "LOGGING" not in settings.__dir__():
+    settings.LOGGING = {}
+settings.LOGGING["version"] = 1
+settings.LOGGING["disable_existing_loggers"] = False
+settings.LOGGING["handlers"] = {"console": {"class": "logging.StreamHandler"}, **settings.LOGGING.get("handlers", {})}
+settings.LOGGING["loggers"] = {
+    "django": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    **settings.LOGGING.get("loggers", {}),
+}

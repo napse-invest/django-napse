@@ -11,15 +11,13 @@ class SimulationQueueTask(BaseTask):
     time_limit = 60 * 60
     soft_time_limit = 60 * 60
 
-    def run(self) -> None:
+    def _run(self) -> None:
         """Run a task to process all SimulationQueues.
 
         Raises:
             e: If the SimulationQueue gebe
             SimulationError.BotSimQueueError: _description_
         """
-        if not self.avoid_overlap(verbose=False):
-            return
         self.info("Running SimQueueTask")
         queue = SimulationQueue.objects.filter(error=False).order_by("created_at").first()
 

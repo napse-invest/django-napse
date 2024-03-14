@@ -11,6 +11,8 @@ from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.utils.errors import BotError
 
 if TYPE_CHECKING:
+    from django_napse.core.models.bots.architecture import Architecture, DataType, DBDataType
+    from django_napse.core.models.bots.strategy import Strategy
     from django_napse.core.models.wallets.space_simulation_wallet import SpaceSimulationWallet
     from django_napse.core.models.wallets.space_wallet import SpaceWallet
 
@@ -23,7 +25,7 @@ class Bot(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
 
-    strategy = models.OneToOneField("Strategy", on_delete=models.CASCADE, related_name="bot")
+    strategy: Strategy = models.OneToOneField("Strategy", on_delete=models.CASCADE, related_name="bot")
 
     def __str__(self) -> str:
         return f"BOT {self.pk=}"
@@ -115,7 +117,7 @@ class Bot(models.Model):
         return self.strategy.find()
 
     @property
-    def architecture(self):
+    def architecture(self) -> Architecture:
         return self._strategy.architecture.find()
 
     @property
@@ -140,12 +142,11 @@ class Bot(models.Model):
     def get_connection_data(self):
         return {connection: connection.to_dict() for connection in self.get_connections()}
 
-    def get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):
+    def get_orders(self, data: DataType, no_db_data: Optional[DBDataType] = None):
         if not self.active:
             error_msg = "Bot is hibernating."
             raise BotError.InvalidSetting(error_msg)
-
-        orders = self._get_orders(data=data, no_db_data=no_db_data)
+        orders = self.get_orders__no_db(data=data, no_db_data=no_db_data)
         batches = {}
         order_objects = []
         for order in orders:
@@ -164,14 +165,15 @@ class Bot(models.Model):
                 ConnectionModification.objects.create(order=order, **modification)
             for modification in architecture_modifications:
                 ArchitectureModification.objects.create(order=order, **modification)
+
         for batch in batches.values():
             batch.set_status_ready()
 
         return order_objects, batches
 
-    def _get_orders(self, data: Optional[dict] = None, no_db_data: Optional[dict] = None):
+    def get_orders__no_db(self, data: DataType, no_db_data: Optional[DBDataType] = None) -> list[dict]:
         """Get orders of the bot."""
-        return self.architecture._get_orders(data=data, no_db_data=no_db_data)  # noqa: SLF001
+        return self.architecture.get_orders__no_db(data=data, no_db_data=no_db_data)
 
     def connect_to_wallet(self, wallet: SpaceSimulationWallet | SpaceWallet) -> Connection:
         """Connect the bot to a (sim)space's wallet."""

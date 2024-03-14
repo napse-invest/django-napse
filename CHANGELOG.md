@@ -1,3 +1,46 @@
+## [1.13.6](https://github.com/napse-invest/django-napse/compare/v1.13.5...v1.13.6) (2024-03-14)
+
+
+### Bug Fixes
+
+* **logging:** weird settings import ([5aefd6c](https://github.com/napse-invest/django-napse/commit/5aefd6cbd8c384a27251fade351a6accf0f8fb4d))
+* **redis:** logging ([742e13f](https://github.com/napse-invest/django-napse/commit/742e13f15b1752ed537eaedc4e00e0df5b16f38f))
+
+## [1.13.5](https://github.com/napse-invest/django-napse/compare/v1.13.4...v1.13.5) (2024-03-14)
+
+
+### Bug Fixes
+
+* **redis:** logging ([a363045](https://github.com/napse-invest/django-napse/commit/a36304578ea9c770fa611f0a01e4e0658c3dcd8b))
+
+## [1.13.4](https://github.com/napse-invest/django-napse/compare/v1.13.3...v1.13.4) (2024-03-13)
+
+
+### Bug Fixes
+
+* **redis:** url fixed ([fd9703b](https://github.com/napse-invest/django-napse/commit/fd9703ba2d953843fea3c046b8be1b9f8ff979f2))
+
+## [1.13.3](https://github.com/napse-invest/django-napse/compare/v1.13.2...v1.13.3) (2024-03-13)
+
+
+### Bug Fixes
+
+* **celery:** now works asynchronously ([0dc86ef](https://github.com/napse-invest/django-napse/commit/0dc86efb931f64153e875f96f4a15c0d721d559c))
+
+## [1.13.2](https://github.com/napse-invest/django-napse/compare/v1.13.1...v1.13.2) (2024-03-12)
+
+
+### Bug Fixes
+
+* **api:** exchange_account creation ([45cb17a](https://github.com/napse-invest/django-napse/commit/45cb17af8a34f0e761748eed78cafbdc43dcdfc0))
+
+## [1.13.1](https://github.com/napse-invest/django-napse/compare/v1.13.0...v1.13.1) (2024-03-12)
+
+
+### Bug Fixes
+
+* **requirements:** pydantic ([08e1256](https://github.com/napse-invest/django-napse/commit/08e1256449e5f449bc97ac4d7b1789e901a0f9a7))
+
 # [1.13.0](https://github.com/napse-invest/django-napse/compare/v1.12.0...v1.13.0) (2024-03-12)
 
 
