@@ -157,7 +157,8 @@ class Bot(models.Model):
             strategy_modifications = order_dict.pop("StrategyModifications")
             connection_modifications = order_dict.pop("ConnectionModifications")
             architecture_modifications = order_dict.pop("ArchitectureModifications")
-            order = Order.objects.create(batch=batches[controller], **order)
+
+            order = Order.objects.create(batch=batches[controller], **order_dict)
             order_objects.append(order)
             for modification in strategy_modifications:
                 StrategyModification.objects.create(order=order, **modification)

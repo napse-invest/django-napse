@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 import uuid
+from typing import TYPE_CHECKING
 
 from django.db import models
 
@@ -6,18 +9,30 @@ from django_napse.core.models.bots.managers.bot_config import BotConfigManager
 from django_napse.core.models.bots.strategy import Strategy
 from django_napse.utils.findable_class import FindableClass
 
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.space import Space
+
 
 class BotConfig(models.Model, FindableClass):
     uuid = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
-    space = models.ForeignKey("Space", on_delete=models.CASCADE, related_name="bot_configs")
+    space: Space = models.ForeignKey("Space", on_delete=models.CASCADE, related_name="bot_configs")
     immutable = models.BooleanField(default=False)
 
-    objects = BotConfigManager()
+    objects: BotConfigManager = BotConfigManager()
 
     def __str__(self) -> str:  # pragma: no cover
         return f"BOT CONFIG: {self.pk}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}BotConfig: ({self.pk=})\n"
         string += f"{beacon}Args:\n"

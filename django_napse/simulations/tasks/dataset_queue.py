@@ -17,7 +17,6 @@ class DataSetQueueTask(BaseTask):
         Raises:
             SimulationError.DataSetQueueError: If the DataSetQueue is not finished.
         """
-        self.info("Running DataSetQueueTask")
         queue = DataSetQueue.objects.all().order_by("created_at").first()
         if queue is None:
             return
@@ -34,4 +33,4 @@ class DataSetQueueTask(BaseTask):
 
 
 DataSetQueueTask().delete_task()
-DataSetQueueTask().register_task()
+# DataSetQueueTask().register_task()
