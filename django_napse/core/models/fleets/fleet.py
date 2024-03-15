@@ -86,7 +86,7 @@ class Fleet(models.Model):
     def value(self) -> float:
         """Sum value of all bots in fleet."""
         connections = Connection.objects.filter(bot__in=self.bots)
-        return sum([connection.wallet.value_market() for connection in connections])
+        return sum([connection.wallet.value() for connection in connections])
 
     def space_frame_value(self, space: Space) -> float:
         """Sum value of all bots connected to the space."""
@@ -94,7 +94,7 @@ class Fleet(models.Model):
         fleet_connections = Connection.objects.filter(bot__in=self.bots)
         space_connections = space.wallet.connections.all()
         commun_connections = space_connections.intersection(fleet_connections)
-        return sum([connection.wallet.value_market() for connection in commun_connections])
+        return sum([connection.wallet.value() for connection in commun_connections])
 
     def bot_clusters(self) -> list[Bot]:
         """Return list of bot containerized into clusters."""

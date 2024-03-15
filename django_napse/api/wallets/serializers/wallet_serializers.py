@@ -37,7 +37,7 @@ class WalletSerializer(serializers.ModelSerializer):
         ]
 
     def get_value(self, instance) -> float:
-        return instance.value_market()
+        return instance.value()
 
     def get_operations(self, instance) -> dict:
         transactions = Transaction.objects.filter(Q(from_wallet=instance) | Q(to_wallet=instance)).order_by("created_at")

@@ -224,7 +224,7 @@ class Wallet(models.Model, FindableClass):
             value += currency.amount * currency.mbp
         return value
 
-    def value_market(self) -> float:
+    def value(self) -> float:
         """Return the value of the wallet in USDT.
 
         Returns:

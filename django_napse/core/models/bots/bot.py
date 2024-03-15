@@ -194,9 +194,9 @@ class Bot(models.Model):
     def value(self, space=None) -> float:  # noqa: ANN001
         """Return value market of the bot, depending of space containerization."""
         if space is None:
-            return sum([connection.wallet.value_market() for connection in self.connections.all()])
+            return sum([connection.wallet.value() for connection in self.connections.all()])
         connection = Connection.objects.get(owner=space.wallet, bot=self)
-        return connection.wallet.value_market()
+        return connection.wallet.value()
 
     def get_stats(self, space=None) -> dict[str, str | int | float]:  # noqa: ANN001
         """Some bot's statistics used for KPI dashboards."""
