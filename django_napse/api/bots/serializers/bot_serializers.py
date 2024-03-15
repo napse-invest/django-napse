@@ -52,7 +52,6 @@ class BotSerializer(serializers.ModelSerializer):
         """Return the space used for the space containerization."""
         if self.space is None:
             return None
-        print("UUID", type(self.space.uuid))
         return self.space.uuid
 
     def get_exchange_account(self, instance: Bot) -> UUID | None:

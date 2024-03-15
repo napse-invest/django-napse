@@ -28,9 +28,7 @@ def build_main_router() -> DefaultRouter:
     for module_name in api_modules_folders_names:
         try:
             module: ModuleType = import_module(f"django_napse.api.{module_name}.views")
-        except (ImportError, ModuleNotFoundError) as error:
-            print(f"Could not import module {module_name} ({type(error)})")
-            print(error)
+        except (ImportError, ModuleNotFoundError):
             continue
         for obj in vars(module).values():
             if isinstance(obj, type) and issubclass(obj, GenericViewSet):
