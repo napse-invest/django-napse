@@ -11,6 +11,8 @@ class CandleCollectorTask(BaseTask):
 
     name = "candle_collector"
     interval_time = 15
+    wait_for = "order_process_executor"
+    color = "\x1b[31;20m"
 
     @staticmethod
     def build_candle(request_json: list[list[int], list[int]]) -> tuple[CandlePydantic, CandlePydantic]:
@@ -137,8 +139,6 @@ class CandleCollectorTask(BaseTask):
         Try to get the results of request of binance's api and send it to controller(s).
         If the request failed, the controller(s) is add to a list and controller(s) is this list try again (on all binance's backup api) at the end.
         """
-        self.info("Running CandleCollectorTask")
-
         failed_controllers: list["Controller"] = []
         failed_controllers_second_attempt: list["Controller"] = []
         all_orders = []
@@ -176,7 +176,7 @@ class CandleCollectorTask(BaseTask):
             self.error(error)
 
         if len(all_orders) > 0:
-            self.info(f"Sent {len(all_orders)} orders")
+            self.info(f"Sent {len(all_orders)} orders. IDs = " + f"{[str(order.pk) for order in all_orders]}")
 
 
 CandleCollectorTask().delete_task()

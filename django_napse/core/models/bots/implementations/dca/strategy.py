@@ -7,12 +7,23 @@ from django_napse.utils.constants import SIDES
 
 
 class DCAStrategy(Strategy):
+    """Implementation of a simple Dollar Cost Averaging strategy."""
+
     variable_last_buy_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self) -> str:
         return f"DCA BOT STRATEGY: {self.pk=}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Strategy ({self.pk=}):\n"
         string += f"{beacon}Args:\n"
@@ -23,14 +34,17 @@ class DCAStrategy(Strategy):
         return string
 
     @classmethod
-    def config_class(cls):
+    def config_class(cls) -> type[DCABotConfig]:
+        """Return the config class for this strategy."""
         return DCABotConfig
 
     @classmethod
-    def architecture_class(cls):
+    def architecture_class(cls) -> type[SinglePairArchitecture]:
+        """Return the architecture class for this strategy."""
         return SinglePairArchitecture
 
     def give_order(self, data: dict) -> list[dict]:
+        """Trading logic for the DCA strategy."""
         controller = data["controllers"]["main"]
         if (
             self.variable_last_buy_date is None

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import math
 from datetime import datetime, timedelta, timezone
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, TypedDict
 
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
@@ -18,6 +18,18 @@ if TYPE_CHECKING:
     from django_napse.core.models.accounts.exchange import Exchange, ExchangeAccount
     from django_napse.core.models.bots.architecture import DataType
     from django_napse.core.pydantic.candle import CandlePydantic
+
+
+class NoDBData(TypedDict):
+    """Type of the no_db_data argument in the process_orders__no_db method."""
+
+    buy_orders: list[Order]
+    sell_orders: list[Order]
+    keep_orders: list[Order]
+    batches: list[OrderBatch]
+    exchange_controller: ExchangeController
+    min_trade: float
+    price: float
 
 
 class Controller(models.Model):
@@ -169,9 +181,10 @@ class Controller(models.Model):
         if self.pk:
             self.save()
 
-    def process_orders__no_db(self, no_db_data: Optional[dict] = None, *, testing: bool) -> tuple[list[Order], list[OrderBatch]]:
+    def process_orders__no_db(self, no_db_data: Optional[NoDBData] = None, *, testing: bool) -> tuple[list[Order], list[OrderBatch]]:
         in_simulation = no_db_data is not None
-        no_db_data = no_db_data or {
+
+        no_db_data: NoDBData = no_db_data or {
             "buy_orders": [
                 order
                 for order in Order.objects.filter(
@@ -204,7 +217,6 @@ class Controller(models.Model):
             "min_trade": self.min_trade,
             "price": self.get_price(),
         }
-
         aggregated_order = {
             "buy_amount": 0,
             "sell_amount": 0,
@@ -273,7 +285,7 @@ class Controller(models.Model):
     def prepare_candles(self, closed_candle: CandlePydantic, current_candle: CandlePydantic) -> DataType:
         return {"candles": {self: {"current": current_candle, "latest": closed_candle}}, "extras": {}}
 
-    def send_candles_to_bots(self, closed_candle: CandlePydantic, current_candle: CandlePydantic) -> list:
+    def send_candles_to_bots(self, closed_candle: CandlePydantic, current_candle: CandlePydantic) -> list[Order]:
         """Scan all bots (that are allowed to trade) and get their orders.
 
         Args:
@@ -287,7 +299,7 @@ class Controller(models.Model):
         """
         orders = []
         for bot in self.single_pair_bots:
-            orders = [*orders, bot.get_orders(data=self.prepare_candles(closed_candle, current_candle))[0]]
+            orders = [*orders, *bot.get_orders(data=self.prepare_candles(closed_candle, current_candle))[0]]
         return orders
 
     @staticmethod

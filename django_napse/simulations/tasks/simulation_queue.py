@@ -18,7 +18,6 @@ class SimulationQueueTask(BaseTask):
             e: If the SimulationQueue gebe
             SimulationError.BotSimQueueError: _description_
         """
-        self.info("Running SimQueueTask")
         queue = SimulationQueue.objects.filter(error=False).order_by("created_at").first()
 
         if queue is None:
@@ -48,4 +47,4 @@ class SimulationQueueTask(BaseTask):
 
 
 SimulationQueueTask().delete_task()
-SimulationQueueTask().register_task()
+# SimulationQueueTask().register_task()

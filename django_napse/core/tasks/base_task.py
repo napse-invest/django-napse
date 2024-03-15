@@ -23,6 +23,8 @@ class BaseTask(celery.Task):
     logger = get_task_logger("django")
     interval_time = 5  # Impossible to make dynamic modification because of celery
     min_interval_time = 4
+    wait_for = None
+    color = None
 
     def __init__(self) -> None:
         super().__init__()
@@ -31,34 +33,55 @@ class BaseTask(celery.Task):
             raise ValueError(error_msg)
         self.logger.setLevel("INFO")
 
+    def wait_for_other_tasks(self, task_name: str) -> None:
+        """Wait for another task to finish."""
+        start_time = time()
+        while redis_client.get(task_name + "_run") is not None:
+            sleep(0.5)
+            self.info(f"Waiting for {task_name} to finish.", color=True)
+            if time() - start_time > self.interval_time:
+                self.error(f"Task {task_name} is taking too long to finish.")
+
     def run(self) -> None:
         """Function called when running the task."""
         t = time()
-        redis_client.set(self.name, t, nx=True, ex=self.interval_time + 1)
+        redis_client.set(self.name, t, nx=True, ex=self.interval_time + self.min_interval_time + 1)
         lock = redis_client.get(self.name)
         if lock is None or lock.decode("utf-8") != str(t):
             return
+
+        if self.wait_for is not None:
+            self.wait_for_other_tasks(self.wait_for)
+
+        redis_client.set(self.name + "_run", "lock", nx=True, ex=self.interval_time + self.min_interval_time + 1)
+        self.info(f"Running task {self.name}", color=True)
         self._run()
+        redis_client.delete(self.name + "_run")
         sleep(self.min_interval_time)  # let all the other tasks fail
         redis_client.delete(self.name)
 
     def _run(self) -> None:
         """Run the task."""
 
-    def info(self, msg: str) -> None:
+    def info(self, msg: str, *, color: bool = False) -> None:
         """Log a message."""
-        info = f"[{datetime.now(tz=timezone.utc)} @{self.name}] : {msg}"
-        self.logger.info(info)
+        string = f"INFO [{datetime.now(tz=timezone.utc)} @{self.name}]"
+        string = string + " " * (70 - len(string)) + f" | {msg}"
+        if self.color and color:
+            string = self.color + string + "\x1b[0m"
+        self.logger.info(string)
 
     def error(self, msg: str) -> None:
         """Log an error."""
-        error = f"[{datetime.now(tz=timezone.utc)} @{self.name}] : {msg}"
-        self.logger.error(error)
+        string = f"ERROR [{datetime.now(tz=timezone.utc)} @{self.name}]"
+        string = string + " " * (70 - len(string)) + f" | {msg}"
+        self.logger.error(string)
 
     def warning(self, msg: str) -> None:
         """Log a warning."""
-        warning = f"[{datetime.now(tz=timezone.utc)} @{self.name}] : {msg}"
-        self.logger.warning(warning)
+        string = f"WARNING [{datetime.now(tz=timezone.utc)} @{self.name}]"
+        string = string + " " * (70 - len(string)) + f" | {msg}"
+        self.logger.warning(string)
 
     def create_task(self) -> None:
         """Build task feed_bots_with_candles.
