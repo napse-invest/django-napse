@@ -37,6 +37,7 @@ class OrderBatch(models.Model):
             raise OrderError.StatusError(error_msg)
 
     def set_status_post_process__no_db(self, receipt: dict) -> None:
+        """Change status of the batch from READY to PASSED, FAILED, ONLY_BUY_PASSED or ONLY_SELL_PASSED."""
         if self.status != ORDER_STATUS.READY:
             error_msg = f"Order {self.pk} is not ready."
             raise OrderError.StatusError(error_msg)

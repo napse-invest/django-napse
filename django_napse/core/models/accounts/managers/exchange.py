@@ -1,16 +1,27 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.apps import apps
 from django.db import models
 
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.exchange import Exchange, ExchangeAccount
+
 
 class ExchangeAccountManager(models.Manager):
+    """Manager for the ExchangeAccount model."""
+
     def create(
         self,
-        exchange,
-        testing: bool,
+        exchange: Exchange,
         name: str,
         description: str = "",
-        **kwargs,
-    ):
+        *,
+        testing: bool,
+        **kwargs: dict[str, any],
+    ) -> ExchangeAccount:
+        """Create a new exchange account."""
         Space = apps.get_model("django_napse_core", "Space")
         exchange_account = self.model(
             exchange=exchange,

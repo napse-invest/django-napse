@@ -40,7 +40,7 @@ class Fleet(models.Model):
         blank=True,
     )
 
-    objects = FleetManager()
+    objects: FleetManager = FleetManager()
 
     def __str__(self) -> str:
         return f"FLEET: {self.pk=}, name={self.name}"

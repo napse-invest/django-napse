@@ -12,7 +12,6 @@ class HistoryUpdateTask(BaseTask):
 
     def _run(self) -> None:
         """Run a task to update all controllers."""
-        self.info("Running HistoryUpdateTask")
         for history in History.objects.all():
             history.find().generate_data_point()
 

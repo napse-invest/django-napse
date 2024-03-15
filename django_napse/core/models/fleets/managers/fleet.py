@@ -1,16 +1,28 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Literal, Optional, Union
+
 from django.db import models
 
 from django_napse.core.models.fleets.cluster import Cluster
 from django_napse.utils.errors import FleetError
 
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.exchange import ExchangeAccount
+    from django_napse.core.models.bots.bot import Bot
+    from django_napse.core.models.fleets.fleet import Fleet
+
 
 class FleetManager(models.Manager):
+    """Manager for the Fleet model."""
+
     def create(
         self,
-        name,
-        exchange_account,
-        clusters=None,
-    ):
+        name: str,
+        exchange_account: ExchangeAccount,
+        clusters: Optional[list[dict[Literal["template_bot", "share", "breakpoint", "autoscale"], Union[float, Bot]]]] = None,
+    ) -> Fleet:
+        """Create a new fleet."""
         clusters = clusters or []
 
         if sum(cluster["share"] for cluster in clusters) != 1:
