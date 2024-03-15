@@ -153,7 +153,7 @@ class FleetDetailSerializer(serializers.ModelSerializer):
         def _search_ticker(ticker: str, merged_wallet: list[dict[str, str | float]]) -> int | None:
             """Return the index of the currency in the list if found, None otherwise."""
             for i, currency in enumerate(merged_wallet):
-                if currency.get("ticker").ticker == ticker:
+                if currency.get("ticker") == ticker:
                     return i
             return None
 
