@@ -25,7 +25,7 @@ class WalletHistory(History):
         """Create a new data point for the bot."""
         wallet = self.owner.to_dict()
         points = {
-            HISTORY_DATAPOINT_FIELDS.WALLET_VALUE: self.owner.value_market(),
+            HISTORY_DATAPOINT_FIELDS.WALLET_VALUE: self.owner.value(),
         }
         for currency in wallet.currencies.values():
             points[HISTORY_DATAPOINT_FIELDS_WILDCARDS.AMOUNT + currency.ticker] = currency.amount
