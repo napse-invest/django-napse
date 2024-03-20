@@ -6,10 +6,13 @@ from datetime import datetime, timedelta
 
 from django.db import models
 
+from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.bots.controller import Controller
 from django_napse.core.models.modifications import ArchitectureModification, ConnectionModification, StrategyModification
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.core.models.transactions.credit import Credit
+from django_napse.core.pydantic.candle import CandlePydantic
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.simulations.models.datasets.dataset import Candle, DataSet
 from django_napse.simulations.models.simulations.managers import SimulationQueueManager
 from django_napse.utils.constants import EXCHANGE_INTERVALS, ORDER_LEEWAY_PERCENTAGE, ORDER_STATUS, SIDES, SIMULATION_STATUS
@@ -19,8 +22,10 @@ from .simulation import Simulation
 
 
 class SimulationQueue(models.Model):
+    """Queue wrapper for a simulation."""
+
     simulation_reference = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
-    space = models.ForeignKey("django_napse_core.NapseSpace", on_delete=models.CASCADE, null=True)
+    space = models.ForeignKey("django_napse_core.Space", on_delete=models.CASCADE, null=True)
     bot = models.OneToOneField("django_napse_core.Bot", on_delete=models.CASCADE, null=True)
 
     start_date = models.DateTimeField()
@@ -40,7 +45,8 @@ class SimulationQueue(models.Model):
     def __str__(self) -> str:
         return f"BOT SIM QUEUE {self.pk}"
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, verbose: bool = True, beacon: str = "") -> str:  # noqa: FBT002, FBT001
+        """Return info on SimulationQueue."""
         string = ""
         string += f"{beacon}SimulationQueue {self.pk}:\n"
         string += f"{beacon}\t{self.bot=}\n"
@@ -61,7 +67,8 @@ class SimulationQueue(models.Model):
             print(string)
         return string
 
-    def setup_simulation(self):
+    def setup_simulation(self) -> tuple[Bot, dict[str, any]]:
+        """Setup investment and connections for the simulation."""
         self.space.simulation_wallet.find().reset()
         for investment in self.investments.all():
             Credit.objects.create(
@@ -70,13 +77,14 @@ class SimulationQueue(models.Model):
                 amount=investment.amount,
             )
         new_bot = self.bot.copy()
-        connection = new_bot.connect_to(self.space.simulation_wallet)
+        connection = new_bot.connect_to_wallet(self.space.simulation_wallet)
         for investment in self.investments.all():
             connection.deposit(investment.ticker, investment.amount)
         no_db_data = new_bot.architecture.prepare_db_data()
         return new_bot, no_db_data
 
-    def cleanup_simulation(self, bot):
+    def cleanup_simulation(self, bot: Bot) -> None:
+        """Reset the simulation: reset wallet & deactivate the bot."""
         self.space.simulation_wallet.reset()
         bot.hibernate()
 
@@ -87,7 +95,7 @@ class SimulationQueue(models.Model):
                 min_interval = interval
                 break
 
-        currencies = next(iter(no_db_data["connection_data"].values()))["wallet"]["currencies"]
+        currencies = next(iter(no_db_data["connection_data"].values()))["wallet"].currencies
 
         exchange_controllers = {controller: controller.exchange_controller for controller in bot.controllers.values()}
 
@@ -146,7 +154,7 @@ class SimulationQueue(models.Model):
         processed_data = {"candles": {}, "extras": {}}
         current_prices = {}
         for controller, candle in candle_data.items():
-            processed_data["candles"][controller] = {"current": candle, "latest": candle}
+            processed_data["candles"][controller] = {"current": CandlePydantic(**candle), "latest": CandlePydantic(**candle)}
             if controller.quote == "USDT" and controller.interval == min_interval:
                 price = candle["close"]
                 current_prices[f"{controller.base}_price"] = price
@@ -173,18 +181,24 @@ class SimulationQueue(models.Model):
     ):
         current_amounts = {}
         for controller in candle_data:
-            current_amounts[f"{controller.base}_amount"] = currencies.get(controller.base, {"amount": 0})["amount"]
-            current_amounts[f"{controller.quote}_amount"] = currencies.get(controller.quote, {"amount": 0})["amount"]
+            current_amounts[f"{controller.base}_amount"] = currencies.get(
+                controller.base,
+                CurrencyPydantic(ticker=controller.base, amount=0, mbp=0),
+            ).amount
+            current_amounts[f"{controller.quote}_amount"] = currencies.get(
+                controller.quote,
+                CurrencyPydantic(ticker=controller.quote, amount=0, mbp=0),
+            ).amount
 
         wallet_value = 0
         for ticker, currency in currencies.items():
-            amount = currency["amount"]
+            amount = currency.amount
             price = 1 if ticker == "USDT" else current_prices[f"{ticker}_price"]
             wallet_value += amount * price
 
         wallet_value_before = 0
         for ticker, currency in currencies_before.items():
-            amount = currency["amount"]
+            amount = currency.amount
             price = 1 if ticker == "USDT" else current_prices[f"{ticker}_price"]
             wallet_value_before += amount * price
 
@@ -221,12 +235,12 @@ class SimulationQueue(models.Model):
                 candle_data=candle_data,
                 min_interval=min_interval,
             )
-            orders = bot._get_orders(data=processed_data, no_db_data=no_db_data)
+            orders = bot.get_orders__no_db(data=processed_data, no_db_data=no_db_data)
             batches = {}
             for order in orders:
                 debited_amount = order["asked_for_amount"] * (1 + ORDER_LEEWAY_PERCENTAGE / 100)
                 if debited_amount > 0:
-                    currencies[order["asked_for_ticker"]]["amount"] -= debited_amount
+                    currencies[order["asked_for_ticker"]].amount -= debited_amount
                 order["debited_amount"] = debited_amount
 
                 controller = order["controller"]
@@ -254,20 +268,20 @@ class SimulationQueue(models.Model):
                     for modification in architecture_modifications:
                         all_modifications.append(ArchitectureModification(order=order, **modification))
 
-                orders = controller.process_orders(
+                orders, _ = controller.process_orders__no_db(
                     no_db_data={
                         "buy_orders": [order for order in order_objects if order.side == SIDES.BUY],
                         "sell_orders": [order for order in order_objects if order.side == SIDES.SELL],
                         "keep_orders": [order for order in order_objects if order.side == SIDES.KEEP],
                         "batches": [batch],
                         "exchange_controller": exchange_controllers[controller],
-                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"]["close"],
-                        "price": processed_data["candles"][controller]["latest"]["close"],
+                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"].close,
+                        "price": processed_data["candles"][controller]["latest"].close,
                     },
                     testing=True,
                 )
                 for order in orders:
-                    order._apply_modifications(
+                    order.apply_modifications__no_db(
                         batch=batch,
                         modifications=[modification for modification in all_modifications if modification.order == order],
                         strategy=no_db_data["strategy"],
@@ -275,10 +289,10 @@ class SimulationQueue(models.Model):
                         currencies=currencies,
                     )
 
-                    currencies[controller.base] = currencies.get(controller.base, {"amount": 0, "mbp": 0})
-                    currencies[controller.quote] = currencies.get(controller.quote, {"amount": 0, "mbp": 0})
-                    currencies[controller.base]["amount"] += order.exit_amount_base
-                    currencies[controller.quote]["amount"] += order.exit_amount_quote
+                    currencies[controller.base] = currencies.get(controller.base, CurrencyPydantic(ticker=controller.base, amount=0, mbp=0))
+                    currencies[controller.quote] = currencies.get(controller.quote, CurrencyPydantic(ticker=controller.quote, amount=0, mbp=0))
+                    currencies[controller.base].amount += order.exit_amount_base
+                    currencies[controller.quote].amount += order.exit_amount_quote
 
                 all_orders += orders
 
@@ -338,7 +352,7 @@ class SimulationQueue(models.Model):
         amounts = []
         tickers = []
         extras = {csa.key: [] for csa in next(iter(no_db_data["connection_data"].values()))["connection_specific_args"].values()}
-        currencies = bot.connections.all()[0].wallet.to_dict()["currencies"]
+        currencies = bot.connections.all()[0].wallet.to_dict().currencies
         for date, candle_data in data.items():
             currencies_before = deepcopy(currencies)
             processed_data, current_prices = self.process_candle_data(
@@ -350,26 +364,27 @@ class SimulationQueue(models.Model):
 
             all_orders = []
             for controller, batch in batches.items():
-                orders = controller.process_orders(
+                orders, batch_list = controller.process_orders__no_db(
                     no_db_data={
                         "buy_orders": [order for order in orders if order.side == SIDES.BUY],
                         "sell_orders": [order for order in orders if order.side == SIDES.SELL],
                         "keep_orders": [order for order in orders if order.side == SIDES.KEEP],
                         "batches": [batch],
                         "exchange_controller": exchange_controllers[controller],
-                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"]["close"],
-                        "price": processed_data["candles"][controller]["latest"]["close"],
+                        "min_trade": controller.min_notional / processed_data["candles"][controller]["latest"].close,
+                        "price": processed_data["candles"][controller]["latest"].close,
                     },
                     testing=True,
                 )
 
+                controller.apply_batches(batch_list)
                 controller.apply_orders(orders)
                 for order in orders:
                     order.apply_modifications()
                     order.process_payout()
                 all_orders += orders
 
-            currencies = bot.connections.all()[0].wallet.to_dict()["currencies"]
+            currencies = bot.connections.all()[0].wallet.to_dict().currencies
             self.append_data(
                 connection_specific_args=bot.connections.all()[0].to_dict()["connection_specific_args"],
                 candle_data=candle_data,

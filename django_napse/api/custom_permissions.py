@@ -2,7 +2,7 @@ from django.forms import ValidationError
 from rest_framework.permissions import BasePermission
 from rest_framework_api_key.permissions import HasAPIKey  # noqa
 
-from django_napse.core.models import NapseSpace
+from django_napse.core.models import Space
 from django_napse.utils.constants import PERMISSION_TYPES
 from django_napse.utils.errors import APIError
 
@@ -11,8 +11,8 @@ def check_for_space(request):
     if "space" not in request.query_params:
         raise APIError.MissingSpace()
     try:
-        return NapseSpace.objects.get(uuid=request.query_params["space"])
-    except NapseSpace.DoesNotExist as e:
+        return Space.objects.get(uuid=request.query_params["space"])
+    except Space.DoesNotExist as e:
         raise APIError.InvalidSpace() from e
     except ValidationError as e:
         raise APIError.InvalidSpace() from e

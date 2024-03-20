@@ -1,23 +1,23 @@
 from django.db.utils import IntegrityError
 
-from django_napse.core.models import Bot, Controller, Credit, EmptyBotConfig, EmptyStrategy, Fleet, NapseSpace, SinglePairArchitecture
+from django_napse.core.models import Bot, Controller, Credit, EmptyBotConfig, EmptyStrategy, Fleet, SinglePairArchitecture, Space
 from django_napse.utils.model_test_case import ModelTestCase
 
 """
-python tests/test_app/manage.py test tests.django_tests.accounts.test_space -v2 --keepdb --parallel
+python tests/test_app/manage.py test tests.django_tests.db.accounts.test_space -v2 --keepdb --parallel
 """
 
 
-class NapseSpaceTestCase:
-    model = NapseSpace
+class SpaceTestCase:
+    model = Space
 
     def simple_create(self):
-        return NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
+        return Space.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
 
     def test_error_create_napse_space_with_same_name(self):
-        NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
+        Space.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
         with self.assertRaises(IntegrityError):
-            NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
+            Space.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
 
     def _build_fleet_context(self):
         config = EmptyBotConfig.objects.create(space=self.space, settings={"empty": True})
@@ -62,5 +62,5 @@ class NapseSpaceTestCase:
         self.assertEqual(self.space.fleets[0].uuid, fleet.uuid)
 
 
-class NaspeSpaceBINANCETestCase(NapseSpaceTestCase, ModelTestCase):
+class NaspeSpaceBINANCETestCase(SpaceTestCase, ModelTestCase):
     exchange = "BINANCE"

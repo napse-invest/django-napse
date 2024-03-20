@@ -38,7 +38,7 @@ class EmptyStrategy(Strategy):
                 "asked_for_amount": 0,
                 "asked_for_ticker": controller.quote,
                 "pair": controller.pair,
-                "price": data["candles"][controller]["latest"]["close"],
+                "price": data["candles"][controller]["latest"].close,
                 "side": SIDES.KEEP,
             },
         ]

@@ -1,7 +1,10 @@
+from __future__ import annotations
+
 import shutil
 import time
 from datetime import datetime, timedelta, timezone
 from time import sleep
+from typing import TYPE_CHECKING
 
 import binance.enums as binance_enums
 from binance.client import Client
@@ -15,8 +18,15 @@ from requests.exceptions import ConnectionError, ConnectTimeout, ReadTimeout
 from django_napse.utils.constants import DEFAULT_TAX, DOWNLOAD_STATUS, SIDES
 from django_napse.utils.usefull_functions import round_down, round_up
 
+if TYPE_CHECKING:
+    from django_napse.core.models.bots.controller import Controller
 
-class BinanceController:
+
+class ExchangeController:
+    pass
+
+
+class BinanceController(ExchangeController):
     """Commmunication interface with binance account."""
 
     def __init__(self, public_key, private_key):
@@ -325,8 +335,9 @@ class BinanceController:
         controller,
         start_date: datetime,
         end_date: datetime,
-        squash: bool = False,
         verbose: int = 0,
+        *,
+        squash: bool = False,
     ):
         """Download all the missing data to complete the dataset."""
         DataSet = apps.get_model("django_napse_simulations", "DataSet")
@@ -400,12 +411,13 @@ class BinanceController:
 
     def send_order_to_exchange(
         self,
-        controller,
+        controller: Controller,
         side: str,
         amount: float,
         min_trade: float,
-        testing: bool,
         price: float,
+        *,
+        testing: bool,
     ) -> tuple[dict, dict]:
         if amount == 0:
             return {"error": "Amount too low"}, {}, {}
@@ -444,7 +456,6 @@ class BinanceController:
                     receipt = {"error": "Amount too low"}
 
         else:
-            # TODO: implement real orders
             error_msg = "IRL orders are not implemented yet. (failsafe to prevent accidental irl orders)."
             raise NotImplementedError(error_msg)
         return receipt, executed_amounts, fees

@@ -1,22 +1,29 @@
-# from django_napse.core.models import Order
-from django_napse.core.tasks.base_tasks import BaseTask
+from django_napse.core.models.bots.controller import Controller
+from django_napse.core.tasks.base_task import BaseTask
 
 
 class OrderProcessExecutorTask(BaseTask):
+    """Task to process all pending orders."""
+
     name = "order_process_executor"
     interval_time = 5  # Impossible to make dynamic modification because of celery
+    wait_for = "candle_collector"
+    color = "\x1b[33;20m"
 
-    def run(self):
-        """Run TASK.
+    def _run(self) -> None:
+        """Run a task to process all pending orders."""
+        processed_orders = []
+        for controller in Controller.objects.all():
+            orders, batches = controller.process_orders__no_db(testing=True)
+            processed_orders = [*processed_orders, *orders]
+            controller.apply_batches(batches)
+            controller.apply_orders(orders)
+            for order in orders:
+                order.apply_modifications()
+                order.process_payout()
 
-        Process orders from bots to make buy/sell on binance.
-        """
-        print("OrderProcessExecutorTask")
-        if not self.avoid_overlap(verbose=True):
-            print("skipped")
-            return
-        # for order in Order.objects.filter(status="pending", completed=True):
-        #     order = processor.process_order(order)
+        if len(processed_orders) > 0:
+            self.info(f"Processed {len(processed_orders)} orders. IDs = " + f"{[str(order.pk) for order in processed_orders]}")
 
 
 OrderProcessExecutorTask().delete_task()

@@ -1,5 +1,6 @@
 from django_napse.core.models.bots.plugin import Plugin
 from django_napse.core.models.connections.connection import ConnectionSpecificArgs
+from django_napse.core.pydantic.currency import CurrencyPydantic
 from django_napse.utils.constants import PLUGIN_CATEGORIES, SIDES
 
 
@@ -8,14 +9,18 @@ class SBVPlugin(Plugin):
     def plugin_category(cls):
         return PLUGIN_CATEGORIES.POST_ORDER
 
-    def _apply(self, data: dict) -> dict:
+    def apply__no_db(self, data: dict) -> dict:
         order = data["order"]
-        current_base_amout = data["connection_data"][data["connection"]]["wallet"]["currencies"].get(order["controller"].base, {"amount": 0})[
-            "amount"
-        ]
-        current_quote_amout = data["connection_data"][data["connection"]]["wallet"]["currencies"].get(order["controller"].quote, {"amount": 0})[
-            "amount"
-        ]
+        current_base_amout = (
+            data["connection_data"][data["connection"]]["wallet"]
+            .currencies.get(order["controller"].base, CurrencyPydantic(ticker=order["controller"].base, amount=0, mbp=0))
+            .amount
+        )
+        current_quote_amout = (
+            data["connection_data"][data["connection"]]["wallet"]
+            .currencies.get(order["controller"].quote, CurrencyPydantic(ticker=order["controller"].quote, amount=0, mbp=0))
+            .amount
+        )
         if data["connection_data"][data["connection"]]["connection_specific_args"]["sbv"].get_value() is None or order["side"] == SIDES.SELL:
             order["ConnectionModifications"] += [
                 {

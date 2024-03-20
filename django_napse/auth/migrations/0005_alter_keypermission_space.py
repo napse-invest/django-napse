@@ -5,16 +5,15 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('django_napse_core', '0007_historydatapoint_created_at'),
-        ('django_napse_auth', '0004_napseapikey_description'),
+        ("django_napse_core", "0007_historydatapoint_created_at"),
+        ("django_napse_auth", "0004_napseapikey_description"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='keypermission',
-            name='space',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='permissions', to='django_napse_core.napsespace'),
+            model_name="keypermission",
+            name="space",
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name="permissions", to="django_napse_core.napsespace"),
         ),
     ]

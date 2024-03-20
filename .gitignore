@@ -37,7 +37,7 @@ MANIFEST
 # pip-delete-this-directory.txt
 
 # Unit test / coverage reports
-htmlcov/
+# htmlcov/
 .tox/
 .nox/
 .coverage
@@ -167,3 +167,5 @@ cython_debug/
 secrets.json
 full-requirements.txt
 .ruff_cache/
+*.sqlite3
+dump.rdb

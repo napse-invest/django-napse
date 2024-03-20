@@ -3,18 +3,20 @@ from datetime import datetime, timedelta
 
 from pytz import UTC
 
+from django_napse.core.pydantic.currency import CurrencyPydantic
+
 
 def calculate_mbp(value: str, current_value: float, order, currencies: dict) -> float:
     ticker, price = value.split("|")
     price = float(price)
 
-    current_amount = currencies.get(ticker, {"amount": 0})["amount"]
+    current_amount = currencies.get(ticker, CurrencyPydantic(ticker=ticker, amount=0, mbp=0)).amount
     current_value = current_value if current_value is not None else 0
     received_quote = order.debited_amount - order.exit_amount_quote
     return (current_amount * current_value + received_quote) / (received_quote / price + current_amount)
 
 
-def process_value_from_type(value, target_type, **kwargs):
+def process_value_from_type(value, target_type, **kwargs) -> any:
     """Convert a value to a specific type."""
     target_type = target_type.lower()
     if value == "None":

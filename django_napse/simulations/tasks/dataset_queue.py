@@ -4,18 +4,19 @@ from django_napse.utils.errors import SimulationError
 
 
 class DataSetQueueTask(BaseTask):
+    """Task to process DataSetQueues."""
+
     name = "dataset_queue"
     interval_time = 5
     time_limit = 60 * 60
     soft_time_limit = 60 * 60
 
-    def run(self):
-        """Run TASK.
+    def _run(self) -> None:
+        """Run a task to process all DataSetQueues.
 
-        Process all pending DataSetQueues periodically.
+        Raises:
+            SimulationError.DataSetQueueError: If the DataSetQueue is not finished.
         """
-        if not self.avoid_overlap(verbose=True):
-            return
         queue = DataSetQueue.objects.all().order_by("created_at").first()
         if queue is None:
             return
@@ -32,4 +33,4 @@ class DataSetQueueTask(BaseTask):
 
 
 DataSetQueueTask().delete_task()
-DataSetQueueTask().register_task()
+# DataSetQueueTask().register_task()

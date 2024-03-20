@@ -4,82 +4,13 @@ repo_name: napse-invest/django-napse
 repo_url: https://github.com/napse-invest/django-napse
 copyright: MIT Licence
 
-
 docs_dir: "docs/"
 
+extra_css:
+  -  assets/stylesheets/extra.css
+  -  assets/stylesheets/api.css
+  -  assets/stylesheets/docstring.css
 
-markdown_extensions:
-  - toc:
-      permalink: "#"
-  - pymdownx.snippets:
-  - pymdownx.magiclink:
-  - attr_list:
-  - md_in_html:
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - pymdownx.inlinehilite:
-  - pymdownx.superfences:
-  - markdown.extensions.attr_list:
-  - pymdownx.keys:
-  - pymdownx.tasklist:
-      custom_checkbox: true
-  - pymdownx.highlight:
-      anchor_linenums: true
-  - admonition
-  - codehilite:
-      use_pygments: true
-      noclasses: true
-      pygments_style: tango
-  - pymdownx.details:
-  - pymdownx.tabbed:
-      alternate_style: true
-  - attr_list:
-  - md_in_html:
-
-
-plugins:
-  - search
-  - inline-svg
-
-
-theme:
-  name: 'material'
-  logo: 'assets/images/NapseInvestLogoSVG.svg'
-  favicon: 'theme/assets/images/logo.ico'
-  language: 'en'
-  palette:
-    # Palette toggle for light mode
-    - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: 'white'
-      toggle:
-        # icon: material/toggle-switch
-        icon: material/toggle-switch-off-outline
-        name: Switch to dark mode
-
-    # Palette toggle for dark mode
-    - media: "(prefers-color-scheme: dark)"
-      scheme: slate
-      primary: black
-      toggle:
-        # icon: material/toggle-switch-off-outline
-        icon: material/toggle-switch
-        name: Switch to light mode
-  custom_dir: 'docs/theme'
-  features:
-    - navigation.tabs
-    - navigation.tabs.stickyx
-    - navigation.instant
-    - navigation.instant.prefetch
-    - navigation.tracking
-    # - navigation.section
-    - content.code.annotate
-    - toc.integrate
-    - toc.follow
-    - navigation.path
-    - navigation.top
-    - content.code.copy
-    - search.suggest
 
 extra:
   social:
@@ -93,13 +24,147 @@ extra:
       link: https://discord.com/invite/47gKBreSXa
       name: Discord
     - icon: fontawesome/brands/github
-      link: https://github.com/napse-invest/Napse
+      link: https://github.com/napse-invest/
       name: Github
+
+theme:
+  name: 'material'
+  custom_dir: theme
+  favicon: 'theme/assets/napse_logo_white.svg'
+  logo: 'theme/assets/napse_invest_logo_white.svg'
+  language: 'en'
+  palette:
+    # Palette toggle for light mode
+    - media: "prefers-color-scheme: light"
+      scheme: default
+      primary: teal
+      accent: teal
+      toggle:
+        # icon: material/toggle-switch
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "prefers-color-scheme: dark"
+      scheme: slate
+      primary: teal
+      accent: teal
+      toggle:
+        # icon: material/toggle-switch-off-outline
+        icon: material/toggle-switch
+        name: Switch to light mode
+
+  custom_dir: 'docs/theme'
+  features:
+    - navigation.tabs
+    - navigation.tabs.stickyx
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.tracking
+    - navigation.section
+    - content.code.annotate
+    # - toc.integrate
+    - toc.follow
+    - navigation.path
+    - navigation.top
+    - content.code.copy
+    - search.suggest
+    - content.tabs.link
+    - content.code.annotate
+
+watch:
+  - django_napse
+  - docs
+
+plugins:
+  - search 
+  - autorefs
+  - inline-svg
+  - coverage:
+      page_name: coverage  # default
+      html_report_dir: htmlcov  # default
+  - neoteroi.mkdocsoad:
+      use_pymdownx: true
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python: 
+          paths: [.] 
+          options: 
+            members_order: source
+            separate_signature: true
+            filters: ["!^_"]
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
+            heading_level: 3
+            # extensions:
+            #   - docs/plugins/griffe_doclinks.py
+            show_source: false
+            allow_inspection: false 
+            show_bases: false 
+            show_root_heading: false 
+            docstring_style: google
+            # docstring_section_style: list
+            
+            # Signature
+            show_signature: true
+            separate_signature: true
+            show_signature_annotations: true
+            annotations_path: full
+            line_length: 80
+
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.snippets:
+  - pymdownx.magiclink:
+  - attr_list:
+  - md_in_html:
+  - pymdownx.inlinehilite:
+  - pymdownx.superfences:
+  - pymdownx.keys: 
+  - pymdownx.tasklist:
+      custom_checkbox: true 
+  - admonition
+  - codehilite:  
+      use_pygments: true
+      noclasses: true
+      pygments_style: tango
+  - pymdownx.details:
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+      # line_spans: __span
+
+
 
 nav:
   - Home: 
     - Overview: "index.md"
-  - Contributing: "contributing.md"
-  #   - Installation:
-  #   - Tutorial:
-  # - API:
+    - Quickstart: "sources/quickstart.md"
+  - How to guides:
+    - "sources/guides/exchange.md"
+    - "sources/guides/exchange_account.md"
+    - "sources/guides/space.md"
+    - "sources/guides/fleet.md"
+  - Reference:
+    - "sources/reference/bots.md"
+    - "sources/reference/connections.md"
+    - "sources/reference/exchanges.md"
+    - "sources/reference/fleets.md"
+    - "sources/reference/histories.md"
+    - "sources/reference/keys.md"
+    - "sources/reference/orders.md"
+    - "sources/reference/permissions.md"
+    - "sources/reference/spaces.md"
+    - "sources/reference/transactions.md"
+    - "sources/reference/wallets.md"
+  - API: "sources/api.md"
+  - Development: 
+    - Contributing: "contributing.md"
+    - Security: "SECURITY.md"
+    - Coverage: coverage.md

@@ -1,19 +1,41 @@
+from __future__ import annotations
+
 import math
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import TYPE_CHECKING, Optional, TypedDict
 
 from django.db import models
 from requests.exceptions import ConnectionError, ReadTimeout, SSLError
 
+from django_napse.core.models.bots.bot import Bot
 from django_napse.core.models.bots.managers.controller import ControllerManager
 from django_napse.core.models.orders.order import Order, OrderBatch
 from django_napse.utils.constants import EXCHANGE_INTERVALS, EXCHANGE_PAIRS, ORDER_STATUS, SIDES, STABLECOINS
 from django_napse.utils.errors import ControllerError
-from django_napse.utils.trading.binance_controller import BinanceController
+from django_napse.utils.trading.binance_controller import BinanceController, ExchangeController
+
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.exchange import Exchange, ExchangeAccount
+    from django_napse.core.models.bots.architecture import DataType
+    from django_napse.core.pydantic.candle import CandlePydantic
+
+
+class NoDBData(TypedDict):
+    """Type of the no_db_data argument in the process_orders__no_db method."""
+
+    buy_orders: list[Order]
+    sell_orders: list[Order]
+    keep_orders: list[Order]
+    batches: list[OrderBatch]
+    exchange_controller: ExchangeController
+    min_trade: float
+    price: float
 
 
 class Controller(models.Model):
-    exchange_account = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="controller")
+    """Model to control the trading of a pair on an exchange."""
+
+    exchange_account: "ExchangeAccount" = models.ForeignKey("ExchangeAccount", on_delete=models.CASCADE, related_name="controller")
 
     pair = models.CharField(max_length=10)
     base = models.CharField(max_length=10)
@@ -29,13 +51,14 @@ class Controller(models.Model):
 
     objects = ControllerManager()
 
-    class Meta:
+    class Meta:  # noqa: D106
         unique_together = ("pair", "interval", "exchange_account")
 
-    def __str__(self):
-        return f"Controller {self.pk=}"
+    def __str__(self) -> str:
+        return f"Controller {self.pair} (id: {self.pk})"
 
-    def save(self, *args, **kwargs):
+    def save(self, *args: list[any], **kwargs: dict[str, any]) -> None:
+        """Save the instance."""
         if not self.pk:
             self.base = self.base.upper()
             self.quote = self.quote.upper()
@@ -43,13 +66,22 @@ class Controller(models.Model):
                 error_msg = f"Base and quote cannot be the same: {self.base} - {self.quote}"
                 raise ControllerError.InvalidSetting(error_msg)
             self.pair = self.base + self.quote
-            self._update_variables()
+            self.update_variables_always()
             if self.interval not in EXCHANGE_INTERVALS[self.exchange.name]:
                 error_msg = f"Invalid interval: {self.interval}"
                 raise ControllerError.InvalidSetting(error_msg)
         return super().save(*args, **kwargs)
 
-    def info(self, verbose=True, beacon=""):
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Controller {self.pk}:\n"
         string += f"{beacon}Args:\n"
@@ -69,7 +101,7 @@ class Controller(models.Model):
         return string
 
     @staticmethod
-    def get(exchange_account, base: str, quote: str, interval: str = "1m") -> "Controller":
+    def get(exchange_account: "ExchangeAccount", base: str, quote: str, interval: str = "1m") -> "Controller":
         """Return a controller object from the database."""
         try:
             controller = Controller.objects.get(
@@ -90,19 +122,36 @@ class Controller(models.Model):
         return controller
 
     @property
-    def exchange_controller(self):
+    def exchange_controller(self) -> "ExchangeController":
+        """Return the exchange controller of the controller.
+
+        Returns:
+            ExchangeController: The exchange controller of the controller.
+        """
         return self.exchange_account.find().exchange_controller()
 
     @property
-    def exchange(self):
+    def exchange(self) -> "Exchange":
+        """Return the exchange of the controller."""
         return self.exchange_account.exchange
+
+    @property
+    def single_pair_bots(self) -> list["Bot"]:
+        """Return the bots that are allowed to trade on the controller."""
+        bots = []
+
+        for bot in Bot.objects.filter(strategy__architecture__in=self.single_pair_architectures.all()):
+            fleet = bot.fleet
+            if fleet is not None and fleet.running and bot.active and not bot.is_in_simulation:
+                bots.append(bot)
+        return bots
 
     def update_variables(self) -> None:
         """If the variables are older than 1 minute, update them."""
         if self.last_settings_update is None or self.last_settings_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
-            self._update_variables()
+            self.update_variables_always()
 
-    def _update_variables(self) -> None:
+    def update_variables_always(self) -> None:
         """Update the variables of the controller."""
         exchange_controller = self.exchange_controller
 
@@ -120,13 +169,11 @@ class Controller(models.Model):
                 self.min_trade = self.min_notional / float(last_price)
                 self.last_settings_update = datetime.now(tz=timezone.utc)
             except ReadTimeout:
-                print("ReadTimeout in _update_variables")
+                print("ReadTimeout in update_variables_always")
             except SSLError:
-                print("SSLError in _update_variables")
+                print("SSLError in update_variables_always")
             except ConnectionError:
-                print("ConnectionError in _update_variables")
-            except Exception as e:
-                print(f"Exception in _update_variables: {e}, {type(e)}")
+                print("ConnectionError in update_variables_always")
         else:
             error_msg = f"Exchange controller not supported: {exchange_controller.__class__}"
             raise NotImplementedError(error_msg)
@@ -134,33 +181,42 @@ class Controller(models.Model):
         if self.pk:
             self.save()
 
-    def process_orders(self, testing: bool, no_db_data: Optional[dict] = None) -> list[Order]:
+    def process_orders__no_db(self, no_db_data: Optional[NoDBData] = None, *, testing: bool) -> tuple[list[Order], list[OrderBatch]]:
         in_simulation = no_db_data is not None
-        no_db_data = no_db_data or {
-            "buy_orders": Order.objects.filter(
-                order__batch__status=ORDER_STATUS.READY,
-                order__side=SIDES.BUY,
-                order__batch__controller=self,
-                order__testing=testing,
-            ),
-            "sell_orders": Order.objects.filter(
-                order__batch__status=ORDER_STATUS.READY,
-                order__side=SIDES.SELL,
-                order__batch__controller=self,
-                order__testing=testing,
-            ),
-            "keep_orders": Order.objects.filter(
-                order__batch__status=ORDER_STATUS.READY,
-                order__side=SIDES.KEEP,
-                order__batch__controller=self,
-                order__testing=testing,
-            ),
-            "batches": OrderBatch.objects.filter(status=ORDER_STATUS.READY, batch__controller=self),
+
+        no_db_data: NoDBData = no_db_data or {
+            "buy_orders": [
+                order
+                for order in Order.objects.filter(
+                    batch__status=ORDER_STATUS.READY,
+                    side=SIDES.BUY,
+                    batch__controller=self,
+                )
+                if order.testing == testing
+            ],
+            "sell_orders": [
+                order
+                for order in Order.objects.filter(
+                    batch__status=ORDER_STATUS.READY,
+                    side=SIDES.SELL,
+                    batch__controller=self,
+                )
+                if order.testing == testing
+            ],
+            "keep_orders": [
+                order
+                for order in Order.objects.filter(
+                    batch__status=ORDER_STATUS.READY,
+                    side=SIDES.KEEP,
+                    batch__controller=self,
+                )
+                if order.testing == testing
+            ],
+            "batches": OrderBatch.objects.filter(status=ORDER_STATUS.READY, controller=self),
             "exchange_controller": self.exchange_controller,
             "min_trade": self.min_trade,
             "price": self.get_price(),
         }
-
         aggregated_order = {
             "buy_amount": 0,
             "sell_amount": 0,
@@ -177,35 +233,35 @@ class Controller(models.Model):
 
         if aggregated_order["buy_amount"] > 0:
             for order in no_db_data["buy_orders"]:
-                order._calculate_batch_share(total=aggregated_order["buy_amount"])
+                order.calculate_batch_share(total=aggregated_order["buy_amount"])
         if aggregated_order["sell_amount"] > 0:
             for order in no_db_data["sell_orders"]:
-                order._calculate_batch_share(total=aggregated_order["sell_amount"])
+                order.calculate_batch_share(total=aggregated_order["sell_amount"])
         for order in no_db_data["keep_orders"]:
             order.batch_share = 0
-
         receipt, executed_amounts_buy, executed_amounts_sell, fees_buy, fees_sell = no_db_data["exchange_controller"].submit_order(
             controller=self,
             aggregated_order=aggregated_order,
             testing=in_simulation or testing,
         )
+
         all_orders = []
         for order in no_db_data["buy_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts=executed_amounts_buy,
                 fees=fees_buy,
             )
             all_orders.append(order)
         for order in no_db_data["sell_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts=executed_amounts_sell,
                 fees=fees_sell,
             )
             all_orders.append(order)
         for order in no_db_data["keep_orders"]:
-            order._calculate_exit_amounts(
+            order.calculate_exit_amounts(
                 controller=self,
                 executed_amounts={},
                 fees={},
@@ -213,31 +269,37 @@ class Controller(models.Model):
             all_orders.append(order)
 
         for batch in no_db_data["batches"]:
-            batch._set_status_post_process(receipt=receipt)
+            batch.set_status_post_process__no_db(receipt=receipt)
 
-        return all_orders
+        return all_orders, no_db_data["batches"]
 
-    def apply_orders(self, orders):
+    def apply_orders(self, orders: list[Order]) -> None:
         for order in orders:
             order.save()
             order.apply_swap()
 
-    def send_candles_to_bots(self, closed_candle, current_candle) -> list:
+    def apply_batches(self, batches: list[OrderBatch]) -> None:
+        for batch in batches:
+            batch.save()
+
+    def prepare_candles(self, closed_candle: CandlePydantic, current_candle: CandlePydantic) -> DataType:
+        return {"candles": {self: {"current": current_candle, "latest": closed_candle}}, "extras": {}}
+
+    def send_candles_to_bots(self, closed_candle: CandlePydantic, current_candle: CandlePydantic) -> list[Order]:
         """Scan all bots (that are allowed to trade) and get their orders.
 
         Args:
         ----
-        closed_candle (dict): The candle that just closed.
-        current_candle (dict): The candle that is currently open.
+        closed_candle : The candle that just closed.
+        current_candle : The candle that is currently open.
 
         Returns:
         -------
         list: A list of orders.
         """
         orders = []
-        for bot in self.bots.all().filter(is_simulation=False, fleet__running=True, can_trade=True):
-            bot = bot.find()
-            orders.append(bot.give_order(closed_candle, current_candle))
+        for bot in self.single_pair_bots:
+            orders = [*orders, *bot.get_orders(data=self.prepare_candles(closed_candle, current_candle))[0]]
         return orders
 
     @staticmethod
@@ -252,13 +314,12 @@ class Controller(models.Model):
 
         return float(controller.get_price())
 
-    def _get_price(self) -> float:
+    def get_price_always(self) -> float:
         """Get the price of the pair.
 
         Always calls the exchange API. (Can be costly)
 
-        Returns
-        -------
+        Returns:
         float: The price of the pair.
         """
         exchange_controller = self.exchange_controller
@@ -267,37 +328,37 @@ class Controller(models.Model):
                 self.price = float(exchange_controller.client.get_ticker(symbol=self.pair)["lastPrice"])
                 self.last_price_update = datetime.now(tz=timezone.utc)
             except ReadTimeout:
-                print("ReadTimeout in _get_price")
+                print("ReadTimeout in get_price_always")
             except SSLError:
-                print("SSLError in _get_price")
+                print("SSLError in get_price_always")
             except ConnectionError:
-                print("ConnectionError in _get_price")
-            except Exception as e:
-                print(f"Exception in _get_price: {e}, {type(e)}")
+                print("ConnectionError in get_price_always")
         else:
             error_msg = f"Exchange controller not supported: {exchange_controller.__class__}"
             raise NotImplementedError(error_msg)
         self.save()
+        return self.price
 
     def get_price(self) -> float:
         """Retreive the price of the pair.
 
         Only updates the price if it is older than 1 minute.
+        The ControllerUpdate task automaticaly refreshes price data.
 
-        Returns
-        -------
-        float: The price of the pair.
+        Returns:
+            price: The price of the pair.
         """
         if self.last_price_update is None or self.last_price_update < datetime.now(tz=timezone.utc) - timedelta(minutes=1):
-            self._get_price()
+            self.get_price_always()
         return self.price
 
     def download(
         self,
         start_date: datetime,
         end_date: datetime,
-        squash: bool = False,
         verbose: int = 0,
+        *,
+        squash: bool = False,
     ):
         return self.exchange_controller.download(
             controller=self,
@@ -306,5 +367,3 @@ class Controller(models.Model):
             squash=squash,
             verbose=verbose,
         )
-
-        return f"CANDLE {self.pk}"

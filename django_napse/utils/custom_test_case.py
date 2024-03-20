@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from django_napse.core.models import EXCHANGE_ACCOUNT_DICT, NapseSpace
+from django_napse.core.models import EXCHANGE_ACCOUNT_DICT, Space
 from django_napse.core.settings import napse_settings
 
 
@@ -31,6 +31,6 @@ class CustomTestCase(TestCase):
     @property
     def space(self):
         try:
-            return NapseSpace.objects.get(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
-        except NapseSpace.DoesNotExist:
-            return NapseSpace.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
+            return Space.objects.get(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")
+        except Space.DoesNotExist:
+            return Space.objects.create(name="Test Space", exchange_account=self.exchange_account, description="This is a test space")

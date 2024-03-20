@@ -1,17 +1,48 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from django.db import models
 
 from django_napse.core.models.bots.managers.strategy import StrategyManager
 from django_napse.utils.findable_class import FindableClass
 
+if TYPE_CHECKING:
+    from django_napse.core.models.bots.architecture import Architecture
+    from django_napse.core.models.bots.config import BotConfig
+    from django_napse.core.models.connections.connection import Connection
+
 
 class Strategy(models.Model, FindableClass):
-    config = models.OneToOneField("BotConfig", on_delete=models.CASCADE, related_name="strategy")
-    architecture = models.OneToOneField("Architecture", on_delete=models.CASCADE, related_name="strategy")
+    """Define the bot's buying and selling logic."""
 
-    objects = StrategyManager()
+    config: BotConfig = models.ForeignKey("BotConfig", on_delete=models.CASCADE, related_name="strategy")
+    architecture: Architecture = models.OneToOneField("Architecture", on_delete=models.CASCADE, related_name="strategy")
+
+    objects: StrategyManager = StrategyManager()
 
     def __str__(self) -> str:  # pragma: no cover
         return f"STRATEGY {self.pk}"
+
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
+        string = ""
+        string += f"{beacon}Strategy {self.pk}:\n"
+        string += f"{beacon}Args:\n"
+        string += f"{beacon}\t{self.config=}\n"
+        string += f"{beacon}\t{self.architecture=}\n"
+
+        if verbose:
+            print(string)
+        return string
 
     def give_order(self, data: dict) -> list[dict]:
         if self.__class__ == Strategy:
@@ -21,7 +52,8 @@ class Strategy(models.Model, FindableClass):
         raise NotImplementedError(error_msg)
 
     @classmethod
-    def plugin_classes(cls):
+    def plugin_classes(cls) -> list:
+        """Return the list of all strategy's plugins."""
         return []
 
     @classmethod
@@ -41,11 +73,13 @@ class Strategy(models.Model, FindableClass):
         raise NotImplementedError(error_msg)
 
     @classmethod
-    def architecture_class(cls):
+    def architecture_class(cls) -> Architecture:
+        """Return the class of the associated architecture."""
         return cls._meta.get_field("architecture").related_model
 
     @property
-    def variables(self):
+    def variables(self) -> dict[str, any]:
+        """Return variables of a strategy."""
         self = self.find(self.pk)
         variables = {}
         for variable in self._meta.get_fields():
@@ -53,10 +87,11 @@ class Strategy(models.Model, FindableClass):
                 variables[variable.name[8:]] = getattr(self, variable.name)
         return variables
 
-    def connect(self, connection):
+    def connect(self, connection: Connection) -> None:
         return
 
-    def copy(self):
+    def copy(self) -> Strategy:
+        """Return a copy of the Strategy."""
         return self.find().__class__.objects.create(
             config=self.config.find().duplicate_immutable(),
             architecture=self.architecture.find().copy(),

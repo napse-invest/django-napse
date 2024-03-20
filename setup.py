@@ -26,6 +26,7 @@ setup(
         "redis>=5.0",
         "python-binance>=1",
         "pandas>=2",
+        "pydantic>=2.6",
     ],
     classifiers=[
         "Development Status :: 4 - Beta",  # "3 - Alpha", "4 - Beta" or "5 - Production/Stable"

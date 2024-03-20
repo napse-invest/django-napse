@@ -1,25 +1,22 @@
 from django_napse.core.models import Controller
-from django_napse.core.tasks.base_tasks import BaseTask
+from django_napse.core.tasks.base_task import BaseTask
 
 
 class ControllerUpdateTask(BaseTask):
+    """Task to update all controllers."""
+
     name = "controller_update"
-    interval_time = 45
+    interval_time = 15
     time_limit = 60
     soft_time_limit = 60
+    color = "\x1b[34;20m"
 
-    def run(self):
+    def _run(self) -> None:
         """Run a task to update all controllers."""
-        print("ControllerUpdateTask")
-        if not self.avoid_overlap(verbose=True):
-            print("skipped")
-            return
         for controller in Controller.objects.all():
-            controller._update_variables()
-            controller._get_price()
+            controller.update_variables_always()
+            controller.get_price_always()
 
 
 ControllerUpdateTask().delete_task()
 ControllerUpdateTask().register_task()
-
-print("ControllerUpdateTask registered")

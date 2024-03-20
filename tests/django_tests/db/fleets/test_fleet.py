@@ -1,8 +1,8 @@
-from django_napse.core.models import Bot, Controller, Credit, EmptyBotConfig, EmptyStrategy, Fleet, NapseSpace, SinglePairArchitecture
+from django_napse.core.models import Bot, Controller, Credit, EmptyBotConfig, EmptyStrategy, Fleet, SinglePairArchitecture, Space
 from django_napse.utils.model_test_case import ModelTestCase
 
 """
-python tests/test_app/manage.py test tests.django_tests.fleets.test_fleet -v2 --keepdb --parallel
+python tests/test_app/manage.py test tests.django_tests.db.fleets.test_fleet -v2 --keepdb --parallel
 """
 
 
@@ -59,7 +59,7 @@ class FleetTestCase:
     def _two_spaces_on_same_fleet(self):
         fleet = self.simple_create()
 
-        space = NapseSpace.objects.create(name="Random Space", exchange_account=self.exchange_account, description="This is a test space")
+        space = Space.objects.create(name="Random Space", exchange_account=self.exchange_account, description="This is a test space")
         Credit.objects.create(wallet=space.wallet, amount=2000, ticker="USDT")
         fleet.invest(space, 1000, "USDT")
 

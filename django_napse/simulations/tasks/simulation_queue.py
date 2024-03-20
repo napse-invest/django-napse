@@ -4,18 +4,20 @@ from django_napse.utils.errors import SimulationError
 
 
 class SimulationQueueTask(BaseTask):
+    """Task to process SimulationQueues."""
+
     name = "simulation_queue"
     interval_time = 5
     time_limit = 60 * 60
     soft_time_limit = 60 * 60
 
-    def run(self):
-        """Run TASK.
+    def _run(self) -> None:
+        """Run a task to process all SimulationQueues.
 
-        Process all pending Sims one by one.
+        Raises:
+            e: If the SimulationQueue gebe
+            SimulationError.BotSimQueueError: _description_
         """
-        if not self.avoid_overlap(verbose=True):
-            return
         queue = SimulationQueue.objects.filter(error=False).order_by("created_at").first()
 
         if queue is None:
@@ -26,15 +28,15 @@ class SimulationQueueTask(BaseTask):
             queue.run_quicksim()
             queue = SimulationQueue.objects.get(simulation_reference=queue.simulation_reference)
         except SimulationError.CancelledSimulationError:
-            print("BotSimQueueTask: cancelled")
+            self.info("BotSimQueueTask: cancelled")
             queue.delete()
             return
         except Exception as e:
-            print("BotSimQueueTask: error")
-            print(str(e))
+            error = f"BotSimQueueTask: error {e}"
+            self.error(error)
             queue.error = True
             queue.save()
-            raise e
+            raise e from None
 
         if queue.is_finished():
             print("BotSimQueueTask: finished")
@@ -45,4 +47,4 @@ class SimulationQueueTask(BaseTask):
 
 
 SimulationQueueTask().delete_task()
-SimulationQueueTask().register_task()
+# SimulationQueueTask().register_task()

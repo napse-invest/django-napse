@@ -1,7 +1,7 @@
 from django.db.utils import IntegrityError
 from django.test import TestCase
 
-from django_napse.core.models import Currency, SpaceWallet, Wallet
+from django_napse.core.models import Currency, CurrencyPydantic, SpaceWallet, Wallet, WalletPydantic
 from django_napse.utils.errors import WalletError
 from django_napse.utils.model_test_case import ModelTestCase
 
@@ -117,13 +117,16 @@ class BaseWalletTestCase:
         Currency.objects.create(wallet=wallet, ticker="USDT", amount=1, mbp=1)
         self.assertEqual(
             wallet.to_dict(),
-            {
-                "title": "Wallet for space Test Space",
-                "testing": True,
-                "locked": False,
-                "created_at": wallet.created_at,
-                "currencies": {"BTC": {"amount": 1.0, "mbp": 20000.0}, "USDT": {"amount": 1.0, "mbp": 1.0}},
-            },
+            WalletPydantic(
+                title="Wallet for space Test Space",
+                testing=True,
+                locked=False,
+                created_at=wallet.created_at,
+                currencies={
+                    "BTC": CurrencyPydantic(ticker="BTC", amount=1.0, mbp=20000.0),
+                    "USDT": CurrencyPydantic(ticker="USDT", amount=1.0, mbp=1.0),
+                },
+            ),
         )
 
 
@@ -141,18 +144,18 @@ class SpaceWalletTestCase(BaseWalletTestCase):
         wallet = self.simple_create()
         self.assertEqual(wallet.space, self.owner)
 
-    def test_value_market_BTC(self):
+    def test_value_market_BTC(self):  # noqa: N802
         Currency.objects.create(wallet=self.space.wallet, ticker="BTC", amount=1, mbp=20000)
-        self.assertTrue(self.space.wallet.value_market() > 0)
+        self.assertTrue(self.space.wallet.value() > 0)
 
-    def test_value_market_USDT(self):
+    def test_value_market_USDT(self):  # noqa: N802
         Currency.objects.create(wallet=self.space.wallet, ticker="USDT", amount=1, mbp=1)
-        self.assertEqual(self.space.wallet.value_market(), 1)
+        self.assertEqual(self.space.wallet.value(), 1)
 
     def test_value_zero(self):
         Currency.objects.create(wallet=self.space.wallet, ticker="BTC", amount=0, mbp=1)
         Currency.objects.create(wallet=self.space.wallet, ticker="USDT", amount=0, mbp=1)
-        self.assertEqual(self.space.wallet.value_market(), 0)
+        self.assertEqual(self.space.wallet.value(), 0)
 
 
 class SpaceWalletBINANCETestCase(SpaceWalletTestCase, ModelTestCase):

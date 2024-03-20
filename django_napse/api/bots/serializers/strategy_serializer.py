@@ -6,9 +6,11 @@ from django_napse.core.models.bots.strategy import Strategy
 
 
 class StrategySerializer(serializers.ModelSerializer):
+    """Serialize a Strategy instance."""
+
     config = ConfigSerializer()
     architecture = ArchitectureSerializer()
 
-    class Meta:
+    class Meta:  # noqa: D106
         model = Strategy
         fields = "__all__"
