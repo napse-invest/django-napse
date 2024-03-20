@@ -49,6 +49,8 @@ make setup
 make up
 ```
 
+Now server runs on `http://localhost:8000/`. See the documentation for further details.
+
 ### Documentation
 
 You can find the documentation [here](https://napse-invest.github.io/django-napse/).
