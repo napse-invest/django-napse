@@ -7,16 +7,18 @@
 </div>
 
 <br>
-
 <p align="center">
+  <a>
+    <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/napse-investment/40fac957532fe3b731c99067467de842/raw/napse-developer-toolkit-coverage.json" alt="Coverage" />
+  </a>
+  <a>  
+    <img src="https://img.shields.io/github/v/release/napse-invest/napse-developer-toolkit" alt="Release" />
+  </a>
   <a href="https://twitter.com/NapseInvest">
     <img src="https://img.shields.io/twitter/follow/NapseInvest?style=flat&label=%40NapseInvest&logo=twitter&color=0bf&logoColor=fff" alt="Twitter" />
   </a>
-  <a>
-    <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/napse-investment/40fac957532fe3b731c99067467de842/raw/django-napse-coverage.json" alt="Coverage" />
-  </a>
   <a>  
-    <img src="https://img.shields.io/github/v/release/napse-invest/django-napse" alt="Release" />
+    <img src="https://img.shields.io/discord/996867961157591081?style=flat&logo=discord&label=Napse%20Invest&link=https%3A%2F%2Fdiscord.gg%2FZkzc2V5KXB" alt="Discord" />
   </a>
 </p>
 
@@ -30,7 +32,7 @@
 ## django-napse
 
 Django napse is a portfolio management module using trading bots.
-This directory can be used as a django module, which you can install as follows:
+This directory can be used as a Django module, which you can install as follows:
 
 ```bash
 pip install django-napse
