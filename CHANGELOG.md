@@ -1,3 +1,13 @@
+## [1.13.8](https://github.com/napse-invest/django-napse/compare/v1.13.7...v1.13.8) (2024-03-20)
+
+
+### Bug Fixes
+
+* **celery:** tasks now run correctly (if I'm not mistaken) ([4d56fa2](https://github.com/napse-invest/django-napse/commit/4d56fa2788a16c548f8068d4f0d133681bb249e8))
+* **fleet:** fix bad currency serialization in fleet's serializer ([414e3ed](https://github.com/napse-invest/django-napse/commit/414e3edd4c63e1b7d119c9c5c23c6aa85fe9caa7))
+* **history:** optimize delta query ([2e5264a](https://github.com/napse-invest/django-napse/commit/2e5264a03cbbe09de771cc6b3e75578d42d6f824))
+* **value:** remove value_market usage ([f3d9004](https://github.com/napse-invest/django-napse/commit/f3d90045245d10e39b677f4b1404014acc4bd0e6))
+
 ## [1.13.7](https://github.com/napse-invest/django-napse/compare/v1.13.6...v1.13.7) (2024-03-14)
 
 
