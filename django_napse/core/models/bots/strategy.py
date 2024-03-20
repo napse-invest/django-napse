@@ -1,24 +1,39 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from django.db import models
 
 from django_napse.core.models.bots.managers.strategy import StrategyManager
 from django_napse.utils.findable_class import FindableClass
 
+if TYPE_CHECKING:
+    from django_napse.core.models.bots.architecture import Architecture
+    from django_napse.core.models.bots.config import BotConfig
+    from django_napse.core.models.connections.connection import Connection
+
 
 class Strategy(models.Model, FindableClass):
     """Define the bot's buying and selling logic."""
 
-    config = models.OneToOneField("BotConfig", on_delete=models.CASCADE, related_name="strategy")
-    architecture = models.OneToOneField("Architecture", on_delete=models.CASCADE, related_name="strategy")
+    config: BotConfig = models.ForeignKey("BotConfig", on_delete=models.CASCADE, related_name="strategy")
+    architecture: Architecture = models.OneToOneField("Architecture", on_delete=models.CASCADE, related_name="strategy")
 
-    objects = StrategyManager()
+    objects: StrategyManager = StrategyManager()
 
     def __str__(self) -> str:  # pragma: no cover
         return f"STRATEGY {self.pk}"
 
-    def info(self, verbose: bool = True, beacon: str = "") -> str:  # noqa: FBT001, FBT002
-        """Return info on the Strategy."""
+    def info(self, beacon: str = "", *, verbose: bool = True) -> str:
+        """Return a string with the model information.
+
+        Args:
+            beacon (str, optional): The prefix for each line. Defaults to "".
+            verbose (bool, optional): Whether to print the string. Defaults to True.
+
+        Returns:
+            str: The string with the history information.
+        """
         string = ""
         string += f"{beacon}Strategy {self.pk}:\n"
         string += f"{beacon}Args:\n"
@@ -29,7 +44,7 @@ class Strategy(models.Model, FindableClass):
             print(string)
         return string
 
-    def give_order(self, data: dict) -> list[dict]:  # noqa
+    def give_order(self, data: dict) -> list[dict]:
         if self.__class__ == Strategy:
             error_msg = "give_order not implemented for the Strategy base class, please implement it in a subclass."
         else:
@@ -42,7 +57,7 @@ class Strategy(models.Model, FindableClass):
         return []
 
     @classmethod
-    def achitecture_class(cls):  # noqa
+    def achitecture_class(cls):
         if cls == Strategy:
             error_msg = "achitecture_class not implemented for the Strategy base class, please implement it in a subclass."
         else:
@@ -50,7 +65,7 @@ class Strategy(models.Model, FindableClass):
         raise NotImplementedError(error_msg)
 
     @classmethod
-    def config_class(cls):  # noqa
+    def config_class(cls):
         if cls == Strategy:
             error_msg = "config_class not implemented for the Strategy base class, please implement it in a subclass."
         else:
@@ -58,7 +73,7 @@ class Strategy(models.Model, FindableClass):
         raise NotImplementedError(error_msg)
 
     @classmethod
-    def architecture_class(cls) -> "Architecture":  # noqa: F821
+    def architecture_class(cls) -> Architecture:
         """Return the class of the associated architecture."""
         return cls._meta.get_field("architecture").related_model
 
@@ -72,7 +87,7 @@ class Strategy(models.Model, FindableClass):
                 variables[variable.name[8:]] = getattr(self, variable.name)
         return variables
 
-    def connect(self, connection):  # noqa
+    def connect(self, connection: Connection) -> None:
         return
 
     def copy(self) -> Strategy:

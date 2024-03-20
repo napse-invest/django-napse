@@ -68,18 +68,13 @@ class History(FindableClass, models.Model):
     def delta(self, days: int = 30) -> float:
         """Return the value delta between today and {days} days ago."""
         date = datetime.now(tz=get_default_timezone()) - timedelta(days=days)
-        data_points = self.data_points.filter(created_at__date=date.date())
+        data_points = self.data_points.filter(created_at__date__gt=date.date()).orderby("created_at")
+        if not data_points.exists():
+            return 0
 
-        while not data_points.exists():
-            days -= 1
-            date = date + timedelta(days=days)
-            data_points = self.data_points.filter(created_at__date=date.date())
-            if days == 0 and not data_points.exists():
-                return 0
-            if data_points.exists():
-                break
-
-        return data_points
+        old_value = data_points.last().value
+        recent_value = data_points.first().value
+        return (old_value - recent_value) / old_value
 
     def generate_data_point(self) -> "HistoryDataPoint":
         """Create a new data point.

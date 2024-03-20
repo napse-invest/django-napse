@@ -14,15 +14,15 @@ class Command(BaseCommand):  # noqa
     def handle(self, *args, **options):  # noqa
         exchange_account = ExchangeAccount.objects.first()
         space = Space.objects.first()
-        config = DCABotConfig.objects.create(space=space, settings={"timeframe": timedelta(hours=1)})
+        config = DCABotConfig.objects.create(space=space, settings={"timeframe": timedelta(minutes=1)})
         controller = Controller.get(
             exchange_account=exchange_account,
-            base="BTC",
+            base="ETH",
             quote="USDT",
-            interval="15m",
+            interval="1m",
         )
         architecture = SinglePairArchitecture.objects.create(constants={"controller": controller})
         strategy = DCAStrategy.objects.create(config=config, architecture=architecture)
-        Bot.objects.create(name="Test Bot", strategy=strategy)
+        Bot.objects.create(name="Test Bot ETH/BTC", strategy=strategy)
 
-        self.stdout.write(self.style.SUCCESS("DCABot have been created successfully!"))
+        self.stdout.write(self.style.SUCCESS("DCABot has been created successfully!"))

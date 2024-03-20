@@ -1,17 +1,29 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Optional
+
 from django.db import models
 
 from django_napse.utils.errors import BotConfigError
 
+if TYPE_CHECKING:
+    from django_napse.core.models.accounts.space import Space
+    from django_napse.core.models.bots.config import BotConfig
+
 
 class BotConfigManager(models.Manager):
+    """Manager for BotConfig model."""
+
     def create(
         self,
-        space,
+        space: Space,
+        settings: Optional[dict[str, str]] = None,
+        *,
         immutable: bool = False,
-        settings=None,
-    ):
+    ) -> BotConfig:
+        """Create a new BotConfig."""
         settings = settings or {}
-        for setting in self.model._meta.get_fields():
+        for setting in self.model._meta.get_fields():  # noqa: SLF001
             if setting.name.startswith("setting_"):
                 try:
                     settings[setting.name[8:]]
