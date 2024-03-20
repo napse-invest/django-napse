@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/napse-investment/40fac957532fe3b731c99067467de842/raw/napse-developer-toolkit-coverage.json" alt="Coverage" />
   </a>
   <a>  
-    <img src="https://img.shields.io/github/v/release/napse-invest/napse-developer-toolkit" alt="Release" />
+    <img src="https://img.shields.io/github/v/release/napse-invest/django-napse" alt="Release" />
   </a>
   <a href="https://twitter.com/NapseInvest">
     <img src="https://img.shields.io/twitter/follow/NapseInvest?style=flat&label=%40NapseInvest&logo=twitter&color=0bf&logoColor=fff" alt="Twitter" />
