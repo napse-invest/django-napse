@@ -9,7 +9,7 @@ django-extensions==3.2.3            # https://github.com/django-extensions/djang
 django-debug-toolbar==4.3.0         # https://github.com/jazzband/django-debug-toolbar
 platformdirs==4.2.0                 # https://github.com/platformdirs/platformdirs
 ruff==0.3.3                         # https://github.com/astral-sh/ruff
-pre-commit==3.6.2                   # https://github.com/pre-commit/pre-commit
+pre-commit==3.7.0                   # https://github.com/pre-commit/pre-commit
 
 
 # Documentation
