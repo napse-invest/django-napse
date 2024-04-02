@@ -20,5 +20,5 @@ mkdocs-coverage==1.0.0              # https://github.com/pawamoy/mkdocs-coverage
 neoteroi-mkdocs==1.0.5              # https://github.com/Neoteroi/mkdocs-plugins
 drf-spectacular==0.27.1             # https://github.com/tfranzel/drf-spectacular
 mkdocstrings==0.24.1                # https://github.com/mkdocstrings/mkdocstrings
-mkdocstrings-python==1.9.0          # https://github.com/mkdocstrings/python
+mkdocstrings-python==1.9.1          # https://github.com/mkdocstrings/python
 
