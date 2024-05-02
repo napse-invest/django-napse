@@ -13,7 +13,7 @@ pre-commit==3.7.0                   # https://github.com/pre-commit/pre-commit
 
 
 # Documentation
-mkdocs-material==9.5.17             # https://github.com/squidfunk/mkdocs-material
+mkdocs-material==9.5.20             # https://github.com/squidfunk/mkdocs-material
 pygments==2.17.2                    # https://github.com/pygments/pygments
 mkdocs-plugin-inline-svg==0.1.0     # https://pypi.org/project/mkdocs-plugin-inline-svg
 mkdocs-coverage==1.0.0              # https://github.com/pawamoy/mkdocs-coverage
